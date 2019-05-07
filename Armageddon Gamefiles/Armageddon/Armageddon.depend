@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1556227693 source:c:\users\max wong\desktop\armageddon\main.cpp
+	<iostream>
+	<conio.h>
+	<math.h>
+	<cstdlib>
+	<windows.h>
+
