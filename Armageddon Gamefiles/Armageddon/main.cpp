@@ -193,4 +193,14 @@ int main()
     cout << "                                                        oMMm/" << endl;
     cout << "                                                         +yNs-" << endl;
 
+    cout << endl;
+    cout << "      __          ______" << endl;
+    cout << "     /  \\       |  __  |" << endl;
+    cout << "    / /\\ \\      | |__| |" << endl;
+    cout << "   / /__\\ \\     | |" << endl;
+    cout << "  /  ____  \\    | |" << endl;
+    cout << " / /      \\ \\   | |" << endl;
+    cout << "/_/        \\_\\  |_|" << endl;
+
+
 }
