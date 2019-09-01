@@ -4,15 +4,15 @@
 
 using namespace std;
 
-void getMapFile (char[][100]);
-void saveMapFile (std::string, char[][100], int);
-void readMapArray (char[][100]);
+void getMapFile (char[][99]);
+void saveMapFile (std::string, char[][99], int);
+void readMapArray (char[][99]);
 
 int main()
 {
-    char gameMap [200][100];
+    char gameMap [199][99];
 
-    gameRun = true;
+    bool gameRun = true;
 
     //Reset the map double array
     for(int i = 0; i < 100; i++)
@@ -26,20 +26,16 @@ int main()
     //Get map from text file
     getMapFile(gameMap);
 
+    readMapArray(gameMap);
 
 
-    while (gameRun)
-    {
-       /* if((GetKeyState('W') && 0x8000)
-        {
 
-        }*/
-    }
+
 
     return 0;
 }
 
-void getMapFile(char gameMap[][100])
+void getMapFile(char gameMap[][99])
 {
     std::string line;
     ifstream file_("MapFile.txt");
@@ -58,7 +54,7 @@ void getMapFile(char gameMap[][100])
     return;
 }
 
-void saveMapFile (std::string line, char gameMap [][100], int currentRow )
+void saveMapFile (std::string line, char gameMap [][99], int currentRow )
 {
        for(std::string::size_type i = 0; i < line.size(); ++i)
     {
@@ -68,7 +64,7 @@ void saveMapFile (std::string line, char gameMap [][100], int currentRow )
     return;
 }
 
-void readMapArray( char gameMap [][100] )
+void readMapArray( char gameMap [][99] )
 {
     //Read out the map double array
     for(int i = 0; i < 100; i++)
