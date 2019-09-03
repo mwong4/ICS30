@@ -75,6 +75,7 @@ int main()
         //Ask for a input from the player
         cout << ">- Please enter a direct command. Below are the primary listed commands." << endl;
         cout << "create a new base -> /spawn" << endl;
+        cout << "to refresh -> /refresh" << endl;
         cin >> inputCommand;
 
         //If player enters /spawn, create a base
@@ -83,8 +84,15 @@ int main()
             placeBase(gameMap, hConsole);
 
         }
+        //To refresh
+        if(inputCommand == "/refresh")
+        {
+            system("CLS");
+            readMapArray(gameMap, hConsole);
+
+        }
         //Otherwise, print an error message
-        else if(inputCommand != "/spawn")
+        else if(inputCommand != "/spawn" && inputCommand != "/refresh" )
         {
             SetConsoleTextAttribute(hConsole, 12);
             cout << endl << "==================================================" << endl;
@@ -211,7 +219,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
         inputCommand = " ";
         cin >> inputCommand;
 
-        if(inputCommand == "/up" || inputCommand == "/UP" || inputCommand == "/U" || inputCommand == "/u")
+        if(inputCommand == "/up" || inputCommand == "/u")
         {
             if((current_y - 1) < 5 )
             {
@@ -230,7 +238,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
             }
         }
 
-        if(inputCommand == "/down" || inputCommand == "/DOWN" || inputCommand == "/D" || inputCommand == "/d")
+        if(inputCommand == "/down" || inputCommand == "/d")
         {
             if((current_y + 1) > 45 )
             {
@@ -249,7 +257,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
             }
         }
 
-        if(inputCommand == "/left" || inputCommand == "/LEFT" || inputCommand == "/L" || inputCommand == "/l")
+        if(inputCommand == "/left" || inputCommand == "/l")
         {
             if((current_x - 1) < 0 )
             {
@@ -268,7 +276,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
             }
         }
 
-        if(inputCommand == "/right" || inputCommand == "/RIGHT" || inputCommand == "/R" || inputCommand == "/r")
+        if(inputCommand == "/right" || inputCommand == "/r")
         {
             if((current_x + 1) > 199 )
             {
@@ -287,7 +295,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
             }
         }
 
-        if(inputCommand == "/input")
+        if(inputCommand == "/input" || inputCommand == "/i")
         {
             findingCoordinate = true;
 
@@ -327,7 +335,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                         cout << ">- Your coordinate is [" << saved_x << "," << saved_y << "]. Press /y to confirm." << endl;
                         cin >> inputCommand;
 
-                        if(inputCommand == "/y" || inputCommand == "/Y" || inputCommand == "/yes" || inputCommand == "/YES")
+                        if(inputCommand == "/y" || inputCommand == "/yes")
                         {
                             gameMap[current_x][current_y] = savedCharacter;
                             savedCharacter = gameMap[saved_x][saved_y];
@@ -355,21 +363,40 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
             }while(findingCoordinate);
         }
 
-        if(inputCommand == "/cancel" || inputCommand == "/CANCEL" || inputCommand == "/C" || inputCommand == "/c")
+        if(inputCommand == "/cancel" || inputCommand == "/c")
         {
             cout << endl << ">- You are Attempting to exit. Are you sure? Press /y to quit" << endl;
             cin >> inputCommand;
 
             system("CLS");
             readMapArray(gameMap, hConsole);
-            if(inputCommand == "/y" || inputCommand == "/Y" || inputCommand == "/yes" || inputCommand == "/YES")
+            if(inputCommand == "/y" || inputCommand == "/yes")
             {
+                //wipe the base symbol from the map array
+                gameMap[current_x][current_y] = savedCharacter;
+
+                //For some reason the base character is not being wiped so I have to refresh two times
+                system("CLS");
+                readMapArray(gameMap, hConsole);
+                return;
+            }
+        }
+
+        if(inputCommand == "/place" || inputCommand == "/p")
+        {
+            cout << endl << ">- Are you sure you want to place the base on [" << current_x << "," << current_y << "]? This action is not reversable. Press /y to confirm." << endl;
+            cin >> inputCommand;
+
+            if(inputCommand == "/y" || inputCommand == "/yes")
+            {
+                system("CLS");
+                readMapArray(gameMap, hConsole);
                 return;
             }
         }
 
         //If input is not valid, print an error message in red
-        else if(inputCommand != "/up" && inputCommand != "/UP" && inputCommand != "/U" && inputCommand != "/u" && inputCommand != "/down" && inputCommand != "/DOWN" && inputCommand != "/D" && inputCommand != "/d" && inputCommand != "/left" && inputCommand != "/LEFT" && inputCommand != "/L" && inputCommand != "/l" && inputCommand != "/cancel" && inputCommand != "/CANCEL" && inputCommand != "/C" && inputCommand != "/c" && inputCommand != "/input")
+        else if(inputCommand != "/up" && inputCommand != "/u" && inputCommand != "/down" && inputCommand != "/d" && inputCommand != "/left" && inputCommand != "/l" && inputCommand != "/cancel" && inputCommand != "/c" && inputCommand != "/input"  && inputCommand != "/i" && inputCommand != "/place" && inputCommand != "/p")
         {
             SetConsoleTextAttribute(hConsole, 12);
             cout << endl << "==================================================" << endl;
