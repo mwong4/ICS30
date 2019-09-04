@@ -26,6 +26,7 @@
 #include <sstream>
 #include <iomanip>
 #include <math.h>
+#include <conio.h>
 
 using namespace std;
 
@@ -34,6 +35,7 @@ void getMapFile (char[][55]); //This function is used to read a txt file line by
 void saveMapFile (std::string, char[][55], int); //This function is used to save the txt file into a double array
 void readMapArray (char[][55], HANDLE); //This function is used to print the map into the consol
 void placeBase(char[][55], HANDLE); //This function is used to select the location of a base
+void loadStartGame();
 
 bool stringChecker(string); //Function to check if an input is a float or integer
 
@@ -58,6 +60,8 @@ int main()
             gameMap[j][i] = ' ';
         }
     }
+
+    loadStartGame();
 
     //Get map from text file and save it
     getMapFile(gameMap);
@@ -432,5 +436,105 @@ bool stringChecker(string myString)
     {
         return false;
     }
+}
+
+void loadStartGame()
+{
+    //Defining the variables
+    string randInput = "";
+    string userID = "";
+    char ch;
+
+    //Fake server connection animation
+    system("color A");
+    for(int i = 0; i < 100; i+= 10 )
+    {
+        cout << ">- -UNSC User Management System-" << endl;
+        cout << "================================" << endl;
+        cout << "________________________________" << endl;
+        cout << "UNSC TacOS  v.337" <<  endl;
+        cout << "(S) 2294 FLEETCOM" << endl;
+        cout << "=======================" <<  endl;
+        cout << "|  User Log:" << endl;
+        cout << "|  >> Administrator (UNSC ID 8384-C)" << endl;
+        cout << "|  >>> " << "unknown.GUEST_userGroup" << endl;
+
+        cout << endl << endl << "connecting to [UNSC REACH] servers" << endl;
+        cout << "connecting";
+        if( (i % 3) == 1 )
+        {
+            cout << "." << endl;
+        }
+        else if ( (i % 3) == 2 )
+        {
+            cout << ".." << endl;
+        }
+        else if ( (i % 3) == 0 )
+        {
+            cout << "..." << endl;
+        }
+
+        cout << "Status: [" << i << "%]" << endl;
+        Sleep ( 1 );
+        system("CLS");
+    }
+
+    //When server is connected
+    cout << ">- -UNSC User Management System-" << endl;
+    cout << "================================" << endl;
+    cout << "________________________________" << endl;
+    cout << "UNSC TacOS  v.337" <<  endl;
+    cout << "(S) 2294 FLEETCOM" << endl;
+    cout << "=======================" <<  endl;
+    cout << "|  User Log:" << endl;
+    cout << "|  >> Administrator (UNSC ID 8384-C)" << endl;
+    cout << "|  >>> " << "unknown.GUEST_userGroup" << endl;
+    cout << endl << endl;
+
+    cout << ">- connecting to [UNSC REACH] servers" << endl;
+    cout << ">- connection established" << endl;
+    cout << ">- Status: [100%]" << endl;
+
+    cout << endl << ">- " << endl;
+    cout << ">- Authenticating" << endl;
+    cout << endl << ">- " << endl;
+    cout << ">- UNSC.ID detected" << endl;
+    cout << ">- NAVCOM.ID undetected" << endl;
+    cout << ">- FLEETCOM.ID undetected" << endl;
+    cout << ">- ONI.ID detected" << endl;
+    cout << endl;
+
+    cout << "________________________________" << endl;
+    cout << "================================" << endl;
+    cout << "[AUTHENTICATION COMPLETE]" << endl;
+    cout << ">- Please enter your pin and ID" << endl << endl;
+    getch();
+
+    cout << ">- ID: ";
+    cin >> userID;
+    cout << ">- PIN: ";
+
+    //Fake username and password system. Converts all letters into *'s
+    ch = _getch();
+    while(ch != 13)
+    {
+        randInput.push_back(ch);
+        cout << '*';
+        ch = _getch();
+    }
+    cout << endl;
+    if(randInput == "cheats.activate")
+    {
+        cout << ">- \Admin hacks activated." << endl;
+        cout << ">- Welcome " << userID << endl;
+    }
+    else
+    {
+        cout << ">- \Acess Granted." << endl;
+        cout << ">- Welcome " << userID << endl;
+    }
+    cout << endl << "    [Press any key to continue]" << endl;
+
+    getch();
 }
 
