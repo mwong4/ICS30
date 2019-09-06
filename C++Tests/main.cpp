@@ -6,18 +6,11 @@
 // a Dev-C++ tested console application by  vegaseat  07nov2004
 #include <iostream>
 #include <windows.h>   // WinApi header
+
 using namespace std;    // std::cout, std::cin
 int main()
 {
-  HANDLE  hConsole;
-
-  hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    SetConsoleTextAttribute(hConsole, 10);
-    cout << "Hellow World" << endl;
-
-    SetConsoleTextAttribute(hConsole, 12);
-    cout << "Hellow World" << endl;
+        Sleep( 1000 );
 
   return 0;
 }

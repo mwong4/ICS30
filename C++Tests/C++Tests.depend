@@ -1,5 +1,6 @@
 # depslib dependency file v1.0
-1567349395 source:c:\users\maxwong\documents\github\ics30\c++tests\main.cpp
+1567719733 source:c:\users\maxwong\documents\github\ics30\c++tests\main.cpp
 	<iostream>
 	<windows.h>
+	<cstdlib>
 
