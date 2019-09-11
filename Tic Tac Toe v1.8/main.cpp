@@ -4,7 +4,7 @@
 >- Updated: Sep 10, 2019
 >- Purpose: To write a tic tac toe game and learn the basics to design in ASCII
 >-
->- [version 0.0.7]
+>- [version 0.0.8]
 >- Thanks to Vedaant Srivastava for the error trapping system and play-testing
 >-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
@@ -93,13 +93,14 @@ int main()
 
                 if(matchPlaying)
                 {
-                    if(playerOneTurn)
-                    {
                         choosingSpot = true;
                         aiAttemptCount = 0;
+
                         //Get player's input
                         while(choosingSpot){
-                            cout << ">- Player X's Turn" << endl;
+                            if(playerOneTurn) cout << ">- Player X's Turn" << endl;
+                            else cout << ">- Player O's Turn" << endl;
+
                             cout << ">- Please select a number to choose your column" << endl;
                             cout << "[1] [2] [3]" << endl;
                             cin >> inputCommand;
@@ -120,9 +121,17 @@ int main()
                                     {
                                         //If yes, set player spot
                                         itemsDone += 1;
-                                        gameBoard[playerInputX - 1][playerInputY - 1] = 'X';
-                                        choosingSpot = false;
-                                        playerOneTurn = false;
+                                        if(playerOneTurn)
+                                        {
+                                            gameBoard[playerInputX - 1][playerInputY - 1] = 'X';
+                                            playerOneTurn = false;
+                                        }
+                                        else
+                                        {
+                                            gameBoard[playerInputX - 1][playerInputY - 1] = 'O';
+                                            playerOneTurn = true;
+                                            choosingSpot = false;
+                                        }
                                     }
                                     else
                                     {
@@ -132,54 +141,8 @@ int main()
                                     }
                                 }
                             }
-                        }
-                    }
-                    else
-                    {
-                        choosingSpot = true;
-                        while(choosingSpot){
 
-                            if(!playingWithAI)
-                            {
-                                //Get player's input
-                                //Hrizontal input
-                                cout << ">- Player O's Turn" << endl;
-                                cout << ">- Please select a number to choose your column" << endl;
-                                cout << "[1] [2] [3]" << endl;
-                                cin >> inputCommand;
-
-                                //Error trapping
-                                if(stringChecker(inputCommand) && (inputCommand == "1" || inputCommand == "2" || inputCommand == "3"))
-                                {
-                                    playerInputY = ::atof(inputCommand.c_str());
-                                    //Vertical input
-                                    cout << ">- Please select a number to choose your row" << endl;
-                                    cout << "[1]" << endl << "[2]" << endl << "[3]" << endl;
-                                    cin >> inputCommand;
-                                    //Error trapping
-                                    if(stringChecker(inputCommand) && (inputCommand == "1" || inputCommand == "2" || inputCommand == "3"))
-                                    {
-                                        playerInputX = ::atof(inputCommand.c_str());
-                                        //Check if spot is available
-                                        if(gameBoard[playerInputX - 1][playerInputY - 1] != 'O' && gameBoard[playerInputX - 1][playerInputY - 1] != 'X' )
-                                        {
-                                            //If yes, place marker down
-                                            itemsDone += 1;
-                                            gameBoard[playerInputX - 1][playerInputY - 1] = 'O';
-                                            choosingSpot = false;
-                                            playerOneTurn = true;
-
-                                        }
-                                        else
-                                        {
-                                            //Otherwise, print error message
-                                            cout << ">- That place is already taken" << endl << endl;
-                                        }
-                                    }
-                                }
-                            }
-                            //Playing with AI
-                            else if(playingWithAI)
+                            if(playingWithAI)
                             {
                                 //Show indication of loading progress
                                 cout << ">- AI Calculating..." << endl;
@@ -201,7 +164,6 @@ int main()
                             }
                         }
                     }
-                }
                 system("CLS");
 
             }while(matchPlaying);

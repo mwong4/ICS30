@@ -10,7 +10,18 @@
 using namespace std;    // std::cout, std::cin
 int main()
 {
-        Sleep( 1000 );
+
+
+int d = 1;
+float result = 0;
+
+result = (d * 100)/300;
+
+cout << result << endl;
+
+cout << 1/3 << endl;
+
+
 
   return 0;
 }
