@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1568243076 source:c:\users\maxwong\documents\github\ics30\storefront activity\main.cpp
+	<iostream>
+	<conio.h>
+	<stdlib.h>
+	<sstream>
+	<iomanip>
+	<math.h>
+	<string>
+	<dos.h>
+	<windows.h>
+	<fstream>
+

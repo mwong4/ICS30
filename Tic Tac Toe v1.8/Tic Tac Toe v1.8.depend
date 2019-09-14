@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1568130510 source:c:\users\maxwong\documents\github\ics30\tic tac toe v1.8\main.cpp
+	<iostream>
+	<stdlib.h>
+	<sstream>
+	<iomanip>
+	<math.h>
+	<string>
+	<conio.h>
+	<cstdlib>
+	<dos.h>
+	<windows.h>
+
