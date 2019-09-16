@@ -1,3 +1,10 @@
+/*
+>- Author: Max Wong
+>- Date: Sep 12, 2019
+>- Updated: Sep 16, 2019
+>- Purpose: write a Storefront simulator
+*/
+
 #include <iostream>
 #include <conio.h>
 
@@ -77,7 +84,7 @@ int main()
         }
         else cout << ">- ERROR, please enter a proper command" << endl;
 
-        if(isPaying)
+        while(isPaying)
         {
             system("CLS");
             cout << ">- Here is your reciept" << endl;
@@ -145,9 +152,13 @@ int main()
                 isPurchasing = false;
                 isPaying = false;
             }
-            if(inputValue == "/b")
+            else if(inputValue == "/b")
             {
                 isPaying = false;
+            }
+            else
+            {
+                cout << endl << ">- Please enter a valid response" << endl;
             }
         }
     }

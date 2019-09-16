@@ -1,8 +1,8 @@
 /*
 >- Author: Max Wong
->- Date: Sep 13, 2019
->- Updated: Sep 13, 2019
->- Purpose: write a Fahrenheit-Celsius converter
+>- Date: Sep 16, 2019
+>- Updated: Sep 16, 2019
+>- Purpose: write a Fahrenheit-Celsius converter with MORE!
 */
 
 //Defining libraries
@@ -15,6 +15,8 @@
 #include <iomanip>
 #include <math.h>
 #include <string>
+
+#include <windows.h>   // WinApi header
 
 using namespace std;
 
@@ -29,13 +31,20 @@ int main()
     bool enteringNumber = false; //This boolean ensures that error trapping will loop you back
     bool enableNumSystem = false; //TO allow a different GUI setup
 
+    HANDLE hConsole;
+    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
+
+
     while(inputCommand != "/q" )
     {
         //Get player to choose which conversion to use
         cout << ">- Hello, please choose /c or /f to convert to Celsius or Fahrenheit" << endl;
 
         //Different GUI choice
-        if(enableNumSystem) cout << endl << ">- Type (1) for Fahrenheit -> Celsius" << endl << ">- Type (2) for Celsius -> Fahrenheit" << endl;
+        if(enableNumSystem)
+        {
+            cout << endl << ">- Type (1) for Fahrenheit -> Celsius" << endl << ">- Type (2) for Celsius -> Fahrenheit" << endl;
+        }
 
         cout << ">- Type /u to change UI settings and /q to quit" << endl;
         cin >> inputCommand;
@@ -62,14 +71,16 @@ int main()
                 }
                 else
                 {
+                    SetConsoleTextAttribute(hConsole, 12);
                     //Print Error message
                     cout << ">- Error, please enter a decimal value" << endl;
+                    SetConsoleTextAttribute(hConsole, 15);
                 }
             }
         }
 
         //If player wants to fonvert to Fahrenheit
-        if(inputCommand == "/f" || inputCommand == "2")
+        else if(inputCommand == "/f" || inputCommand == "2")
         {
             enteringNumber = true;
             while(enteringNumber){
@@ -90,8 +101,10 @@ int main()
                 }
                 else
                 {
+                    SetConsoleTextAttribute(hConsole, 12);
                     //Print Error message
                     cout << ">- Error, please enter a decimal value" << endl;
+                    SetConsoleTextAttribute(hConsole, 15);
                 }
             }
         }
@@ -101,8 +114,10 @@ int main()
         }
         else if(inputCommand != "/c" && inputCommand != "/f" && inputCommand != "/q" && inputCommand != "/u")
         {
+            SetConsoleTextAttribute(hConsole, 12);
             //Print Error message
             cout << ">- Error, please input a valid response" << endl;
+            SetConsoleTextAttribute(hConsole, 15);
         }
 
         //Get input before continuing
