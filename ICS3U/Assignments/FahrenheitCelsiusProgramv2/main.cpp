@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 16, 2019
->- Updated: Sep 16, 2019
+>- Updated: Sep 17, 2019
 >- Purpose: write a Fahrenheit-Celsius converter with MORE!
 */
 
@@ -19,9 +19,6 @@
 #include <windows.h>   // WinApi header
 
 using namespace std;
-
-//Function used for error trapping
-bool stringChecker(string);
 
 int main()
 {
@@ -56,25 +53,26 @@ int main()
             while(enteringNumber){
                 //Get player input
                 cout << endl << ">- Please enter your degrees in Fahrenheit" << endl;
-                cin >> inputCommand;
+                cin >> savedFloat;
 
                 //Call function to check if value is a float or int
-                if(stringChecker(inputCommand))
+                if(cin.fail())
                 {
-                    //Convert input string to float value
-                    savedFloat =::atof(inputCommand.c_str());
+                    cin.clear();
+                    cout << ">- [Press Any Key to Continue]" << endl;
+                    cin.ignore(9);
 
-                    //Now convert and output
-                    cout << "In Celsius: " << ((savedFloat - 32) * 5)/9 << endl;
-                    enteringNumber = false;
-                    inputCommand = "/c";
-                }
-                else
-                {
                     SetConsoleTextAttribute(hConsole, 12);
                     //Print Error message
                     cout << ">- Error, please enter a decimal value" << endl;
                     SetConsoleTextAttribute(hConsole, 15);
+                }
+                else
+                {
+                    //Now convert and output
+                    cout << "In Celsius: " << ((savedFloat - 32) * 5)/9 << endl;
+                    enteringNumber = false;
+                    inputCommand = "/c";
                 }
             }
         }
@@ -85,26 +83,27 @@ int main()
             enteringNumber = true;
             while(enteringNumber){
                 cout << endl << ">- Please enter your degrees in Celsius" << endl;
-                cin >> inputCommand;
+                cin >> savedFloat;
 
                 //Call function to check if value is a float or int
-                if(stringChecker(inputCommand))
+                if(cin.fail())
                 {
-                    //Convert input string to float value
-                    savedFloat =::atof(inputCommand.c_str());
+                    cin.clear();
+                    cout << ">- [Press Any Key to Continue]" << endl;
+                    cin.ignore(9); //Clear errors
 
+                    SetConsoleTextAttribute(hConsole, 12);
+                    //Print Error message
+                    cout << ">- Error, please enter a decimal value" << endl;
+                    SetConsoleTextAttribute(hConsole, 15);
+                }
+                else
+                {
                     //Now convert and output
                     cout << "In Farenheit: " << (savedFloat * 9)/5 + 32 << endl;
                     cout << endl << ">- Also, why would you ever want to use inferior Imperial system?" << endl;
                     inputCommand = "/f";
                     enteringNumber = false;
-                }
-                else
-                {
-                    SetConsoleTextAttribute(hConsole, 12);
-                    //Print Error message
-                    cout << ">- Error, please enter a decimal value" << endl;
-                    SetConsoleTextAttribute(hConsole, 15);
                 }
             }
         }
@@ -126,28 +125,4 @@ int main()
         system("CLS");
     }
     return 0;
-}
-
-//Function used to check if input string is a float
-//Credit to Vedaant for this function
-bool stringChecker(string myString)
-{
-    long double flMyString;
-    ostringstream conversion;
-
-    //Checks the string using built in iostream library
-    stringstream(myString) >> flMyString;
-    conversion << setprecision(9) << flMyString;
-
-    string convFlMyString = conversion.str();
-
-    //If initial string does not match corrected string, string is not a float
-    if (convFlMyString == myString)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
 }
