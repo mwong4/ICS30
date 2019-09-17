@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1568732732 source:c:\users\maxwong\documents\github\ics30\fahrenheitcelsiusprogramv3\main.cpp
+	<iostream>
+	<conio.h>
+	<stdlib.h>
+	<sstream>
+	<iomanip>
+	<math.h>
+	<string>
+	<windows.h>
+
