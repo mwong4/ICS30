@@ -235,7 +235,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                 }
             }
 
-            if((GetKeyState('S') & 0x8000) || (GetKeyState(VK_DOWN) & 0x8000))
+            else if((GetKeyState('S') & 0x8000) || (GetKeyState(VK_DOWN) & 0x8000))
             {
                 if((current_y + 1) > 45 )
                 {
@@ -257,7 +257,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                 }
             }
 
-            if((GetKeyState('A') & 0x8000) || (GetKeyState(VK_LEFT) & 0x8000))
+            else if((GetKeyState('A') & 0x8000) || (GetKeyState(VK_LEFT) & 0x8000))
             {
                 if((current_x - 1) < 0 )
                 {
@@ -279,7 +279,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                 }
             }
 
-            if((GetKeyState('D') & 0x8000) || (GetKeyState(VK_RIGHT) & 0x8000))
+            else if((GetKeyState('D') & 0x8000) || (GetKeyState(VK_RIGHT) & 0x8000))
             {
                 if((current_x + 1) > 199 )
                 {
@@ -301,7 +301,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                 }
             }
 
-            if((GetKeyState(VK_ESCAPE) & 0x8000))
+            else if((GetKeyState(VK_ESCAPE) & 0x8000))
             {
                 inputCommand = "escape";
             }
@@ -321,7 +321,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                     inputCommand = "";
                 }
 
-                if(stringChecker(inputCommand))
+                else if(stringChecker(inputCommand))
                 {
                     saved_x = round(::atof(inputCommand.c_str()));
 
@@ -336,7 +336,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                         findingCoordinate = false;
                         inputCommand = "";
                     }
-                    if( stringChecker(inputCommand))
+                    else if( stringChecker(inputCommand))
                     {
                         saved_y = round(::atof(inputCommand.c_str()));
 
@@ -374,7 +374,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
             }while(findingCoordinate);
         }
 
-        if(inputCommand == "/cancel" || inputCommand == "/c")
+        else if(inputCommand == "/cancel" || inputCommand == "/c")
         {
             cout << endl << ">- You are Attempting to exit. Are you sure? Press /y to quit" << endl;
             cin >> inputCommand;
@@ -393,7 +393,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
             }
         }
 
-        if(inputCommand == "/p" || inputCommand == "/place")
+        else if(inputCommand == "/p" || inputCommand == "/place")
         {
             cout << endl << ">- Are you sure you want to place the base on [" << current_x << "," << current_y << "]? This action is not reversable. Press /y to confirm." << endl;
             cin >> inputCommand;
