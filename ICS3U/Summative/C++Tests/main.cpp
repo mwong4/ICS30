@@ -6,22 +6,22 @@
 // a Dev-C++ tested console application by  vegaseat  07nov2004
 #include <iostream>
 #include <windows.h>   // WinApi header
+#include <dos.h>
 
 using namespace std;    // std::cout, std::cin
 int main()
 {
+cout << "hello world" << endl;
+while (true)
+{
+    if(GetKeyState('A') & 0x8000/*Check if high-order bit is set (1 << 15)*/)
+    {
+        cout << "pressed a" << endl;
+        Sleep( 100 );
+    }
 
 
-int d = 1;
-float result = 0;
-
-result = (d * 100)/300;
-
-cout << result << endl;
-
-cout << 1/3 << endl;
-
-
+}
 
   return 0;
 }

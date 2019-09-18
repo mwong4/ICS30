@@ -1,19 +1,21 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Sep 2, 2019
+>- Updated: Sep 18, 2019
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 0.0.2]
+>- [version 1.0.2]
 >- Thanks to Vedaant Srivastava for the error trapping system and play-testing
->-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >-
 >- [TO DO]
 >- commenting
 >- cleaning
+>- Structures
+>- Arrow Key/Letter movement
+>- Error trapping
 >-
 */
 
@@ -62,7 +64,6 @@ int main()
     }
 
     loadStartGame();
-
     //Get map from text file and save it
     getMapFile(gameMap);
 
@@ -86,14 +87,12 @@ int main()
         if(inputCommand == "/spawn")
         {
             placeBase(gameMap, hConsole);
-
         }
         //To refresh
         if(inputCommand == "/refresh")
         {
             system("CLS");
             readMapArray(gameMap, hConsole);
-
         }
         //Otherwise, print an error message
         else if(inputCommand != "/spawn" && inputCommand != "/refresh" )
@@ -103,10 +102,8 @@ int main()
             cout << ">- Please enter a valid input command"<< endl;
             cout << "==================================================" << endl << endl;
             SetConsoleTextAttribute(hConsole, 15);
-
         }
     }
-
     return 0;
 }
 
@@ -136,9 +133,8 @@ void getMapFile(char gameMap[][55])
 void saveMapFile (std::string line, char gameMap [][55], int currentRow)
 {
     //Running through every character
-       for(std::string::size_type i = 0; i < line.size(); ++i)
+    for(std::string::size_type i = 0; i < line.size(); ++i)
     {
-        //cout << line[i] << endl;
        gameMap[i][currentRow] = line[i];
     }
     return;
@@ -147,7 +143,6 @@ void saveMapFile (std::string line, char gameMap [][55], int currentRow)
 //simply runs through a for loop through each value of the array and prints them out to console
 void readMapArray(char gameMap [][55], HANDLE hConsole)
 {
-
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
     //Read out the map double array
@@ -173,9 +168,7 @@ void readMapArray(char gameMap [][55], HANDLE hConsole)
 //Function used to place a base anywhere on the map
 void placeBase(char gameMap[][55], HANDLE hConsole)
 {
-
     //Defining variables
-
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //allows the manipulation of the console
 
     bool choosingLocation = false; //boolean that is used to check if the player is still choosing a lcation
@@ -186,7 +179,6 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
 
     int current_x; //temporarily holds the x value
     int current_y; //temporarily holds the y value
-
     int saved_x; //Saves coordinate for the custom choice of coordinate feature
     int saved_y;
 
@@ -208,7 +200,6 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
 
     while(choosingLocation)
     {
-
         cout << ">- Please enter a direct command. Primary function commands are listed below" << endl;
 
         if(errorOccured == false)
@@ -303,7 +294,8 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
         {
             findingCoordinate = true;
 
-            do{
+            do
+            {
 
                 cout << endl << ">- Please enter your specific X-coordinate below. Press /cancel to exit" << endl;
                 cin >> inputCommand;
@@ -386,7 +378,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
             }
         }
 
-        if(inputCommand == "/place" || inputCommand == "/p")
+        if(inputCommand == "/p" || inputCommand == "/place")
         {
             cout << endl << ">- Are you sure you want to place the base on [" << current_x << "," << current_y << "]? This action is not reversable. Press /y to confirm." << endl;
             cin >> inputCommand;
@@ -398,7 +390,6 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                 return;
             }
         }
-
         //If input is not valid, print an error message in red
         else if(inputCommand != "/up" && inputCommand != "/u" && inputCommand != "/down" && inputCommand != "/d" && inputCommand != "/left" && inputCommand != "/l" && inputCommand != "/cancel" && inputCommand != "/c" && inputCommand != "/input"  && inputCommand != "/i" && inputCommand != "/place" && inputCommand != "/p")
         {
@@ -438,6 +429,7 @@ bool stringChecker(string myString)
     }
 }
 
+//Game start menu
 void loadStartGame()
 {
     //Defining the variables
@@ -447,37 +439,6 @@ void loadStartGame()
 
     //Fake server connection animation
     system("color A");
-    for(int i = 0; i < 100; i+= 10 )
-    {
-        cout << ">- -UNSC User Management System-" << endl;
-        cout << "================================" << endl;
-        cout << "________________________________" << endl;
-        cout << "UNSC TacOS  v.337" <<  endl;
-        cout << "(S) 2294 FLEETCOM" << endl;
-        cout << "=======================" <<  endl;
-        cout << "|  User Log:" << endl;
-        cout << "|  >> Administrator (UNSC ID 8384-C)" << endl;
-        cout << "|  >>> " << "unknown.GUEST_userGroup" << endl;
-
-        cout << endl << endl << "connecting to [UNSC REACH] servers" << endl;
-        cout << "connecting";
-        if( (i % 3) == 1 )
-        {
-            cout << "." << endl;
-        }
-        else if ( (i % 3) == 2 )
-        {
-            cout << ".." << endl;
-        }
-        else if ( (i % 3) == 0 )
-        {
-            cout << "..." << endl;
-        }
-
-        cout << "Status: [" << i << "%]" << endl;
-        Sleep ( 1 );
-        system("CLS");
-    }
 
     //When server is connected
     cout << ">- -UNSC User Management System-" << endl;
@@ -489,26 +450,11 @@ void loadStartGame()
     cout << "|  User Log:" << endl;
     cout << "|  >> Administrator (UNSC ID 8384-C)" << endl;
     cout << "|  >>> " << "unknown.GUEST_userGroup" << endl;
-    cout << endl << endl;
-
-    cout << ">- connecting to [UNSC REACH] servers" << endl;
-    cout << ">- connection established" << endl;
-    cout << ">- Status: [100%]" << endl;
-
-    cout << endl << ">- " << endl;
-    cout << ">- Authenticating" << endl;
-    cout << endl << ">- " << endl;
-    cout << ">- UNSC.ID detected" << endl;
-    cout << ">- NAVCOM.ID undetected" << endl;
-    cout << ">- FLEETCOM.ID undetected" << endl;
-    cout << ">- ONI.ID detected" << endl;
     cout << endl;
-
     cout << "________________________________" << endl;
-    cout << "================================" << endl;
-    cout << "[AUTHENTICATION COMPLETE]" << endl;
+    cout << "================================" << endl << endl;
+
     cout << ">- Please enter your pin and ID" << endl << endl;
-    getch();
 
     cout << ">- ID: ";
     cin >> userID;
@@ -534,7 +480,6 @@ void loadStartGame()
         cout << ">- Welcome " << userID << endl;
     }
     cout << endl << "    [Press any key to continue]" << endl;
-
     getch();
 }
 
