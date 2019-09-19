@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1568913076 source:c:\users\maxwong\documents\github\ics30\ics3u\assignments\multiplechoicequizv1\main.cpp
+	<iostream>
+	<conio.h>
+	<windows.h>
+
