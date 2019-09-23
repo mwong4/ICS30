@@ -11,7 +11,6 @@
 >-
 >-
 >- [TO DO]
->- commenting
 >- cleaning
 >- Structures
 >-
@@ -149,12 +148,14 @@ void readMapArray(char gameMap [][55], HANDLE hConsole)
         for(int j = 0; j < 199; j++)
         {
             if(gameMap[j][i] == '@')
+                //Everytime you encounter a @ sign, color it red
             {
                 SetConsoleTextAttribute(hConsole, 12);
                 cout << gameMap[j][i];
             }
             else
             {
+                //Otherwise, color it white
                 SetConsoleTextAttribute(hConsole, 15);
                 cout << gameMap[j][i];
             }
@@ -198,6 +199,7 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
 
     while(choosingLocation)
     {
+        //Print out what the player can do
         cout << ">- Please enter a direct command. Primary function commands are listed below" << endl;
         if(errorOccured == false)
         {
@@ -209,23 +211,25 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
         inputCommand = " ";
         cin >> inputCommand;
 
+        //If player inputs /k, activate keyboard mode
         if(inputCommand == "/k" || inputCommand == "/keyboard") cout << ">- Please use arrow keys or WASD" << endl;
 
         while(inputCommand == "/k" || inputCommand == "/keyboard")
         {
+            //If specific key is pressed:
             if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
             {
-                if((current_y - 1) < 5 )
+                if((current_y - 1) < 5 ) //Check to see if new position is legal
                 {
                     cout << ">- ERROR, item can not move there" << endl;
                     cout << ">- Directive: Please type a different command" << endl;
                 }
                 else
                 {
-                    gameMap[current_x][current_y] = savedCharacter;
-                    savedCharacter = gameMap[current_x][current_y - 1];
-                    gameMap[current_x][current_y - 1] = '@';
-                    current_y -= 1;
+                    gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
+                    savedCharacter = gameMap[current_x][current_y - 1]; //Save the character of the future value
+                    gameMap[current_x][current_y - 1] = '@'; //Replace the future spot with an @ symbol
+                    current_y -= 1; //Update current position
 
                     system("CLS");
                     readMapArray(gameMap, hConsole);
@@ -234,20 +238,20 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                     SetConsoleTextAttribute(hConsole, 15);
                 }
             }
-
+            //Else if specific key is pressed:
             else if((GetKeyState('S') & 0x8000) || (GetKeyState(VK_DOWN) & 0x8000))
             {
-                if((current_y + 1) > 45 )
+                if((current_y + 1) > 45 ) //Check to see if new position is legal
                 {
                     cout << ">- ERROR, item can not move there" << endl;
                     cout << ">- Directive: Please type a different command" << endl;
                 }
                 else
                 {
-                    gameMap[current_x][current_y] = savedCharacter;
-                    savedCharacter = gameMap[current_x][current_y + 1];
-                    gameMap[current_x][current_y + 1] = '@';
-                    current_y += 1;
+                    gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
+                    savedCharacter = gameMap[current_x][current_y + 1]; //Save the character of the future value
+                    gameMap[current_x][current_y + 1] = '@'; //Replace the future spot with an @ symbol
+                    current_y += 1; //Update current position
 
                     system("CLS");
                     readMapArray(gameMap, hConsole);
@@ -256,20 +260,20 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                     SetConsoleTextAttribute(hConsole, 15);
                 }
             }
-
+            //Else if specific key is pressed:
             else if((GetKeyState('A') & 0x8000) || (GetKeyState(VK_LEFT) & 0x8000))
             {
-                if((current_x - 1) < 0 )
+                if((current_x - 1) < 0 ) //Check to see if new position is legal
                 {
                     cout << ">- ERROR, item can not move there" << endl;
                     cout << ">- Directive: Please type a different command" << endl;
                 }
                 else
                 {
-                    gameMap[current_x][current_y] = savedCharacter;
-                    savedCharacter = gameMap[current_x - 1][current_y];
-                    gameMap[current_x - 1][current_y] = '@';
-                    current_x -= 1;
+                    gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
+                    savedCharacter = gameMap[current_x - 1][current_y]; //Save the character of the future value
+                    gameMap[current_x - 1][current_y] = '@'; //Replace the future spot with an @ symbol
+                    current_x -= 1; //Update current position
 
                     system("CLS");
                     readMapArray(gameMap, hConsole);
@@ -278,20 +282,20 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                     SetConsoleTextAttribute(hConsole, 15);
                 }
             }
-
+            //Else if specific key is pressed:
             else if((GetKeyState('D') & 0x8000) || (GetKeyState(VK_RIGHT) & 0x8000))
             {
-                if((current_x + 1) > 199 )
+                if((current_x + 1) > 199 ) //Check to see if new position is legal
                 {
                     cout << "ERROR, item can not move there" << endl;
                     cout << "Directive: Please type a different command" << endl;
                 }
                 else
                 {
-                    gameMap[current_x][current_y] = savedCharacter;
-                    savedCharacter = gameMap[current_x + 1][current_y];
-                    gameMap[current_x + 1][current_y] = '@';
-                    current_x += 1;
+                    gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
+                    savedCharacter = gameMap[current_x + 1][current_y]; //Save the character of the future value
+                    gameMap[current_x + 1][current_y] = '@'; //Replace the future spot with an @ symbol
+                    current_x += 1; //Update current position
 
                     system("CLS");
                     readMapArray(gameMap, hConsole);
@@ -300,58 +304,58 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
                     SetConsoleTextAttribute(hConsole, 15);
                 }
             }
-
+            //Else if escape is pressed, exit
             else if((GetKeyState(VK_ESCAPE) & 0x8000))
             {
                 inputCommand = "escape";
             }
         }
-
+        //If player chooses to input a custom input:
         if(inputCommand == "/input" || inputCommand == "/i")
         {
             findingCoordinate = true;
             do
             {
                 cout << endl << ">- Please enter your specific X-coordinate below. Press /cancel to exit" << endl;
-                cin >> inputCommand;
+                cin >> inputCommand; //get the specific x input
 
-                if(inputCommand == "/cancel")
+                if(inputCommand == "/cancel") //If they choose to exit, exit
                 {
                     findingCoordinate = false;
                     inputCommand = "";
                 }
 
-                else if(stringChecker(inputCommand))
+                else if(stringChecker(inputCommand)) //Check to see if input is valid
                 {
-                    saved_x = round(::atof(inputCommand.c_str()));
+                    saved_x = round(::atof(inputCommand.c_str())); //If yes convert to int
 
-                    if(saved_x > 198) saved_x = 198;
+                    if(saved_x > 198) saved_x = 198; //Check to see if new position is legal. If no, set to default value
                     if(saved_x <  3) saved_x = 3;
 
                     cout << endl << ">- Please enter your specific Y-coordinate below. Press /cancel to exit" << endl;
-                    cin >> inputCommand;
+                    cin >> inputCommand; //Get input for specific y-input
 
                     if(inputCommand == "/cancel")
                     {
-                        findingCoordinate = false;
+                        findingCoordinate = false; //If player chooses to exit, exit
                         inputCommand = "";
                     }
-                    else if( stringChecker(inputCommand))
+                    else if( stringChecker(inputCommand)) //Otherwise check to see if input in an integer
                     {
-                        saved_y = round(::atof(inputCommand.c_str()));
+                        saved_y = round(::atof(inputCommand.c_str())); //If yes, convert to integer
 
-                        if(saved_y > 44) saved_y = 44;
+                        if(saved_y > 44) saved_y = 44; //If input is not legal, set to default values
                         if(saved_y <  3) saved_y = 3;
 
                         cout << ">- Your coordinate is [" << saved_x << "," << saved_y << "]. Press /y to confirm." << endl;
-                        cin >> inputCommand;
+                        cin >> inputCommand; //Get player confirmation for their input
 
-                        if(inputCommand == "/y" || inputCommand == "/yes")
+                        if(inputCommand == "/y" || inputCommand == "/yes") //If they answer yes, repeat process done above in keyboard mode
                         {
-                            gameMap[current_x][current_y] = savedCharacter;
-                            savedCharacter = gameMap[saved_x][saved_y];
-                            gameMap[saved_x][saved_y] = '@';
-                            current_x = saved_x;
+                            gameMap[current_x][current_y] = savedCharacter; //place saved character back
+                            savedCharacter = gameMap[saved_x][saved_y]; //save new position character
+                            gameMap[saved_x][saved_y] = '@'; //Replace new position on map with @ sign
+                            current_x = saved_x; //Save current position as the new values
                             current_y = saved_y;
 
                             system("CLS");
