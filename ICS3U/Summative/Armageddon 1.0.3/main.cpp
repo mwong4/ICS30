@@ -1,14 +1,13 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Sep 18, 2019
+>- Updated: Sep 23, 2019
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.0.3]
+>- [version 1.0.4]
 >- Thanks to Vedaant Srivastava for the error trapping system and play-testing
 >-Thanks to Thomas Maloley for teaching me how to program with C++
->-
 >-
 >- [TO DO]
 >- cleaning
@@ -423,7 +422,6 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
 
     }
 }
-
 //Function used to check if input string is a float
 //Credit to Vedaant for this function
 bool stringChecker(string myString)

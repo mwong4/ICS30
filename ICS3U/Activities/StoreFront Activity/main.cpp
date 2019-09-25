@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 12, 2019
->- Updated: Sep 16, 2019
+>- Updated: Sep 23, 2019
 >- Purpose: write a Storefront simulator
 */
 
@@ -30,6 +30,7 @@ struct shoppingList
     string creditCardNumber;
     int purchaseCounter = 0;
     int itemsPurchased[20];
+    float itemPrices[10];
 };
 
 void printStock();
@@ -51,6 +52,7 @@ int main()
     char ch;
 
     for(int i = 0; i < 20; i++) userInformation.itemsPurchased[i] = 0;
+    //for(int i = 0; i < 10; i++) userInformation.itemPrices = ((rand() % 1000 + 1) / 100);
 
     cout << ">- Welcome to the S.A.W (Super Animal World) Store." << endl;
 
