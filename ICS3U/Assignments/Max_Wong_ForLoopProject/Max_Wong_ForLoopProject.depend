@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1569450270 source:c:\users\maxwong\documents\github\ics30\ics3u\max_wong_forloopproject\main.cpp
+	<iostream>
+	<limits>
+	<conio.h>
+
