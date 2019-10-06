@@ -1,13 +1,11 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 25, 2019
->- Updated: Sep 25, 2019
+>- Updated: Sep 27, 2019
 >- Purpose: To write a number guessing game using a for loop
 >-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
->- [TO DO]
->- Describe the loop
 */
 
 //Declaring used libraries
@@ -35,24 +33,30 @@ int main()
         targetNumber = rand() % 101; //Assign the target a random value
         cout << ">- For debugging: The target number: " << targetNumber << endl << endl; //Print out the answer for debugging
 
+        //The loop will run for i times
         for(int i = 10; i > 0; i--)
         {
+            //Display UI elements
             cout << ">- Current score: [" << scoreCounter << "]" << endl;
             cout << ">- Number of guesses left: [" << i << "]" << endl << endl;
 
+            //Get the player's input
             guessedNumber = getAnswer();
             cout << endl;
 
+            //If the guessed number is the right number, reward # of points = to the remaining turns
             if(guessedNumber == targetNumber)
             {
                 cout << ">- Yay! You got it! You won "<< i << " points!" << endl;
                 scoreCounter += i;
                 i = 0;
             }
+            //Otherwise, if the player has not run out of turns yet, display this message
             else if(i != 1)
             {
                 cout << endl << ">- Oh, so close! Guess again!" << endl;
             }
+            //Otherwise, when player has run out of turns, display this message
             else
             {
                 cout << endl << ">- Sorry you ran out of guesses!" << endl;
@@ -62,6 +66,13 @@ int main()
             getChar();
             system("CLS");
         }
+
+        /*
+            === Loop Description ===
+            This loop will loop 10 times, each time asking for the player's input. If the players input is correct, reward players #
+            of points equivalent to the remaining turns and end the loop. Otherwise if the player still has turns, give some feedback and loop.
+            If the player runs out of turns, return feedback before exiting the loop.
+        */
 
         //Ask player if they want to play again. If yes, play again
         cout << ">- Yay, you scored: " << scoreCounter << " points" << endl;
@@ -107,7 +118,7 @@ int getAnswer ()
         //Else if player input is not between 1 to 3, pritn error message
         else if( playerInput < 0 || playerInput > 100)
         {
-            cout << endl << ">- [Error], please enter an value between 1 and 3!" << endl;
+            cout << endl << ">- [Error], please enter an value between 1 and 100!" << endl;
 
             findingInput = true; //If the input is invalid, then the loop will loop
         }
