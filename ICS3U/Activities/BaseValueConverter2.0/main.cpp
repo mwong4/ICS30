@@ -8,9 +8,7 @@
 >-
 
 TODO
-
 Error trapping
-any to any
 Up to hexadeciaml
 */
 
@@ -27,22 +25,19 @@ using namespace std;
 
 //Declre all function prototypes
 int toBaseTen(int, float);
-string fromBaseTen(float, float);
+void fromBaseTen(float, float);
 
 int main()
 {
     float targetNumber = 0; //This is the number being converted;
     float baseNumber = 0; //This value is your base value
     float secondBase = 0; //The intended ending base number
-    int tempInt = 0;
-
-    int inputNumber;
-    string tempString;
+    int tempInt = 0; //A temporary variable that stores an integer
 
     cout << ">- Please select a number between 3" << endl << ">- 1) Any base to Decimal" << endl << ">- 2) Decimal to any base" << endl << ">- 3) Any base to any base" << endl;
-    cin >> inputNumber;
+    cin >> targetNumber;
 
-    if(inputNumber == 1)
+    if(targetNumber == 1)
     {
         //Get player input
         cout << ">- Hello, please enter your /any/ base value" << endl;
@@ -50,16 +45,18 @@ int main()
 
         cout << ">- Now, define your base" << endl;
         cin >> baseNumber;
-        inputNumber = toBaseTen(tempInt, baseNumber);
+        tempInt  = toBaseTen(tempInt, baseNumber);
+
+        cout << "Answer: " << tempInt << endl; //Output answer
     }
-    else if(inputNumber == 2)
+    else if(targetNumber == 2)
     {
         cout << ">- Hello, please enter your base 10 value" << endl;
         cin >> targetNumber;
 
         cout << ">- Now, define your base" << endl;
         cin >> baseNumber;
-        tempString = fromBaseTen(targetNumber, baseNumber);
+        fromBaseTen(targetNumber, baseNumber);
     }
     else
     {
@@ -72,9 +69,8 @@ int main()
         cout << ">- Now, define your ending base" << endl;
         cin >> secondBase;
 
-        inputNumber = toBaseTen(targetNumber, baseNumber);
-        tempInt = inputNumber;
-        tempString = fromBaseTen(tempInt, secondBase);
+        tempInt = toBaseTen(targetNumber, baseNumber);
+        fromBaseTen(tempInt, secondBase);
     }
 
     return 0;
@@ -83,7 +79,7 @@ int main()
 int toBaseTen(int tempInt, float baseNumber)
 {
     float targetNumber = 0; //A number that acts as the number to be converted
-    float answerNumber = 0;
+    int answerNumber = 0;
 
     //Run for loop 100000 times
     for(int i = 0; i < 100000; i ++)
@@ -98,13 +94,10 @@ int toBaseTen(int tempInt, float baseNumber)
             i = 100001;
         }
     }
-    //Output answer
-    cout << "Answer: " << answerNumber << endl;
-
     return answerNumber;
 }
 
-string fromBaseTen(float targetNumber, float baseNumber)
+void fromBaseTen(float targetNumber, float baseNumber)
 {
     int tempInt = 0; //A temporary integer to convert to base greater than 9
     string answerString = ""; //This string saves your answer
@@ -112,7 +105,6 @@ string fromBaseTen(float targetNumber, float baseNumber)
     do
     {
         tempInt = (((targetNumber/baseNumber) - floor(targetNumber/baseNumber))*baseNumber);
-        //answerNumber += (((targetNumber/baseNumber) - floor(targetNumber/baseNumber))*baseNumber) *pow(10, counter);
 
         switch(tempInt)
         {
@@ -146,6 +138,4 @@ string fromBaseTen(float targetNumber, float baseNumber)
     answerString.insert(0, to_string(tempInt));
 
     cout << "Final answer: " << answerString << endl;
-
-    return answerString;
 }
