@@ -8,8 +8,10 @@
 >-
 
 TODO
-Error trapping
+Looping
 Up to hexadeciaml
+Commenting
+any to any bug (off by 1)
 */
 
 //Defining Libraries
@@ -19,6 +21,7 @@ Up to hexadeciaml
 
 #include <string.h>
 #include <stdio.h> //For converting string to array
+#include<limits> //For error trapping
 
 //Defining namespace
 using namespace std;
@@ -26,6 +29,7 @@ using namespace std;
 //Declre all function prototypes
 int toBaseTen(int, float);
 void fromBaseTen(float, float);
+int getAnswer(); //Function used to get the players response as an integer (with error trapping)
 
 int main()
 {
@@ -34,17 +38,18 @@ int main()
     float secondBase = 0; //The intended ending base number
     int tempInt = 0; //A temporary variable that stores an integer
 
-    cout << ">- Please select a number between 3" << endl << ">- 1) Any base to Decimal" << endl << ">- 2) Decimal to any base" << endl << ">- 3) Any base to any base" << endl;
-    cin >> targetNumber;
+    cout << ">- Please select a number between 3" << endl << ">- 1) Any base to Decimal" << endl << ">- 2) Decimal to any base" << endl << ">- 3) Any base to any base" << endl << endl;
+    targetNumber = getAnswer();
 
     if(targetNumber == 1)
     {
         //Get player input
         cout << ">- Hello, please enter your /any/ base value" << endl;
-        cin >> tempInt;
+        tempInt = getAnswer();
 
         cout << ">- Now, define your base" << endl;
-        cin >> baseNumber;
+        baseNumber = getAnswer();
+
         tempInt  = toBaseTen(tempInt, baseNumber);
 
         cout << "Answer: " << tempInt << endl; //Output answer
@@ -52,22 +57,22 @@ int main()
     else if(targetNumber == 2)
     {
         cout << ">- Hello, please enter your base 10 value" << endl;
-        cin >> targetNumber;
+        targetNumber = getAnswer();
 
         cout << ">- Now, define your base" << endl;
-        cin >> baseNumber;
+        baseNumber = getAnswer();
         fromBaseTen(targetNumber, baseNumber);
     }
     else
     {
         cout << ">- Hello, please enter the number you want to convert" << endl;
-        cin >> targetNumber;
+        targetNumber = getAnswer();
 
         cout << ">- Now, define your starting base" << endl;
-        cin >> baseNumber;
+        baseNumber = getAnswer();
 
         cout << ">- Now, define your ending base" << endl;
-        cin >> secondBase;
+        secondBase = getAnswer();
 
         tempInt = toBaseTen(targetNumber, baseNumber);
         fromBaseTen(tempInt, secondBase);
@@ -138,4 +143,28 @@ void fromBaseTen(float targetNumber, float baseNumber)
     answerString.insert(0, to_string(tempInt));
 
     cout << "Final answer: " << answerString << endl;
+}
+
+//Get player input. Check to see if there is an error
+int getAnswer ()
+{
+    int playerInput; //This variable is used to get the player's input
+    bool findingInput; //This bool determines if the loop continues running
+
+    do
+    {
+        findingInput = false; //By default, the loop will end
+
+        cout << ">- Your input: "; //Get player input
+        cin >> playerInput;
+
+        if(cin.fail())//Check to see if player entered a "bad" input type
+        {
+            cin.clear(); //Clear all flags
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //ignore incorrect symbols
+            cout << endl << ">- [Error], please enter an integer value!" << endl;
+            findingInput = true; //If the input is invalid, then the loop will loop
+        }
+    }while(findingInput);
+    return playerInput;//Otherwise input is good, return input
 }
