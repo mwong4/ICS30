@@ -6,12 +6,8 @@
 >-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
-
-TODO
-Looping
-Up to hexadeciaml
-Commenting
-any to any bug (off by 1)
+>- TODO
+    //Up to hexadeciaml
 */
 
 //Defining Libraries
@@ -38,47 +34,64 @@ int main()
     float secondBase = 0; //The intended ending base number
     int tempInt = 0; //A temporary variable that stores an integer
 
-    cout << ">- Please select a number between 3" << endl << ">- 1) Any base to Decimal" << endl << ">- 2) Decimal to any base" << endl << ">- 3) Any base to any base" << endl << endl;
-    targetNumber = getAnswer();
-
-    if(targetNumber == 1)
+    do
     {
-        //Get player input
-        cout << ">- Hello, please enter your /any/ base value" << endl;
-        tempInt = getAnswer();
+        //Let player choose their operation
+        cout << ">- Please select a number between 3" << endl << ">- 1) Any base to Decimal" << endl << ">- 2) Decimal to any base" << endl << ">- 3) Any base to any base" << endl << ">- 4) To quit" << endl << endl;
+        targetNumber = getAnswer(); //Get input
 
-        cout << ">- Now, define your base" << endl;
-        baseNumber = getAnswer();
+        if(targetNumber == 1)
+        {
+            //Get player input for conversion value
+            cout << ">- Hello, please enter your /any/ base value" << endl;
+            tempInt = getAnswer();
+            //Get player input for base value
+            cout << ">- Now, define your base" << endl;
+            baseNumber = getAnswer();
+            //Convert the value to base 10
+            tempInt  = toBaseTen(tempInt, baseNumber);
 
-        tempInt  = toBaseTen(tempInt, baseNumber);
-
-        cout << "Answer: " << tempInt << endl; //Output answer
-    }
-    else if(targetNumber == 2)
-    {
-        cout << ">- Hello, please enter your base 10 value" << endl;
-        targetNumber = getAnswer();
-
-        cout << ">- Now, define your base" << endl;
-        baseNumber = getAnswer();
-        fromBaseTen(targetNumber, baseNumber);
-    }
-    else
-    {
-        cout << ">- Hello, please enter the number you want to convert" << endl;
-        targetNumber = getAnswer();
-
-        cout << ">- Now, define your starting base" << endl;
-        baseNumber = getAnswer();
-
-        cout << ">- Now, define your ending base" << endl;
-        secondBase = getAnswer();
-
-        tempInt = toBaseTen(targetNumber, baseNumber);
-        fromBaseTen(tempInt, secondBase);
-    }
-
-    return 0;
+            cout << "Answer: " << tempInt << endl; //Output answer
+        }
+        else if(targetNumber == 2)
+        {
+            //Get player input for base 10 value
+            cout << ">- Hello, please enter your base 10 value" << endl;
+            targetNumber = getAnswer();
+            //Get input for new base value
+            cout << ">- Now, define your base" << endl;
+            baseNumber = getAnswer();
+            //COnvert
+            fromBaseTen(targetNumber, baseNumber);
+            targetNumber = 0; //Reset variable to prevent premature quit
+        }
+        else if(targetNumber == 3)
+        {
+            //Get player input for value to be converted
+            cout << ">- Hello, please enter the number you want to convert" << endl;
+            targetNumber = getAnswer();
+            //Get input for original base
+            cout << ">- Now, define your starting base" << endl;
+            baseNumber = getAnswer();
+            //Get input for new base
+            cout << ">- Now, define your ending base" << endl;
+            secondBase = getAnswer();
+            //Convert value to base ten before converting from base 10 to new base
+            tempInt = toBaseTen(targetNumber, baseNumber);
+            fromBaseTen(tempInt, secondBase);
+            //Reset value to prevent premature quit
+            targetNumber = 0;
+        }
+        else
+        {
+            //Set value that breaks out of loop, ends program
+            cout << ">- Quitting..." << endl;
+            targetNumber = 20;
+        }
+        system("Pause"); //Get any input before clearing the console
+        system("CLS");
+    }while(targetNumber < 4);
+    return 0; //Quit
 }
 
 int toBaseTen(int tempInt, float baseNumber)
@@ -104,43 +117,45 @@ int toBaseTen(int tempInt, float baseNumber)
 
 void fromBaseTen(float targetNumber, float baseNumber)
 {
-    int tempInt = 0; //A temporary integer to convert to base greater than 9
+    float tempFloat = 0; //A temporary integer to convert to base greater than 9
     string answerString = ""; //This string saves your answer
 
     do
-    {
-        tempInt = (((targetNumber/baseNumber) - floor(targetNumber/baseNumber))*baseNumber);
+    {   //get the remainder and multiply it to the base
+        tempFloat = (((targetNumber/baseNumber) - floor(targetNumber/baseNumber))*baseNumber);
 
-        switch(tempInt)
-        {
-            case 10:
-                answerString.insert(0,"A");
-                break;
-            case 11:
-                answerString.insert(0,"B");
-                break;
-            case 12:
-                answerString.insert(0,"C");
-                break;
-            case 13:
-                answerString.insert(0,"D");
-                break;
-            case 14:
-                answerString.insert(0,"E");
-                break;
-            case 15:
-                answerString.insert(0,"F");
-                break;
-            default:
-                answerString.insert(0, to_string(tempInt));
-                break;
-        }
-
+        //If the found value is hexadecimal, convert it
+        if(tempFloat == 10)
+            { answerString.insert(0,"A");
+            }
+        else if(tempFloat == 11)
+            { answerString.insert(0,"B");
+            }
+        else if(tempFloat == 12)
+            { answerString.insert(0,"C");
+            }
+        else if(tempFloat == 13)
+            { answerString.insert(0,"D");
+            }
+        else if(tempFloat == 14)
+            { answerString.insert(0,"E");
+            }
+        else if(tempFloat == 15)
+            { answerString.insert(0,"F");
+            }
+        else if(tempFloat > 15)
+            { answerString.insert(0,"*");
+            }
+        else //Otherwise insert it into a string
+            { answerString.insert(0, to_string(tempFloat));
+            }
+        //Update the number to be converted
         targetNumber = floor(targetNumber/baseNumber);
     }while(targetNumber > (baseNumber-1));
 
-    tempInt = targetNumber;
-    answerString.insert(0, to_string(tempInt));
+    //in the end, convert the last remaining value and insert into string
+    tempFloat = targetNumber;
+    answerString.insert(0, to_string(llround(tempFloat)));
 
     cout << "Final answer: " << answerString << endl;
 }
