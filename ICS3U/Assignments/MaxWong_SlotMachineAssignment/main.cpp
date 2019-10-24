@@ -2,11 +2,9 @@
 >- Author: Max Wong
 >- Date: Sep 25, 2019
 >- Updated: Sep 27, 2019
->- Purpose: To write a number guessing game using a for loop
+>- Purpose: To write a slot machine simulator
 >-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
->-
->- [TO DO]
 */
 
 //Declare used libraries
@@ -19,16 +17,14 @@ using namespace std;
 //Delcaring structures
 struct PlayerData
 {
-    int payoutCountOne = 0; //These variables keep count of when the slot machines will give a payout
-    int payoutCountTwo = 0;
-    int payoutCountThree = 0;
-
+    int payoutCounter[3] = {0,0,0}; //These variables keep count of when the slot machines will give a payout
     int coinsCount; //This variable keeps track of remaining coins
     int currentPlays = 0; //This variable keeps track of how many tiems the player has played
 };
 
 //declaring functions
 int getAnswer(); //Function used to get the players response as an integer (with error trapping)
+PlayerData runSlotMachine(int, int, int, PlayerData); //This function acts as all three slot machines, being preset by each call for different settings
 
 int main()
 {
@@ -36,6 +32,7 @@ int main()
 
     do
     {
+        marthaData.currentPlays = 0;
         system("CLS"); //Whipe console
 
         cout << ">- Please enter how many quarters Martha has (between 0 and 1000 inclusively)" << endl;
@@ -43,49 +40,17 @@ int main()
 
         //Get slot machine input
         cout << endl << ">- Please enter the case situation for each slot machine" << endl << ">- Machine one: ";
-        marthaData.payoutCountOne = getAnswer();
+        marthaData.payoutCounter[0] = getAnswer(); //Call the function to get the first slot machine preset
         cout << ">- Machine 2: ";
-        marthaData.payoutCountTwo = getAnswer();
+        marthaData.payoutCounter[1] = getAnswer(); //Call the function to get the second slot machine preset
         cout << ">- Machine 3: ";
-        marthaData.payoutCountThree = getAnswer();
+        marthaData.payoutCounter[2] = getAnswer(); //Call the function to get the third slot machine preset
 
         while(marthaData.coinsCount > 0)
         {
-            if(marthaData.coinsCount > 0) //Check if player has coins. If yes, run section below
-            {
-                marthaData.payoutCountOne ++; //Martha has played once
-                if(marthaData.payoutCountOne == 35) //If the machine reaches 35 tries, payout 30 coins and reset payout counter
-                {
-                    marthaData.payoutCountOne = 0;
-                    marthaData.coinsCount += 30;
-                }
-                marthaData.coinsCount --; //Take one coin away for playing
-                marthaData.currentPlays ++; //The player has played once
-            }
-
-            if(marthaData.coinsCount > 0) //Check if player has coins. If yes, run section below
-            {
-                marthaData.payoutCountTwo ++; //Martha has played once
-                if(marthaData.payoutCountTwo == 100) //If the machine reaches 100 tries, payout 60 coins and reset payout counter
-                {
-                    marthaData.payoutCountTwo = 0;
-                    marthaData.coinsCount += 60;
-                }
-                marthaData.coinsCount --; //Take one coin away for playing
-                marthaData.currentPlays ++; //The player has played once
-            }
-
-            if(marthaData.coinsCount > 0) //Check if player has coins. If yes, run section below
-            {
-                marthaData.payoutCountThree ++; //Martha has played once
-                if(marthaData.payoutCountThree == 10) //If the machine reaches 10 tries, payout 9 coins and reset payout counter
-                {
-                    marthaData.payoutCountThree = 0;
-                    marthaData.coinsCount += 9;
-                }
-                marthaData.coinsCount --; //Take one coin away for playing
-                marthaData.currentPlays ++; //The player has played once
-            }
+            marthaData = runSlotMachine(0, 35, 30, marthaData); //Call the function to run machine 1
+            marthaData = runSlotMachine(1, 100, 60, marthaData); //Call function to run machine 2
+            marthaData = runSlotMachine(2, 10, 9, marthaData); //Call function to run machine 3
         }
         //Display how many tries martha has been able to try using the counter variable
         cout << endl << ">- Martha plays " << marthaData.currentPlays << " times" << endl;
@@ -126,4 +91,21 @@ int getAnswer ()
         }
     }while(findingInput);
     return playerInput;//Otherwise input is good, return input
+}
+
+//This function acts as all three slot machines, being preset by each call for different settings
+PlayerData runSlotMachine(int currentMachine, int payoutWhen, int payoutQuantity, PlayerData marthaData)
+{
+    if(marthaData.coinsCount > 0) //Check if player has coins. If yes, run section below
+    {
+        marthaData.payoutCounter[currentMachine] ++; //Martha has played once
+        if(marthaData.payoutCounter[currentMachine] == payoutWhen) //If the machine reaches 10 tries, payout 9 coins and reset payout counter
+        {
+            marthaData.payoutCounter[currentMachine] = 0;
+            marthaData.coinsCount += payoutQuantity;
+        }
+        marthaData.coinsCount --; //Take one coin away for playing
+        marthaData.currentPlays ++; //The player has played once
+    }
+    return marthaData;
 }

@@ -1,8 +1,8 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 17, 2019
->- Updated: Sep 17, 2019
->- Purpose: write a Fahrenheit-Celsius that has focus on using switch statements!
+>- Updated: Oct 24, 2019
+>- Purpose: write a Fahrenheit-Celsius that has focus on using functions and menus!
 */
 
 //Defining libraries
@@ -10,101 +10,46 @@
 #include <conio.h>
 
 //For error trapping
-#include <stdlib.h>
-#include <sstream>
-#include <iomanip>
-#include <math.h>
-#include <string>
-
+#include<limits>
 #include <windows.h>   // WinApi header
 
 using namespace std;
 
+float toCelsius(float);
+float toFahrenheit(float);
+float getAnswer(); //Function used to get the players response as an integer (with error trapping)
+
 int main()
 {
     //Defining the variables
-    int savedFloat = 0; //This float is the main variable used for conversion
-    bool enteringNumber = false; //This boolean ensures that error trapping will loop you back
+    int inputNumber = 0;
+    float savedTemp;
 
-    HANDLE hConsole;
-    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
-
-    while(savedFloat != 3 )
+    while(inputNumber != 3 )
     {
         cout << endl << ">- Type (1) for Fahrenheit -> Celsius" << endl << ">- Type (2) for Celsius -> Fahrenheit" << endl;
-        cout << ">- Type (3) to quit" << endl;
-        cin >> savedFloat;
+        cout << ">- Type (3+) to quit" << endl;
+        inputNumber = getAnswer();
 
-        switch (savedFloat)
+        if(inputNumber == 1)
         {
-            case 1:
-                enteringNumber = true;
-                while(enteringNumber)
-                {
-                    //Get player input
-                    cout << endl << ">- Please enter your degrees in Fahrenheit" << endl;
-                    cin >> savedFloat;
-
-                    //Call function to check if value is a float or int
-                    if(cin.fail())
-                    {
-                        cin.clear();
-                        cout << ">- [Press Any Key to Continue]" << endl;
-                        cin.ignore(9);
-
-                        SetConsoleTextAttribute(hConsole, 12);
-                        //Print Error message
-                        cout << ">- Error, please enter a whole number" << endl;
-                        SetConsoleTextAttribute(hConsole, 15);
-                    }
-                    else
-                    {
-                        //Now convert and output
-                        cout << "In Celsius: ~" << ((savedFloat - 32) * 5)/9 << endl;
-                        enteringNumber = false;
-                        savedFloat = 1;
-                    }
-                }
-                break;
-
-            case 2:
-                enteringNumber = true;
-                while(enteringNumber)
-                    {
-                    cout << endl << ">- Please enter your degrees in Celsius" << endl;
-                    cin >> savedFloat;
-
-                    //Call function to check if value is a float or int
-                    if(cin.fail())
-                    {
-                        cin.clear();
-                        cout << ">- [Press Any Key to Continue]" << endl;
-                        cin.ignore(9); //Clear errors
-
-                        SetConsoleTextAttribute(hConsole, 12);
-                        //Print Error message
-                        cout << ">- Error, please enter a whole number" << endl;
-                        SetConsoleTextAttribute(hConsole, 15);
-                    }
-                    else
-                    {
-                        //Now convert and output
-                        cout << "In Farenheit: ~" << (savedFloat * 9)/5 + 32 << endl;
-                        cout << endl << ">- Also, why would you ever want to use inferior Imperial system?" << endl;
-                        savedFloat = 2;
-                        enteringNumber = false;
-                    }
-                }
-                break;
-
-            default:
-                if(savedFloat > 3 && savedFloat <= 0)
-                {
-                    SetConsoleTextAttribute(hConsole, 12);
-                    //Print Error message
-                    cout << ">- Error, please input a valid response" << endl;
-                    SetConsoleTextAttribute(hConsole, 15);
-                }
+            //Get input
+            savedTemp = getAnswer();
+            savedTemp = toFahrenheit(savedTemp);
+            //Now convert and output
+            cout << "In Celsius: ~" << savedTemp << endl;
+        }
+        else if(inputNumber == 2)
+        {
+            //Get input
+            savedTemp = getAnswer();
+            savedTemp = toCelsius(savedTemp);
+            //Now convert and output
+            cout << "In Fahrenheit: ~" << savedTemp << endl;
+        }
+        else
+        {
+            inputNumber = 3;
         }
 
         //Get input before continuing
@@ -113,4 +58,38 @@ int main()
         system("CLS");
     }
     return 0;
+}
+
+float toCelsius(float originalTempature)
+{
+    return (originalTempature * 9.0)/5.0 + 32.0;
+}
+
+float toFahrenheit(float originalTempature)
+{
+    return ((originalTempature - 32.0) * 5.0)/9.0;
+}
+
+//Get player input. Check to see if there is an error
+float getAnswer ()
+{
+    float playerInput; //This variable is used to get the player's input
+    bool findingInput; //This bool determines if the loop continues running
+
+    do
+    {
+        findingInput = false; //By default, the loop will end
+
+        cout << ">- Your input: "; //Get player input
+        cin >> playerInput;
+
+        if(cin.fail())//Check to see if player entered a "bad" input type
+        {
+            cin.clear(); //Clear all flags
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //ignore incorrect symbols
+            cout << endl << ">- [Error], please enter a number value!" << endl;
+            findingInput = true; //If the input is invalid, then the loop will loop
+        }
+    }while(findingInput);
+    return playerInput;//Otherwise input is good, return input
 }

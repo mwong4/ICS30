@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: Oct 3, 2019
->- Updated: Oct 9, 2019
+>- Updated: Oct 22, 2019
 >- Purpose: To write code that can convert bases
 >-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
@@ -20,10 +20,11 @@
 using namespace std;
 
 //Declre all function prototypes
-int toBaseTen(string, float);
-void fromBaseTen(int, float);
+int toBaseTen(string, float); //This function is to convert a number of any base to base 10
+string fromBaseTen(int, float); //This function converts from base 10 to any number base
 int getAnswer(); //Function used to get the players response as an integer (with error trapping)
 string getString(); //This function gets a string that fits the constraint
+int power(int, int); //This function is to replicate the power function, to get the result of a power
 
 int main()
 {
@@ -36,7 +37,7 @@ int main()
     do
     {
         //Let player choose their operation
-        cout << ">- Please select a number between 3" << endl << ">- 1) Any base to Decimal" << endl << ">- 2) Decimal to any base" << endl << ">- 3) Any base to any base" << endl << ">- 4) To quit" << endl << endl;
+        cout << ">- Please select a number between 1 - 4" << endl << ">- 1) Any base to Decimal" << endl << ">- 2) Decimal to any base" << endl << ">- 3) Any base to any base" << endl << ">- 4) To quit" << endl << endl;
         targetNumber = getAnswer(); //Get input
 
         if(targetNumber == 1)
@@ -60,8 +61,8 @@ int main()
             //Get input for new base value
             cout << ">- Now, define your base" << endl;
             baseNumber = getAnswer();
-            //COnvert
-            fromBaseTen(targetNumber, baseNumber);
+            //Convert
+            cout << "Final answer: " << fromBaseTen(targetNumber, baseNumber) << endl;
             targetNumber = 0; //Reset variable to prevent premature quit
         }
         else if(targetNumber == 3)
@@ -77,7 +78,8 @@ int main()
             secondBase = getAnswer();
             //Convert value to base ten before converting from base 10 to new base
             tempInt = toBaseTen(inputString, baseNumber);
-            fromBaseTen(tempInt, secondBase);
+
+            cout << "Final answer: " << fromBaseTen(tempInt, secondBase) << endl;
             //Reset value to prevent premature quit
             targetNumber = 0;
         }
@@ -107,40 +109,34 @@ int toBaseTen(string inputValue, float baseNumber)
 
         //If the valeus are hexadecimal, find the equivalent decimal value
         if(tempString == "A")
-        {
-            targetNumber = 10;
+        { targetNumber = 10;
         }
         else if(tempString == "B")
-        {
-            targetNumber = 11;
+        { targetNumber = 11;
         }
         else if(tempString == "C")
-        {
-            targetNumber = 12;
+        { targetNumber = 12;
         }
         else if(tempString == "D")
-        {
-            targetNumber = 13;
+        { targetNumber = 13;
         }
         else if(tempString == "E")
-        {
-            targetNumber = 14;
+        { targetNumber = 14;
         }
         else if(tempString == "F")
-        {
-            targetNumber = 15;
+        { targetNumber = 15;
         }
         else
         {
             //convert string to float
             targetNumber = std::atoi (tempString.c_str());
         }
-        answerNumber += targetNumber * pow(baseNumber, inputValue.size()-i-1); //Comvert it (float) to base 10 and add to answer
+        answerNumber += targetNumber * power(baseNumber, inputValue.size()-i-1); //Comvert it (float) to base 10 and add to answer
     }
     return answerNumber;
 }
 
-void fromBaseTen(int targetNumber, float baseNumber)
+string fromBaseTen(int targetNumber, float baseNumber)
 {
     float tempFloat = 0; //A temporary integer to convert to base greater than 9
     string answerString = ""; //This string saves your answer
@@ -183,7 +179,8 @@ void fromBaseTen(int targetNumber, float baseNumber)
     tempFloat = targetNumber;
     answerString.insert(0, to_string(llround(tempFloat)));
 
-    cout << "Final answer: " << answerString << endl;
+
+    return answerString;
 }
 
 //Get player input. Check to see if there is an error
@@ -223,13 +220,16 @@ string getString ()
         //Start by assuming there is an error
         foundError = false;
         isNumber = false;
+        //Get input
         cout << ">- Please enter your number" << endl;
         cin >> inputString;
 
+        //Run through every single character to check and see if it is valid
         for(int i = 0; i < inputString.size(); i++)
         {
+            //Grab the character at a certain digit
             tempString = inputString.at(i);
-            cout << tempString;
+            //If the value is not a number from 1-9, run the second level of filter. Otherwise, value is good
             for(int j = 0; j < 10; j++)
             {
                 if (tempString == to_string(j))
@@ -237,11 +237,13 @@ string getString ()
                     isNumber = true;
                 }
             }
+            //If values are not hexadecimal, notify code that error is present
             if(isNumber == false && tempString != "A" && tempString != "B" && tempString != "C" && tempString != "D" && tempString != "E" && tempString != "F")
             {
                 foundError = true;
             }
         }
+        //Print error message and restart loop untill input is valid
         if(foundError == true)
         {
             cout << ">- [ERROR] Please enter values that are 1-9, A-F" << endl;
@@ -249,4 +251,14 @@ string getString ()
     }while(foundError == true);
 
     return inputString;
+}
+
+int power(int baseNumber, int exponentNumber)
+{
+    int answer = 1;
+    for(int i = exponentNumber; i > 0; i--)
+    {
+        answer *= baseNumber;
+    }
+    return answer;
 }

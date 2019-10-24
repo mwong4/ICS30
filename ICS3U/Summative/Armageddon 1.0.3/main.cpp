@@ -1,19 +1,56 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Sep 23, 2019
+>- Updated: Oct 21, 2019
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.0.4]
+>- [version 1.0.5]
 >- Thanks to Vedaant Srivastava for the error trapping system and play-testing
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 >- cleaning
->- Structures
+>- Structures -> optimize place base function
 >-
 */
+
+//Version 1.0.7
+
+//Game features to be finished
+    //Spending money to build nuclear bases (a balance of power thing)
+    //Build radar stations to detect ships or planes
+    //Be able to search ships and planes and figure out if they are soviet
+    //Events that affect income or gameplay
+        //Soviets invade afghenistan
+        //Cuban missile crisis
+        //Berlin wall
+    //Always a nuclear ending, no winning
+    //Research tech
+    //Communiquges with the other military department
+
+//Events that could affect income:
+    //Soviets become more agressive, US Government becomes more worried and increases military spending (+)
+    //New government is pro-military and increases military spending(+)
+    //Military demonstration impresses the public(+)
+    //World is goingt through a recession, funding is decreased(-)
+    //New government is against military and decreases military spending(-)
+    //Military demonstration goes badly, public is less supportive(-)
+    //NATO performs a military excercise
+    //Warsaw Pact performs military exercise
+    //More refugees escape East Germany
+    //Civial war in south america supports an anti-soviet regime
+
+//Specific events
+    //Soviets invade afghanistan
+    //Cuban missile crisis begins
+    //Berlin wall falls
+    //Large uprising in hungary begins
+    //Soviet submarine acceident happens (K-219)
+    //Macarthur calls for 100 nuclear bombs for Korea
+    //Civil actions against the government for Vietnam are started
+    //U-2 shot down
+    //Space Race begins
 
 //Declaring all used libraries
 #include <iostream>
@@ -28,12 +65,18 @@
 
 using namespace std;
 
+struct gameInfo
+{
+
+};
+
 //Declaring all functions
 void getMapFile (char[][55]); //This function is used to read a txt file line by line
 void saveMapFile (std::string, char[][55], int); //This function is used to save the txt file into a double array
 void readMapArray (char[][55], HANDLE); //This function is used to print the map into the consol
 void placeBase(char[][55], HANDLE); //This function is used to select the location of a base
 void loadStartGame();
+void changePosition(char[][55]); //This function is used to update the position of an object
 
 bool stringChecker(string); //Function to check if an input is a float or integer
 
@@ -422,6 +465,12 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
 
     }
 }
+
+void changePosition(char gameMap [][55])
+{
+
+}
+
 //Function used to check if input string is a float
 //Credit to Vedaant for this function
 bool stringChecker(string myString)
@@ -454,24 +503,13 @@ void loadStartGame()
     string userID = "";
     char ch;
 
-    //Fake server connection animation
-    system("color A");
+    system("color A"); //Fake server connection animation
 
     //When server is connected
-    cout << ">- -UNSC User Management System-" << endl;
-    cout << "================================" << endl;
-    cout << "________________________________" << endl;
-    cout << "UNSC TacOS  v.337" <<  endl;
-    cout << "(S) 2294 FLEETCOM" << endl;
-    cout << "=======================" <<  endl;
-    cout << "|  User Log:" << endl;
-    cout << "|  >> Administrator (UNSC ID 8384-C)" << endl;
-    cout << "|  >>> " << "unknown.GUEST_userGroup" << endl;
-    cout << endl;
-    cout << "________________________________" << endl;
-    cout << "================================" << endl << endl;
-
-    cout << ">- Please enter your pin and ID" << endl << endl;
+    cout << ">- -UNSC User Management System-" << endl << "================================" << endl << "________________________________" << endl;
+    cout << "UNSC TacOS  v.337" <<  endl << "(S) 2294 FLEETCOM" << endl << "=======================" <<  endl << "|  User Log:" << endl;
+    cout << "|  >> Administrator (UNSC ID 8384-C)" << endl << "|  >>> " << "unknown.GUEST_userGroup" << endl << endl;
+    cout << "________________________________" << endl << "================================" << endl << endl << ">- Please enter your pin and ID" << endl << endl;
 
     cout << ">- ID: ";
     cin >> userID;
@@ -488,13 +526,11 @@ void loadStartGame()
     cout << endl;
     if(randInput == "cheats.activate")
     {
-        cout << ">- \Admin hacks activated." << endl;
-        cout << ">- Welcome " << userID << endl;
+        cout << ">- \Admin hacks activated." << endl << ">- Welcome " << userID << endl;
     }
     else
     {
-        cout << ">- \Acess Granted." << endl;
-        cout << ">- Welcome " << userID << endl;
+        cout << ">- \Acess Granted." << endl << ">- Welcome " << userID << endl;
     }
     cout << endl << "    [Press any key to continue]" << endl;
     getch();

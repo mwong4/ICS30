@@ -1,17 +1,16 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 19, 2019
->- Updated: Sep 25, 2019
+>- Updated: Oct 21, 2019
 >- Purpose: To write a multiple choice quiz
 >-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 */
-
 //included liraries
 #include <iostream>
 #include <conio.h>
-#include <windows.h>
+#include <windows.h> //For color
 #include<limits> //For error trapping
 
 
@@ -22,11 +21,20 @@ using namespace std;
 int getAnswer(); //Get player input. Check to see if there is an error
 void getChar(); //Get any player input before continuing
 
+int questionOne(); //This function is to ask the first question
+int questionTwo(); //This function is to ask the second question
+int questionThree(); //This function is to ask the third question
+int questionFour(); //This function is to ask the fourth question
+int questionFive(); //This function is to ask the fifth question
+
+int askQuestion(int, string, string, string, string, int);
+int checkAnswer(int, int);
+
 //Main loop
 int main()
 {
-    int answerNumber = 0;
-    int pointsCounter;
+    int answerNumber = 0;//This stores the player's answer
+    int pointsCounter; //This variable keeps track of your score
 
     //For color to consol
     HANDLE hConsole;
@@ -43,128 +51,25 @@ int main()
         //Reset values
         pointsCounter = 0;
 
-        //Print question
-        cout << "=====================" << endl << " <> Question 1 </>" << endl;
-        cout << "What is my favorite animal?" << endl;
-        cout << "=====================" << endl;
-        cout << "1) Crow" << endl << "2) Owl" << endl << "3) Targdigrade" << endl;
-        //Get response
-        answerNumber = getAnswer();
-
-        //Check Answer. If correct, give points
-        switch(answerNumber)
-            {
-            case 3:
-                cout << endl << ">- Yay! You are correct" << endl;
-                pointsCounter += 1;
-                break;
-
-            default:
-                SetConsoleTextAttribute(hConsole, 12);
-                cout << endl << ">- Poop! Got it wrong" << endl;
-                SetConsoleTextAttribute(hConsole, 15);
-                break;
-        }
+        //Calling the function to ask the first question
+        pointsCounter += askQuestion(1, "What is my favorite animal?", "Crow", "Owl", "Targdigrade", 3);
         getChar();
         system("CLS");
 
-        //Print question
-        cout << "=====================" << endl << " <> Question 2 </>" << endl;
-        cout << "What is my favorite saying?" << endl;
-        cout << "=====================" << endl;
-        cout << "1) I don't share cause I'm not a communist!" << endl << "2) Quad Erat Demonstratum" << endl << "3) Makin Bakin Pancakes?" << endl;
-        //Get response
-        answerNumber = getAnswer();
-
-        //Check Answer. If correct, give points
-        switch(answerNumber)
-            {
-            case 1:
-                cout << endl << ">- Yay! +1 to hunger" << endl;
-                pointsCounter += 1;
-                break;
-
-            default:
-                SetConsoleTextAttribute(hConsole, 12);
-                cout << endl << ">- What! how could you?" << endl;
-                SetConsoleTextAttribute(hConsole, 15);
-                break;
-        }
+        //Calling the function to ask the second question
+        pointsCounter += askQuestion(2, "What is my favorite saying?", "I don't share cause I'm not a communist!", "Quad Erat Demonstratum", "Makin Bakin Pancakes?", 1);
         getChar();
         system("CLS");
-
-        //Print question
-        cout << "=====================" << endl << " <> Question 3 </>" << endl;
-        cout << "What is my favorite formula?" << endl;
-        cout << "=====================" << endl;
-        cout << "1) Snells law" << endl << "2) Binomial Theorum" << endl << "3) Quadratic equation" << endl;
-        //Get response
-        answerNumber = getAnswer();
-
-        //Check Answer. If correct, give points
-        switch(answerNumber)
-            {
-            case 2:
-                cout << endl << ">- Praise the sun!" << endl;
-                pointsCounter += 1;
-                break;
-
-            default:
-                SetConsoleTextAttribute(hConsole, 12);
-                cout << endl << ">- Poop! YOU DIED" << endl;
-                SetConsoleTextAttribute(hConsole, 15);
-                break;
-        }
+        //Calling the function to ask the third question
+        pointsCounter += askQuestion(3, "What is my favorite formula?", "Snells law", "Binomial Theorum", "Quadratic equation", 2);
         getChar();
         system("CLS");
-
-        //Print question
-        cout << "=====================" << endl << " <> Question 4 </>" << endl;
-        cout << "What's my favorite TV show?" << endl;
-        cout << "=====================" << endl;
-        cout << "1) Adventure Time" << endl << "2) I don't watch TV" << endl << "3) House MD" << endl;
-        //Get response
-        answerNumber = getAnswer();
-
-        //Check Answer. If correct, give points
-        switch(answerNumber)
-            {
-            case 2:
-                cout << endl << ">- You got it!" << endl;
-                pointsCounter += 1;
-                break;
-
-            default:
-                SetConsoleTextAttribute(hConsole, 12);
-                cout << endl << ">- :/" << endl;
-                SetConsoleTextAttribute(hConsole, 15);
-                break;
-        }
+        //Calling the function to ask the fourth question
+        pointsCounter += askQuestion(4, "What's my favorite TV show?", "Adventure Time", "I don't watch TV", "House MD", 2);
         getChar();
         system("CLS");
-
-        //Print question
-        cout << "=====================" << endl << " <> Question 5 </>" << endl;
-        cout << "What is the book I just finished?" << endl;
-        cout << "=====================" << endl;
-        cout << "1) Red Platoon" << endl << "2) Tribe" << endl << "3) The Martian" << endl;
-        //Get response
-        answerNumber = getAnswer();
-
-        //Check Answer. If correct, give points
-        switch(answerNumber)
-            {
-            case 3:
-                cout << endl << ">- Excellent" << endl;
-                pointsCounter += 1;
-                break;
-
-            default:
-                SetConsoleTextAttribute(hConsole, 12);
-                cout << endl << ">- Burn the books!" << endl;
-                SetConsoleTextAttribute(hConsole, 15);
-                break;
-        }
+        //Calling the function to ask the fifth question
+        pointsCounter += askQuestion(5, "What is the book I just finished?", "Red Platoon", "Tribe", "The Martian", 1);
         getChar();
         system("CLS");
 
@@ -236,4 +141,39 @@ void getChar ()
 {
     cout << "[Press any key to continue]" << endl;
     getch();
+}
+
+//This function asks the questions
+int askQuestion(int currentQuestionNumber, string currentQuestion, string choiceOne, string choiceTwo, string choiceThree, int correctAnswer )
+{
+    //Print question
+    cout << "=====================" << endl << " <> Question "<< currentQuestionNumber << " </>" << endl;
+    cout << currentQuestion << endl;
+    cout << "=====================" << endl;
+    cout << "1) " << choiceOne << endl << "2) " << choiceTwo << endl << "3) " << choiceThree << endl;
+    //Get response
+
+    return checkAnswer(getAnswer(), correctAnswer);
+}
+
+//This function checks if the answer is correct
+int checkAnswer(int playerInput, int correctAnswer)
+{
+    //For color to consol
+    HANDLE hConsole;
+    hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    //Check Answer. If correct, give points
+    if(playerInput == correctAnswer)
+    {
+        cout << endl << ">- Yay! You are correct" << endl;
+        return 1;
+    }
+    else
+    {
+        SetConsoleTextAttribute(hConsole, 12);
+        cout << endl << ">- Oh no! You got it wrong" << endl;
+        SetConsoleTextAttribute(hConsole, 15);
+        return 0;
+    }
+
 }
