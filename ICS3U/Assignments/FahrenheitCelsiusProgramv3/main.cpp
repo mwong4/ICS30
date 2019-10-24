@@ -15,14 +15,14 @@
 
 using namespace std;
 
-float toCelsius(float);
-float toFahrenheit(float);
+float toCelsius(float); //This function converts Fahrenheit to Celsius
+float toFahrenheit(float); //This function converts Celsius to Fahrenheit
 float getAnswer(); //Function used to get the players response as an integer (with error trapping)
 
 int main()
 {
     //Defining the variables
-    int inputNumber = 0;
+    int inputNumber = 0; //This integer is used for the players menu input
     float savedTemp;
 
     while(inputNumber != 3 )
@@ -35,16 +35,16 @@ int main()
         {
             //Get input
             savedTemp = getAnswer();
-            savedTemp = toFahrenheit(savedTemp);
             //Now convert and output
+            savedTemp = toFahrenheit(savedTemp);
             cout << "In Celsius: ~" << savedTemp << endl;
         }
         else if(inputNumber == 2)
         {
             //Get input
             savedTemp = getAnswer();
-            savedTemp = toCelsius(savedTemp);
             //Now convert and output
+            savedTemp = toCelsius(savedTemp);
             cout << "In Fahrenheit: ~" << savedTemp << endl;
         }
         else
@@ -60,11 +60,13 @@ int main()
     return 0;
 }
 
+//This function converts Fahrenheit to Celsius
 float toCelsius(float originalTempature)
 {
     return (originalTempature * 9.0)/5.0 + 32.0;
 }
 
+//This function converts Celsius to Fahrenheit
 float toFahrenheit(float originalTempature)
 {
     return ((originalTempature - 32.0) * 5.0)/9.0;
