@@ -1,4 +1,5 @@
 # depslib dependency file v1.0
-1572278453 source:c:\users\maxwong\documents\github\ics30\ics3u\findprime\main.cpp
+1572392927 source:c:\users\maxwong\documents\github\ics30\ics3u\findprime\main.cpp
 	<iostream>
+	<tgmath.h>
 

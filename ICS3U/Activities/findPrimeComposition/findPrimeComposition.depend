@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1572472263 source:c:\users\maxwong\documents\github\ics30\ics3u\activities\findprimecomposition\main.cpp
+	<iostream>
+	<tgmath.h>
+	<limits>
+	<windows.h>
+

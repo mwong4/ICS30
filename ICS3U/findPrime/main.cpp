@@ -7,6 +7,7 @@
 
 //Declaring used libraries
 #include <iostream>
+#include <tgmath.h>
 
 //Declaring namespace
 using namespace std;
@@ -45,7 +46,7 @@ bool determineIfPrime(int inputNumber)
     }
 
     //Run through all numbers up to and excluding 1 and the input number
-    for(int i = 2; i < inputNumber - 1; i++)
+    for(int i = 2; i < ceil(sqrt(inputNumber)); i++)
     {
         //If the division is clean (no remainder), number is not prime
         if(inputNumber % i == 0)
