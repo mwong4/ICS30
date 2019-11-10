@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Oct 21, 2019
+>- Updated: Nov 10, 2019
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
@@ -10,12 +10,16 @@
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
+>- Handle
+>- Menu's
+>- Error trapping new
+>- Structures
+>- place base efficiency
 >- cleaning
->- Structures -> optimize place base function
 >-
 */
 
-//Version 1.0.7
+//Version 1.0.8
 
 //Game features to be finished
     //Spending money to build nuclear bases (a balance of power thing)
@@ -73,10 +77,11 @@ struct gameInfo
 //Declaring all functions
 void getMapFile (char[][55]); //This function is used to read a txt file line by line
 void saveMapFile (std::string, char[][55], int); //This function is used to save the txt file into a double array
-void readMapArray (char[][55], HANDLE); //This function is used to print the map into the consol
-void placeBase(char[][55], HANDLE); //This function is used to select the location of a base
+void readMapArray (char[][55]); //This function is used to print the map into the consol
+void placeBase(char[][55], string[]); //This function is used to select the location of a base
 void loadStartGame();
 void changePosition(char[][55]); //This function is used to update the position of an object
+void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
 
 bool stringChecker(string); //Function to check if an input is a float or integer
 
@@ -84,6 +89,7 @@ int main()
 {
     //Declaring all variables
     char gameMap [199][55];//This is the double array that houses the whole map
+    string myOptions[10] = {"-", "-", "-", "-", "-", "-", "-", "-", "-", "-"}; //This array is used in the menu that allows custome size
 
     bool gameRun = true; //This boolean is used to determine if the program is running
     bool gameStart = true; //This boolean is used to determine if the game is running for the first time
@@ -117,15 +123,15 @@ int main()
         }
 
         //Ask for a input from the player
-        cout << ">- Please enter a direct command. Below are the primary listed commands." << endl;
-        cout << "create a new base -> /spawn" << endl;
-        cout << "to refresh -> /refresh" << endl;
+        myOptions[0] = "create a new base -> /spawn";
+        myOptions[1] = "to refresh -> /refresh";
+        displayMenu(myOptions, 2);
         cin >> inputCommand;
 
         //If player enters /spawn, create a base
         if(inputCommand == "/spawn")
         {
-            placeBase(gameMap, hConsole);
+            placeBase(gameMap, hConsole, myOptions);
         }
         //To refresh
         if(inputCommand == "/refresh")
@@ -180,9 +186,10 @@ void saveMapFile (std::string line, char gameMap [][55], int currentRow)
 }
 
 //simply runs through a for loop through each value of the array and prints them out to console
-void readMapArray(char gameMap [][55], HANDLE hConsole)
+void readMapArray(char gameMap [][55])
 {
-    hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE hConsole;
+    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
 
     //Read out the map double array
     for(int i = 0; i < 55; i++)
@@ -207,10 +214,11 @@ void readMapArray(char gameMap [][55], HANDLE hConsole)
 }
 
 //Function used to place a base anywhere on the map
-void placeBase(char gameMap[][55], HANDLE hConsole)
+void placeBase(char gameMap[][55], string myOptions[])
 {
     //Defining variables
-    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //allows the manipulation of the console
+    HANDLE hConsole;
+    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
 
     bool choosingLocation = false; //boolean that is used to check if the player is still choosing a lcation
     bool errorOccured = false; //Boolean that checks if an error has occured
@@ -242,12 +250,14 @@ void placeBase(char gameMap[][55], HANDLE hConsole)
     while(choosingLocation)
     {
         //Print out what the player can do
-        cout << ">- Please enter a direct command. Primary function commands are listed below" << endl;
         if(errorOccured == false)
         {
-            cout << ">- Move around using keyboard -> /k" << endl;
-            cout << endl << ">- to place on a custom coordinate -> /input" << endl << ">- to place base -> /place" << endl << ">- Cancel -> /cancel" << endl;
-            cout << ">- Press escape to exit keyboard mode" << endl;
+            myOptions[0] = ">- Move around using keyboard -> /k";
+            myOptions[1] = ">- to place on a custom coordinate -> /input";
+            myOptions[2] = ">- to place base -> /place";
+            myOptions[3] = ">- Cancel -> /cancel";
+            myOptions[4] = ">- Press escape to exit keyboard mode";
+            displayMenu(myOptions,5);
         }
         errorOccured = false;
         inputCommand = " ";
@@ -534,5 +544,16 @@ void loadStartGame()
     }
     cout << endl << "    [Press any key to continue]" << endl;
     getch();
+}
+
+void displayMenu(string options[], int arraySize)
+{
+    cout << ">- Please enter a direct command. Below are the primary listed commands." << endl;
+    //Display instructions
+    for(int i = 0; i < arraySize; i++)
+    {
+        cout << ">- [" << i+1 << "] " << options[i] << endl;
+    }
+    return;
 }
 
