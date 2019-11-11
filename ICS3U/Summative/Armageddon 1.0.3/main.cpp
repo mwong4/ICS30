@@ -5,12 +5,11 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.0.9]
+>- [version 1.1.0]
 >- Thanks to Vedaant Srivastava for the error trapping system and play-testing
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
->- Testing
 >- Structures
 >- place base efficiency
 >- cleaning
@@ -230,12 +229,11 @@ void placeBase(char gameMap[][55], string myOptions[])
     while(choosingLocation)
     {
         //Print out what the player can do
-        myOptions[0] = ">- Move around using keyboard -> /k";
-        myOptions[1] = ">- to place on a custom coordinate -> /input";
-        myOptions[2] = ">- to place base -> /place";
-        myOptions[3] = ">- Cancel -> /cancel";
-        myOptions[4] = ">- Press escape to exit keyboard mode";
-        displayMenu(myOptions,5);
+        myOptions[0] = ">- Move around using keyboard";
+        myOptions[1] = ">- to place on a custom coordinate";
+        myOptions[2] = ">- to place base";
+        myOptions[3] = ">- Cancel/exit";
+        displayMenu(myOptions,4);
 
         inputCommand = 0;
         inputCommand = getAnswer();
@@ -348,7 +346,7 @@ void placeBase(char gameMap[][55], string myOptions[])
             findingCoordinate = true;
             do
             {
-                cout << endl << ">- Please enter your specific X-coordinate below. Press 0 to exit" << endl;
+                cout << endl << ">- Please enter your specific X-coordinate below between 3 and 198. Press 0 to exit" << endl;
                 saved_x = getAnswer();
 
                 if(saved_x == 0) //If they choose to exit, exit
@@ -359,10 +357,10 @@ void placeBase(char gameMap[][55], string myOptions[])
                 {
                     if(saved_x <  3) saved_x = 3;
 
-                    cout << endl << ">- Please enter your specific Y-coordinate below. Press /cancel to exit" << endl;
+                    cout << endl << ">- Please enter your specific Y-coordinate below between 3 and 43. Press 0 to exit" << endl;
                     saved_y = getAnswer(); //Get input for specific y-input
 
-                    if(inputCommand == 0)
+                    if(saved_y == 0)
                     {
                         findingCoordinate = false; //If player chooses to exit, exit
                     }
@@ -382,12 +380,12 @@ void placeBase(char gameMap[][55], string myOptions[])
                             current_x = saved_x; //Save current position as the new values
                             current_y = saved_y;
 
-                            system("CLS");
-                            readMapArray(gameMap);
                             findingCoordinate = false;
                         }
                     }
                 }
+            system("CLS");
+            readMapArray(gameMap);
             }while(findingCoordinate);
         }
         else if(inputCommand == 3)
@@ -395,10 +393,10 @@ void placeBase(char gameMap[][55], string myOptions[])
             cout << endl << ">- Are you sure you want to place the base on [" << current_x << "," << current_y << "]? This action is not reversable. Press 1 to confirm." << endl;
             inputCommand = getAnswer();
 
+            system("CLS");
+            readMapArray(gameMap);
             if(inputCommand == 1)
             {
-                system("CLS");
-                readMapArray(gameMap);
                 return;
             }
         }
@@ -441,13 +439,12 @@ float getAnswer ()
 
     HANDLE hConsole;
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
-    SetConsoleTextAttribute(hConsole, 12); //Set color to red
-
     do
     {
         findingInput = false; //By default, the loop will end
         cout << ">- Your input: "; //Get player input
         cin >> playerInput;
+        SetConsoleTextAttribute(hConsole, 12); //Set color to red
 
         if(cin.fail())//Check to see if player entered a "bad" input type
         {
@@ -458,14 +455,15 @@ float getAnswer ()
             cout << "==================================================" << endl << endl;
             findingInput = true; //If the input is invalid, then the loop will loop
         }
-        else if(playerInput > 198 && playerInput < 0 ) //Otherwise, print an error message
+        else if(playerInput > 198 || playerInput < 0 ) //Otherwise, print an error message
         {
             cout << endl << "==================================================" << endl;
             cout << ">- Please enter a number between 0 and 198 "<< endl;
             cout << "==================================================" << endl << endl;
+            findingInput = true; //If the input is invalid, then the loop will loop
         }
+        SetConsoleTextAttribute(hConsole, 15); //Set color back to white
     }while(findingInput);
-    SetConsoleTextAttribute(hConsole, 15); //Set color back to white
     return playerInput;//Otherwise input is good, return input
 }
 
