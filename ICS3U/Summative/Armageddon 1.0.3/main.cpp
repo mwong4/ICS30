@@ -10,7 +10,7 @@
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
->- Structures
+>- Find out why bases go missing
 >- place base efficiency
 >- cleaning
 >-
@@ -69,15 +69,15 @@ using namespace std;
 
 struct gameInfo
 {
-
+    char gameMap [199][55];//This is the double array that houses the whole map
 };
 
 //Declaring all functions
-void getMapFile (char[][55]); //This function is used to read a txt file line by line
-void saveMapFile (std::string, char[][55], int); //This function is used to save the txt file into a double array
-void readMapArray (char[][55]); //This function is used to print the map into the consol
-void placeBase(char[][55], string[]); //This function is used to select the location of a base
-void changePosition(char[][55]); //This function is used to update the position of an object
+gameInfo getMapFile (gameInfo); //This function is used to read a txt file line by line
+gameInfo saveMapFile (std::string, gameInfo, int); //This function is used to save the txt file into a double array
+void readMapArray (gameInfo); //This function is used to print the map into the consol
+void placeBase(gameInfo, string[]); //This function is used to select the location of a base
+void changePosition(gameInfo); //This function is used to update the position of an object
 
 void loadStartGame();
 
@@ -87,7 +87,7 @@ float getAnswer(); //Function used to get the players response as an integer (wi
 int main()
 {
     //Declaring all variables
-    char gameMap [199][55];//This is the double array that houses the whole map
+    gameInfo myGameInfo;
     string myOptions[10] = {"-", "-", "-", "-", "-", "-", "-", "-", "-", "-"}; //This array is used in the menu that allows custome size
 
     bool gameRun = true; //This boolean is used to determine if the program is running
@@ -100,13 +100,13 @@ int main()
     {
         for(int j = 0; j < 199; j++)
         {
-            gameMap[j][i] = ' ';
+            myGameInfo.gameMap[j][i] = ' ';
         }
     }
 
     loadStartGame();
     //Get map from text file and save it
-    getMapFile(gameMap);
+    myGameInfo = getMapFile(myGameInfo);
 
     //main loop of the game
     while(gameRun)
@@ -114,32 +114,32 @@ int main()
         //If the game is starting for the first time, print out the map
         if(gameStart)
         {
-           readMapArray(gameMap);
+           readMapArray(myGameInfo);
            gameStart = false;
         }
 
         //Ask for a input from the player
-        myOptions[0] = "create a new base -> /spawn";
-        myOptions[1] = "to refresh -> /refresh";
+        myOptions[0] = "create a new base";
+        myOptions[1] = "to refresh";
         displayMenu(myOptions, 2);
         inputCommand = getAnswer(); //Get player input
 
 
         if(inputCommand == 1) //If player enters /spawn, create a base
         {
-            placeBase(gameMap, myOptions);
+            placeBase(myGameInfo, myOptions);
         }
         else //To refresh
         {
             system("CLS");
-            readMapArray(gameMap);
+            readMapArray(myGameInfo);
         }
     }
     return 0;
 }
 
 //This function is used to access the txt file and read the file line by line.
-void getMapFile(char gameMap[][55])
+gameInfo getMapFile(gameInfo myGameInfo)
 {
     std::string line;
     ifstream file_("MapFile.txt");
@@ -150,26 +150,26 @@ void getMapFile(char gameMap[][55])
     {
         while(getline(file_,line)) //This function uses the builtin function: getline
         {
-            saveMapFile(line, gameMap, currentRow); //It then references the saveMapFile function in order to save it into a doubel array.
+            myGameInfo = saveMapFile(line, myGameInfo, currentRow); //It then references the saveMapFile function in order to save it into a doubel array.
             currentRow += 1;
         }
         file_.close();
     }
-    return;
+    return myGameInfo;
 }
 
 //Saves the map from the txt file into a double array
-void saveMapFile (std::string line, char gameMap [][55], int currentRow)
+gameInfo saveMapFile (std::string line, gameInfo myGameInfo, int currentRow)
 {
     for(std::string::size_type i = 0; i < line.size(); ++i) //Running through every character
     {
-       gameMap[i][currentRow] = line[i];
+       myGameInfo.gameMap[i][currentRow] = line[i];
     }
-    return;
+    return myGameInfo;
 }
 
 //simply runs through a for loop through each value of the array and prints them out to console
-void readMapArray(char gameMap [][55])
+void readMapArray(gameInfo myGameInfo)
 {
     HANDLE hConsole;
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
@@ -178,23 +178,24 @@ void readMapArray(char gameMap [][55])
     {
         for(int j = 0; j < 199; j++)
         {
-            if(gameMap[j][i] == '@') //Everytime you encounter a @ sign, color it red
+            if(myGameInfo.gameMap[j][i] == '@') //Everytime you encounter a @ sign, color it red
             {
                 SetConsoleTextAttribute(hConsole, 12);
-                cout << gameMap[j][i];
+                cout << myGameInfo.gameMap[j][i];
             }
             else //Otherwise, color it white
             {
                 SetConsoleTextAttribute(hConsole, 15);
-                cout << gameMap[j][i];
+                cout << myGameInfo.gameMap[j][i];
             }
         }
         cout << endl;
     }
+    return;
 }
 
 //Function used to place a base anywhere on the map
-void placeBase(char gameMap[][55], string myOptions[])
+void placeBase(gameInfo myGameInfo, string myOptions[])
 {
     //Defining variables
     HANDLE hConsole;
@@ -216,15 +217,15 @@ void placeBase(char gameMap[][55], string myOptions[])
     choosingLocation = true;
 
     //Spawn base on position:
-    savedCharacter = gameMap[100][20];
-    gameMap[100][20] = '@';
+    savedCharacter = myGameInfo.gameMap[100][20];
+    myGameInfo.gameMap[100][20] = '@';
 
     //save current x and current y
     current_x = 100;
     current_y = 20;
 
     system("CLS");
-    readMapArray(gameMap);
+    readMapArray(myGameInfo);
 
     while(choosingLocation)
     {
@@ -256,13 +257,13 @@ void placeBase(char gameMap[][55], string myOptions[])
                 }
                 else
                 {
-                    gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
-                    savedCharacter = gameMap[current_x][current_y - 1]; //Save the character of the future value
-                    gameMap[current_x][current_y - 1] = '@'; //Replace the future spot with an @ symbol
+                    myGameInfo.gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
+                    savedCharacter = myGameInfo.gameMap[current_x][current_y - 1]; //Save the character of the future value
+                    myGameInfo.gameMap[current_x][current_y - 1] = '@'; //Replace the future spot with an @ symbol
                     current_y -= 1; //Update current position
 
                     system("CLS");
-                    readMapArray(gameMap);
+                    readMapArray(myGameInfo);
                     SetConsoleTextAttribute(hConsole, 12);
                     cout << ">- Press escape to exit keyboard mode" << endl;
                     SetConsoleTextAttribute(hConsole, 15);
@@ -278,13 +279,13 @@ void placeBase(char gameMap[][55], string myOptions[])
                 }
                 else
                 {
-                    gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
-                    savedCharacter = gameMap[current_x][current_y + 1]; //Save the character of the future value
-                    gameMap[current_x][current_y + 1] = '@'; //Replace the future spot with an @ symbol
+                    myGameInfo.gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
+                    savedCharacter = myGameInfo.gameMap[current_x][current_y + 1]; //Save the character of the future value
+                    myGameInfo.gameMap[current_x][current_y + 1] = '@'; //Replace the future spot with an @ symbol
                     current_y += 1; //Update current position
 
                     system("CLS");
-                    readMapArray(gameMap);
+                    readMapArray(myGameInfo);
                     SetConsoleTextAttribute(hConsole, 12);
                     cout << ">- Press escape to exit keyboard mode" << endl;
                     SetConsoleTextAttribute(hConsole, 15);
@@ -300,13 +301,13 @@ void placeBase(char gameMap[][55], string myOptions[])
                 }
                 else
                 {
-                    gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
-                    savedCharacter = gameMap[current_x - 1][current_y]; //Save the character of the future value
-                    gameMap[current_x - 1][current_y] = '@'; //Replace the future spot with an @ symbol
+                    myGameInfo.gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
+                    savedCharacter = myGameInfo.gameMap[current_x - 1][current_y]; //Save the character of the future value
+                    myGameInfo.gameMap[current_x - 1][current_y] = '@'; //Replace the future spot with an @ symbol
                     current_x -= 1; //Update current position
 
                     system("CLS");
-                    readMapArray(gameMap);
+                    readMapArray(myGameInfo);
                     SetConsoleTextAttribute(hConsole, 12);
                     cout << ">- Press escape to exit keyboard mode" << endl;
                     SetConsoleTextAttribute(hConsole, 15);
@@ -322,13 +323,13 @@ void placeBase(char gameMap[][55], string myOptions[])
                 }
                 else
                 {
-                    gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
-                    savedCharacter = gameMap[current_x + 1][current_y]; //Save the character of the future value
-                    gameMap[current_x + 1][current_y] = '@'; //Replace the future spot with an @ symbol
+                    myGameInfo.gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
+                    savedCharacter = myGameInfo.gameMap[current_x + 1][current_y]; //Save the character of the future value
+                    myGameInfo.gameMap[current_x + 1][current_y] = '@'; //Replace the future spot with an @ symbol
                     current_x += 1; //Update current position
 
                     system("CLS");
-                    readMapArray(gameMap);
+                    readMapArray(myGameInfo);
                     SetConsoleTextAttribute(hConsole, 12);
                     cout << ">- Press escape to exit keyboard mode" << endl;
                     SetConsoleTextAttribute(hConsole, 15);
@@ -374,9 +375,9 @@ void placeBase(char gameMap[][55], string myOptions[])
 
                         if(inputCommand == 1) //If they answer yes, repeat process done above in keyboard mode
                         {
-                            gameMap[current_x][current_y] = savedCharacter; //place saved character back
-                            savedCharacter = gameMap[saved_x][saved_y]; //save new position character
-                            gameMap[saved_x][saved_y] = '@'; //Replace new position on map with @ sign
+                            myGameInfo.gameMap[current_x][current_y] = savedCharacter; //place saved character back
+                            savedCharacter = myGameInfo.gameMap[saved_x][saved_y]; //save new position character
+                            myGameInfo.gameMap[saved_x][saved_y] = '@'; //Replace new position on map with @ sign
                             current_x = saved_x; //Save current position as the new values
                             current_y = saved_y;
 
@@ -385,7 +386,7 @@ void placeBase(char gameMap[][55], string myOptions[])
                     }
                 }
             system("CLS");
-            readMapArray(gameMap);
+            readMapArray(myGameInfo);
             }while(findingCoordinate);
         }
         else if(inputCommand == 3)
@@ -394,7 +395,7 @@ void placeBase(char gameMap[][55], string myOptions[])
             inputCommand = getAnswer();
 
             system("CLS");
-            readMapArray(gameMap);
+            readMapArray(myGameInfo);
             if(inputCommand == 1)
             {
                 return;
@@ -406,15 +407,15 @@ void placeBase(char gameMap[][55], string myOptions[])
             inputCommand = getAnswer();
 
             system("CLS");
-            readMapArray(gameMap);
+            readMapArray(myGameInfo);
             if(inputCommand == 1)
             {
                 //wipe the base symbol from the map array
-                gameMap[current_x][current_y] = savedCharacter;
+                myGameInfo.gameMap[current_x][current_y] = savedCharacter;
 
                 //For some reason the base character is not being wiped so I have to refresh two times
                 system("CLS");
-                readMapArray(gameMap);
+                readMapArray(myGameInfo);
                 return;
             }
         }
@@ -426,7 +427,7 @@ void placeBase(char gameMap[][55], string myOptions[])
     }
 }
 
-void changePosition(char gameMap [][55])
+void changePosition(gameInfo myGameInfo)
 {
 
 }
