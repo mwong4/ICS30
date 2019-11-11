@@ -70,7 +70,6 @@ float getAnswer ()
     do
     {
         findingInput = false; //By default, the loop will end
-
         cout << ">- Your input: "; //Get player input
         cin >> playerInput;
 

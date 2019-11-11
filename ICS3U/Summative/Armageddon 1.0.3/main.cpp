@@ -5,21 +5,17 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.0.5]
+>- [version 1.0.9]
 >- Thanks to Vedaant Srivastava for the error trapping system and play-testing
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
->- Handle
->- Menu's
->- Error trapping new
+>- Testing
 >- Structures
 >- place base efficiency
 >- cleaning
 >-
 */
-
-//Version 1.0.8
 
 //Game features to be finished
     //Spending money to build nuclear bases (a balance of power thing)
@@ -67,6 +63,9 @@
 #include <math.h>
 #include <conio.h>
 
+//For error trapping
+#include<limits>
+
 using namespace std;
 
 struct gameInfo
@@ -79,11 +78,12 @@ void getMapFile (char[][55]); //This function is used to read a txt file line by
 void saveMapFile (std::string, char[][55], int); //This function is used to save the txt file into a double array
 void readMapArray (char[][55]); //This function is used to print the map into the consol
 void placeBase(char[][55], string[]); //This function is used to select the location of a base
-void loadStartGame();
 void changePosition(char[][55]); //This function is used to update the position of an object
-void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
 
-bool stringChecker(string); //Function to check if an input is a float or integer
+void loadStartGame();
+
+void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
+float getAnswer(); //Function used to get the players response as an integer (with error trapping)
 
 int main()
 {
@@ -94,10 +94,7 @@ int main()
     bool gameRun = true; //This boolean is used to determine if the program is running
     bool gameStart = true; //This boolean is used to determine if the game is running for the first time
 
-    string inputCommand = "";//This variable is used to get the players input
-
-    HANDLE hConsole;
-    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
+    int inputCommand = 0;//This variable is used to get the players input
 
     //Reset the map double array to blank/null
     for(int i = 0; i < 55; i++)
@@ -118,7 +115,7 @@ int main()
         //If the game is starting for the first time, print out the map
         if(gameStart)
         {
-           readMapArray(gameMap, hConsole);
+           readMapArray(gameMap);
            gameStart = false;
         }
 
@@ -126,27 +123,17 @@ int main()
         myOptions[0] = "create a new base -> /spawn";
         myOptions[1] = "to refresh -> /refresh";
         displayMenu(myOptions, 2);
-        cin >> inputCommand;
+        inputCommand = getAnswer(); //Get player input
 
-        //If player enters /spawn, create a base
-        if(inputCommand == "/spawn")
+
+        if(inputCommand == 1) //If player enters /spawn, create a base
         {
-            placeBase(gameMap, hConsole, myOptions);
+            placeBase(gameMap, myOptions);
         }
-        //To refresh
-        if(inputCommand == "/refresh")
+        else //To refresh
         {
             system("CLS");
-            readMapArray(gameMap, hConsole);
-        }
-        //Otherwise, print an error message
-        else if(inputCommand != "/spawn" && inputCommand != "/refresh" )
-        {
-            SetConsoleTextAttribute(hConsole, 12);
-            cout << endl << "==================================================" << endl;
-            cout << ">- Please enter a valid input command"<< endl;
-            cout << "==================================================" << endl << endl;
-            SetConsoleTextAttribute(hConsole, 15);
+            readMapArray(gameMap);
         }
     }
     return 0;
@@ -162,11 +149,9 @@ void getMapFile(char gameMap[][55])
 
     if(file_.is_open())
     {
-        //This function uses the builtin function: getline
-        while(getline(file_,line))
+        while(getline(file_,line)) //This function uses the builtin function: getline
         {
-            //It then references the saveMapFile function in order to save it into a doubel array.
-            saveMapFile(line, gameMap, currentRow);
+            saveMapFile(line, gameMap, currentRow); //It then references the saveMapFile function in order to save it into a doubel array.
             currentRow += 1;
         }
         file_.close();
@@ -177,8 +162,7 @@ void getMapFile(char gameMap[][55])
 //Saves the map from the txt file into a double array
 void saveMapFile (std::string line, char gameMap [][55], int currentRow)
 {
-    //Running through every character
-    for(std::string::size_type i = 0; i < line.size(); ++i)
+    for(std::string::size_type i = 0; i < line.size(); ++i) //Running through every character
     {
        gameMap[i][currentRow] = line[i];
     }
@@ -191,20 +175,17 @@ void readMapArray(char gameMap [][55])
     HANDLE hConsole;
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
 
-    //Read out the map double array
-    for(int i = 0; i < 55; i++)
+    for(int i = 0; i < 55; i++) //Read out the map double array
     {
         for(int j = 0; j < 199; j++)
         {
-            if(gameMap[j][i] == '@')
-                //Everytime you encounter a @ sign, color it red
+            if(gameMap[j][i] == '@') //Everytime you encounter a @ sign, color it red
             {
                 SetConsoleTextAttribute(hConsole, 12);
                 cout << gameMap[j][i];
             }
-            else
+            else //Otherwise, color it white
             {
-                //Otherwise, color it white
                 SetConsoleTextAttribute(hConsole, 15);
                 cout << gameMap[j][i];
             }
@@ -221,10 +202,9 @@ void placeBase(char gameMap[][55], string myOptions[])
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
 
     bool choosingLocation = false; //boolean that is used to check if the player is still choosing a lcation
-    bool errorOccured = false; //Boolean that checks if an error has occured
     bool findingCoordinate = false; //Boolean that checks if an error has occured
 
-    string inputCommand = ""; //Stirng to take inputs from player
+    int inputCommand = 0; //Stirng to take inputs from player
 
     int current_x; //temporarily holds the x value
     int current_y; //temporarily holds the y value
@@ -245,28 +225,28 @@ void placeBase(char gameMap[][55], string myOptions[])
     current_y = 20;
 
     system("CLS");
-    readMapArray(gameMap, hConsole);
+    readMapArray(gameMap);
 
     while(choosingLocation)
     {
         //Print out what the player can do
-        if(errorOccured == false)
-        {
-            myOptions[0] = ">- Move around using keyboard -> /k";
-            myOptions[1] = ">- to place on a custom coordinate -> /input";
-            myOptions[2] = ">- to place base -> /place";
-            myOptions[3] = ">- Cancel -> /cancel";
-            myOptions[4] = ">- Press escape to exit keyboard mode";
-            displayMenu(myOptions,5);
-        }
-        errorOccured = false;
-        inputCommand = " ";
-        cin >> inputCommand;
+        myOptions[0] = ">- Move around using keyboard -> /k";
+        myOptions[1] = ">- to place on a custom coordinate -> /input";
+        myOptions[2] = ">- to place base -> /place";
+        myOptions[3] = ">- Cancel -> /cancel";
+        myOptions[4] = ">- Press escape to exit keyboard mode";
+        displayMenu(myOptions,5);
+
+        inputCommand = 0;
+        inputCommand = getAnswer();
 
         //If player inputs /k, activate keyboard mode
-        if(inputCommand == "/k" || inputCommand == "/keyboard") cout << ">- Please use arrow keys or WASD" << endl;
+        if(inputCommand == 1)
+        {
+            cout << ">- Please use arrow keys or WASD" << endl;
+        }
 
-        while(inputCommand == "/k" || inputCommand == "/keyboard")
+        while(inputCommand == 1)
         {
             //If specific key is pressed:
             if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
@@ -284,7 +264,7 @@ void placeBase(char gameMap[][55], string myOptions[])
                     current_y -= 1; //Update current position
 
                     system("CLS");
-                    readMapArray(gameMap, hConsole);
+                    readMapArray(gameMap);
                     SetConsoleTextAttribute(hConsole, 12);
                     cout << ">- Press escape to exit keyboard mode" << endl;
                     SetConsoleTextAttribute(hConsole, 15);
@@ -306,7 +286,7 @@ void placeBase(char gameMap[][55], string myOptions[])
                     current_y += 1; //Update current position
 
                     system("CLS");
-                    readMapArray(gameMap, hConsole);
+                    readMapArray(gameMap);
                     SetConsoleTextAttribute(hConsole, 12);
                     cout << ">- Press escape to exit keyboard mode" << endl;
                     SetConsoleTextAttribute(hConsole, 15);
@@ -328,7 +308,7 @@ void placeBase(char gameMap[][55], string myOptions[])
                     current_x -= 1; //Update current position
 
                     system("CLS");
-                    readMapArray(gameMap, hConsole);
+                    readMapArray(gameMap);
                     SetConsoleTextAttribute(hConsole, 12);
                     cout << ">- Press escape to exit keyboard mode" << endl;
                     SetConsoleTextAttribute(hConsole, 15);
@@ -350,7 +330,7 @@ void placeBase(char gameMap[][55], string myOptions[])
                     current_x += 1; //Update current position
 
                     system("CLS");
-                    readMapArray(gameMap, hConsole);
+                    readMapArray(gameMap);
                     SetConsoleTextAttribute(hConsole, 12);
                     cout << ">- Press escape to exit keyboard mode" << endl;
                     SetConsoleTextAttribute(hConsole, 15);
@@ -359,50 +339,42 @@ void placeBase(char gameMap[][55], string myOptions[])
             //Else if escape is pressed, exit
             else if((GetKeyState(VK_ESCAPE) & 0x8000))
             {
-                inputCommand = "escape";
+                inputCommand = 0;
             }
         }
         //If player chooses to input a custom input:
-        if(inputCommand == "/input" || inputCommand == "/i")
+        if(inputCommand == 2)
         {
             findingCoordinate = true;
             do
             {
-                cout << endl << ">- Please enter your specific X-coordinate below. Press /cancel to exit" << endl;
-                cin >> inputCommand; //get the specific x input
+                cout << endl << ">- Please enter your specific X-coordinate below. Press 0 to exit" << endl;
+                saved_x = getAnswer();
 
-                if(inputCommand == "/cancel") //If they choose to exit, exit
+                if(saved_x == 0) //If they choose to exit, exit
                 {
                     findingCoordinate = false;
-                    inputCommand = "";
                 }
-
-                else if(stringChecker(inputCommand)) //Check to see if input is valid
+                else
                 {
-                    saved_x = round(::atof(inputCommand.c_str())); //If yes convert to int
-
-                    if(saved_x > 198) saved_x = 198; //Check to see if new position is legal. If no, set to default value
                     if(saved_x <  3) saved_x = 3;
 
                     cout << endl << ">- Please enter your specific Y-coordinate below. Press /cancel to exit" << endl;
-                    cin >> inputCommand; //Get input for specific y-input
+                    saved_y = getAnswer(); //Get input for specific y-input
 
-                    if(inputCommand == "/cancel")
+                    if(inputCommand == 0)
                     {
                         findingCoordinate = false; //If player chooses to exit, exit
-                        inputCommand = "";
                     }
-                    else if( stringChecker(inputCommand)) //Otherwise check to see if input in an integer
+                    else
                     {
-                        saved_y = round(::atof(inputCommand.c_str())); //If yes, convert to integer
-
                         if(saved_y > 44) saved_y = 44; //If input is not legal, set to default values
                         if(saved_y <  3) saved_y = 3;
 
-                        cout << ">- Your coordinate is [" << saved_x << "," << saved_y << "]. Press /y to confirm." << endl;
-                        cin >> inputCommand; //Get player confirmation for their input
+                        cout << ">- Your coordinate is [" << saved_x << "," << saved_y << "]. Press 1 to confirm." << endl;
+                        inputCommand = getAnswer(); //Get player confirmation for their input
 
-                        if(inputCommand == "/y" || inputCommand == "/yes") //If they answer yes, repeat process done above in keyboard mode
+                        if(inputCommand == 1) //If they answer yes, repeat process done above in keyboard mode
                         {
                             gameMap[current_x][current_y] = savedCharacter; //place saved character back
                             savedCharacter = gameMap[saved_x][saved_y]; //save new position character
@@ -411,66 +383,46 @@ void placeBase(char gameMap[][55], string myOptions[])
                             current_y = saved_y;
 
                             system("CLS");
-                            readMapArray(gameMap, hConsole);
-
+                            readMapArray(gameMap);
                             findingCoordinate = false;
-                            inputCommand  = "/input";
                         }
                     }
-                    else
-                    {
-                        cout << endl << ">- Error, please enter an integer between 2 and 45" << endl << endl;
-                    }
                 }
-                else
-                {
-                    cout << endl << ">- Error, please enter an integer between 2 and 199" << endl << endl;
-                }
-
             }while(findingCoordinate);
         }
-
-        else if(inputCommand == "/cancel" || inputCommand == "/c")
+        else if(inputCommand == 3)
         {
-            cout << endl << ">- You are Attempting to exit. Are you sure? Press /y to quit" << endl;
-            cin >> inputCommand;
+            cout << endl << ">- Are you sure you want to place the base on [" << current_x << "," << current_y << "]? This action is not reversable. Press 1 to confirm." << endl;
+            inputCommand = getAnswer();
+
+            if(inputCommand == 1)
+            {
+                system("CLS");
+                readMapArray(gameMap);
+                return;
+            }
+        }
+        else if(inputCommand == 4)
+        {
+            cout << endl << ">- You are Attempting to exit. Are you sure? Press 1 to quit" << endl;
+            inputCommand = getAnswer();
 
             system("CLS");
-            readMapArray(gameMap, hConsole);
-            if(inputCommand == "/y" || inputCommand == "/yes")
+            readMapArray(gameMap);
+            if(inputCommand == 1)
             {
                 //wipe the base symbol from the map array
                 gameMap[current_x][current_y] = savedCharacter;
 
                 //For some reason the base character is not being wiped so I have to refresh two times
                 system("CLS");
-                readMapArray(gameMap, hConsole);
+                readMapArray(gameMap);
                 return;
             }
         }
-
-        else if(inputCommand == "/p" || inputCommand == "/place")
+        else
         {
-            cout << endl << ">- Are you sure you want to place the base on [" << current_x << "," << current_y << "]? This action is not reversable. Press /y to confirm." << endl;
-            cin >> inputCommand;
-
-            if(inputCommand == "/y" || inputCommand == "/yes")
-            {
-                system("CLS");
-                readMapArray(gameMap, hConsole);
-                return;
-            }
-        }
-        //If input is not valid, print an error message in red
-        else if(inputCommand != "/cancel" && inputCommand != "/c" && inputCommand != "/input"  && inputCommand != "/i" && inputCommand != "/place" && inputCommand != "/p" && inputCommand != "/k" && inputCommand != "/keyboard" && inputCommand != "escape")
-        {
-            SetConsoleTextAttribute(hConsole, 12);
-            cout << endl << "==================================================" << endl;
-            cout << ">- Please enter a valid input command"<< endl;
-            cout << "==================================================" << endl << endl;
-            SetConsoleTextAttribute(hConsole, 15);
-
-            errorOccured = true;
+                cout << endl << ">- hmm, try choosing a number from 1-4" << endl;
         }
 
     }
@@ -481,28 +433,40 @@ void changePosition(char gameMap [][55])
 
 }
 
-//Function used to check if input string is a float
-//Credit to Vedaant for this function
-bool stringChecker(string myString)
+//Error trapping funcion that only accepts integers
+float getAnswer ()
 {
-    long double flMyString;
-    ostringstream conversion;
+    int playerInput; //This variable is used to get the player's input
+    bool findingInput; //This bool determines if the loop continues running
 
-    //Checks the string using built in iostream library
-    stringstream(myString) >> flMyString;
-    conversion << setprecision(9) << flMyString;
+    HANDLE hConsole;
+    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
+    SetConsoleTextAttribute(hConsole, 12); //Set color to red
 
-    string convFlMyString = conversion.str();
-
-    //If initial string does not match corrected string, string is not a float
-    if (convFlMyString == myString)
+    do
     {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+        findingInput = false; //By default, the loop will end
+        cout << ">- Your input: "; //Get player input
+        cin >> playerInput;
+
+        if(cin.fail())//Check to see if player entered a "bad" input type
+        {
+            cin.clear(); //Clear all flags
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //ignore incorrect symbols
+            cout << endl << "==================================================" << endl;
+            cout << ">- Please enter a valid input number"<< endl;
+            cout << "==================================================" << endl << endl;
+            findingInput = true; //If the input is invalid, then the loop will loop
+        }
+        else if(playerInput > 198 && playerInput < 0 ) //Otherwise, print an error message
+        {
+            cout << endl << "==================================================" << endl;
+            cout << ">- Please enter a number between 0 and 198 "<< endl;
+            cout << "==================================================" << endl << endl;
+        }
+    }while(findingInput);
+    SetConsoleTextAttribute(hConsole, 15); //Set color back to white
+    return playerInput;//Otherwise input is good, return input
 }
 
 //Game start menu
