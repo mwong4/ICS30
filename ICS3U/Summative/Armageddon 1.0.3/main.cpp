@@ -1,16 +1,15 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Nov 10, 2019
+>- Updated: Nov 12, 2019
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.1.0]
+>- [version 1.1.2]
 >- Thanks to Vedaant Srivastava for the error trapping system and play-testing
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
->- Find out why bases go missing
 >- place base efficiency
 >- cleaning
 >-
@@ -76,8 +75,8 @@ struct gameInfo
 gameInfo getMapFile (gameInfo); //This function is used to read a txt file line by line
 gameInfo saveMapFile (std::string, gameInfo, int); //This function is used to save the txt file into a double array
 void readMapArray (gameInfo); //This function is used to print the map into the consol
-void placeBase(gameInfo, string[]); //This function is used to select the location of a base
-void changePosition(gameInfo); //This function is used to update the position of an object
+gameInfo placeBase(gameInfo, string[]); //This function is used to select the location of a base
+gameInfo changePosition(gameInfo); //This function is used to update the position of an object
 
 void loadStartGame();
 
@@ -127,7 +126,7 @@ int main()
 
         if(inputCommand == 1) //If player enters /spawn, create a base
         {
-            placeBase(myGameInfo, myOptions);
+            myGameInfo = placeBase(myGameInfo, myOptions);
         }
         else //To refresh
         {
@@ -195,7 +194,7 @@ void readMapArray(gameInfo myGameInfo)
 }
 
 //Function used to place a base anywhere on the map
-void placeBase(gameInfo myGameInfo, string myOptions[])
+gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
 {
     //Defining variables
     HANDLE hConsole;
@@ -398,7 +397,7 @@ void placeBase(gameInfo myGameInfo, string myOptions[])
             readMapArray(myGameInfo);
             if(inputCommand == 1)
             {
-                return;
+                return myGameInfo;
             }
         }
         else if(inputCommand == 4)
@@ -416,7 +415,7 @@ void placeBase(gameInfo myGameInfo, string myOptions[])
                 //For some reason the base character is not being wiped so I have to refresh two times
                 system("CLS");
                 readMapArray(myGameInfo);
-                return;
+                return myGameInfo;
             }
         }
         else
@@ -427,9 +426,9 @@ void placeBase(gameInfo myGameInfo, string myOptions[])
     }
 }
 
-void changePosition(gameInfo myGameInfo)
+gameInfo changePosition(gameInfo myGameInfo)
 {
-
+    return myGameInfo;
 }
 
 //Error trapping funcion that only accepts integers
