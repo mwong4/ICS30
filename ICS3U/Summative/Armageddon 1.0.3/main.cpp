@@ -64,6 +64,7 @@
 //For error trapping
 #include<limits>
 
+
 using namespace std;
 
 struct gameInfo
@@ -80,6 +81,7 @@ gameInfo changePosition(gameInfo); //This function is used to update the positio
 
 void loadStartGame();
 
+void displayRedText(string, bool);
 void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
 float getAnswer(); //Function used to get the players response as an integer (with error trapping)
 
@@ -104,6 +106,7 @@ int main()
     }
 
     loadStartGame();
+    system("color F"); //Changed color to white
     //Get map from text file and save it
     myGameInfo = getMapFile(myGameInfo);
 
@@ -122,7 +125,6 @@ int main()
         myOptions[1] = "to refresh";
         displayMenu(myOptions, 2);
         inputCommand = getAnswer(); //Get player input
-
 
         if(inputCommand == 1) //If player enters /spawn, create a base
         {
@@ -170,21 +172,16 @@ gameInfo saveMapFile (std::string line, gameInfo myGameInfo, int currentRow)
 //simply runs through a for loop through each value of the array and prints them out to console
 void readMapArray(gameInfo myGameInfo)
 {
-    HANDLE hConsole;
-    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
-
     for(int i = 0; i < 55; i++) //Read out the map double array
     {
         for(int j = 0; j < 199; j++)
         {
             if(myGameInfo.gameMap[j][i] == '@') //Everytime you encounter a @ sign, color it red
             {
-                SetConsoleTextAttribute(hConsole, 12);
-                cout << myGameInfo.gameMap[j][i];
+                displayRedText("@", false);
             }
-            else //Otherwise, color it white
+            else //Otherwise, color and display others in white
             {
-                SetConsoleTextAttribute(hConsole, 15);
                 cout << myGameInfo.gameMap[j][i];
             }
         }
@@ -197,9 +194,6 @@ void readMapArray(gameInfo myGameInfo)
 gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
 {
     //Defining variables
-    HANDLE hConsole;
-    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
-
     bool choosingLocation = false; //boolean that is used to check if the player is still choosing a lcation
     bool findingCoordinate = false; //Boolean that checks if an error has occured
 
@@ -251,7 +245,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             {
                 if((current_y - 1) < 5 ) //Check to see if new position is legal
                 {
-                    cout << ">- ERROR, item can not move there" << endl;
+                    displayRedText(">- ERROR, item can not move there", true);
                     cout << ">- Directive: Please type a different command" << endl;
                 }
                 else
@@ -263,9 +257,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
 
                     system("CLS");
                     readMapArray(myGameInfo);
-                    SetConsoleTextAttribute(hConsole, 12);
-                    cout << ">- Press escape to exit keyboard mode" << endl;
-                    SetConsoleTextAttribute(hConsole, 15);
+                    displayRedText(">- Press escape to exit keyboard mode", true);
                 }
             }
             //Else if specific key is pressed:
@@ -273,7 +265,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             {
                 if((current_y + 1) > 45 ) //Check to see if new position is legal
                 {
-                    cout << ">- ERROR, item can not move there" << endl;
+                    displayRedText(">- ERROR, item can not move there", true);
                     cout << ">- Directive: Please type a different command" << endl;
                 }
                 else
@@ -285,9 +277,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
 
                     system("CLS");
                     readMapArray(myGameInfo);
-                    SetConsoleTextAttribute(hConsole, 12);
-                    cout << ">- Press escape to exit keyboard mode" << endl;
-                    SetConsoleTextAttribute(hConsole, 15);
+                    displayRedText(">- Press escape to exit keyboard mode", true);
                 }
             }
             //Else if specific key is pressed:
@@ -295,7 +285,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             {
                 if((current_x - 1) < 0 ) //Check to see if new position is legal
                 {
-                    cout << ">- ERROR, item can not move there" << endl;
+                    displayRedText(">- ERROR, item can not move there", true);
                     cout << ">- Directive: Please type a different command" << endl;
                 }
                 else
@@ -307,9 +297,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
 
                     system("CLS");
                     readMapArray(myGameInfo);
-                    SetConsoleTextAttribute(hConsole, 12);
-                    cout << ">- Press escape to exit keyboard mode" << endl;
-                    SetConsoleTextAttribute(hConsole, 15);
+                    displayRedText(">- Press escape to exit keyboard mode", true);
                 }
             }
             //Else if specific key is pressed:
@@ -317,7 +305,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             {
                 if((current_x + 1) > 199 ) //Check to see if new position is legal
                 {
-                    cout << "ERROR, item can not move there" << endl;
+                    displayRedText("ERROR, item can not move there", true);
                     cout << "Directive: Please type a different command" << endl;
                 }
                 else
@@ -329,9 +317,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
 
                     system("CLS");
                     readMapArray(myGameInfo);
-                    SetConsoleTextAttribute(hConsole, 12);
-                    cout << ">- Press escape to exit keyboard mode" << endl;
-                    SetConsoleTextAttribute(hConsole, 15);
+                    displayRedText(">- Press escape to exit keyboard mode", true);
                 }
             }
             //Else if escape is pressed, exit
@@ -431,42 +417,6 @@ gameInfo changePosition(gameInfo myGameInfo)
     return myGameInfo;
 }
 
-//Error trapping funcion that only accepts integers
-float getAnswer ()
-{
-    int playerInput; //This variable is used to get the player's input
-    bool findingInput; //This bool determines if the loop continues running
-
-    HANDLE hConsole;
-    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
-    do
-    {
-        findingInput = false; //By default, the loop will end
-        cout << ">- Your input: "; //Get player input
-        cin >> playerInput;
-        SetConsoleTextAttribute(hConsole, 12); //Set color to red
-
-        if(cin.fail())//Check to see if player entered a "bad" input type
-        {
-            cin.clear(); //Clear all flags
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //ignore incorrect symbols
-            cout << endl << "==================================================" << endl;
-            cout << ">- Please enter a valid input number"<< endl;
-            cout << "==================================================" << endl << endl;
-            findingInput = true; //If the input is invalid, then the loop will loop
-        }
-        else if(playerInput > 198 || playerInput < 0 ) //Otherwise, print an error message
-        {
-            cout << endl << "==================================================" << endl;
-            cout << ">- Please enter a number between 0 and 198 "<< endl;
-            cout << "==================================================" << endl << endl;
-            findingInput = true; //If the input is invalid, then the loop will loop
-        }
-        SetConsoleTextAttribute(hConsole, 15); //Set color back to white
-    }while(findingInput);
-    return playerInput;//Otherwise input is good, return input
-}
-
 //Game start menu
 void loadStartGame()
 {
@@ -508,6 +458,36 @@ void loadStartGame()
     getch();
 }
 
+//Error trapping funcion that only accepts integers
+float getAnswer ()
+{
+    int playerInput; //This variable is used to get the player's input
+    bool findingInput; //This bool determines if the loop continues running
+    do
+    {
+        findingInput = false; //By default, the loop will end
+        cout << ">- Your input: "; //Get player input
+        cin >> playerInput;
+        if(cin.fail())//Check to see if player entered a "bad" input type
+        {
+            cin.clear(); //Clear all flags
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //ignore incorrect symbols
+            displayRedText("==================================================", true);
+            displayRedText(">- Please enter a valid input number", true);
+            displayRedText("==================================================", true);
+            findingInput = true; //If the input is invalid, then the loop will loop
+        }
+        else if(playerInput > 198 || playerInput < 0 ) //Otherwise, print an error message
+        {
+            displayRedText("==================================================", true);
+            displayRedText(">- Please enter a number between 0 and 198 ", true);
+            displayRedText("==================================================", true);
+            findingInput = true; //If the input is invalid, then the loop will loop
+        }
+    }while(findingInput);
+    return playerInput;//Otherwise input is good, return input
+}
+
 void displayMenu(string options[], int arraySize)
 {
     cout << ">- Please enter a direct command. Below are the primary listed commands." << endl;
@@ -517,5 +497,19 @@ void displayMenu(string options[], int arraySize)
         cout << ">- [" << i+1 << "] " << options[i] << endl;
     }
     return;
+}
+
+void displayRedText(string inputOne, bool returnTrue)
+{
+    HANDLE hConsole;
+    hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
+
+    SetConsoleTextAttribute(hConsole, 12); //Set color to red
+    cout << inputOne;
+    SetConsoleTextAttribute(hConsole, 15); //Set color to red
+    if(returnTrue)
+    {
+        cout << endl;
+    }
 }
 
