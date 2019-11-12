@@ -5,12 +5,11 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.1.2]
+>- [version 1.1.3]
 >- Thanks to Vedaant Srivastava for the error trapping system and play-testing
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
->- place base efficiency
 >- cleaning
 >-
 */
@@ -70,6 +69,9 @@ using namespace std;
 struct gameInfo
 {
     char gameMap [199][55];//This is the double array that houses the whole map
+    int current_x; //temporarily holds the x value while placing building
+    int current_y; //temporarily holds the y value while placing building
+    char savedCharacter; //Temporarily saves a character while placing building
 };
 
 //Declaring all functions
@@ -77,9 +79,9 @@ gameInfo getMapFile (gameInfo); //This function is used to read a txt file line 
 gameInfo saveMapFile (std::string, gameInfo, int); //This function is used to save the txt file into a double array
 void readMapArray (gameInfo); //This function is used to print the map into the consol
 gameInfo placeBase(gameInfo, string[]); //This function is used to select the location of a base
-gameInfo changePosition(gameInfo); //This function is used to update the position of an object
+gameInfo changePosition(gameInfo, int, int, bool); //This function is used to update the position of an object
 
-void loadStartGame();
+void loadStartGame(); //Fake loading screen to start the game
 
 void displayRedText(string, bool);
 void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
@@ -199,23 +201,19 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
 
     int inputCommand = 0; //Stirng to take inputs from player
 
-    int current_x; //temporarily holds the x value
-    int current_y; //temporarily holds the y value
     int saved_x; //Saves coordinate for the custom choice of coordinate feature
     int saved_y;
-
-    char savedCharacter; //Temporarily saves a character
 
     cout << ">- Creating..." << endl << endl;
     choosingLocation = true;
 
     //Spawn base on position:
-    savedCharacter = myGameInfo.gameMap[100][20];
+    myGameInfo.savedCharacter = myGameInfo.gameMap[100][20];
     myGameInfo.gameMap[100][20] = '@';
 
     //save current x and current y
-    current_x = 100;
-    current_y = 20;
+    myGameInfo.current_x = 100;
+    myGameInfo.current_y = 20;
 
     system("CLS");
     readMapArray(myGameInfo);
@@ -243,81 +241,57 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             //If specific key is pressed:
             if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
             {
-                if((current_y - 1) < 5 ) //Check to see if new position is legal
+                if((myGameInfo.current_y - 1) < 5 ) //Check to see if new position is legal
                 {
                     displayRedText(">- ERROR, item can not move there", true);
                     cout << ">- Directive: Please type a different command" << endl;
                 }
                 else
                 {
-                    myGameInfo.gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
-                    savedCharacter = myGameInfo.gameMap[current_x][current_y - 1]; //Save the character of the future value
-                    myGameInfo.gameMap[current_x][current_y - 1] = '@'; //Replace the future spot with an @ symbol
-                    current_y -= 1; //Update current position
-
-                    system("CLS");
-                    readMapArray(myGameInfo);
-                    displayRedText(">- Press escape to exit keyboard mode", true);
+                    //Update position of base
+                    myGameInfo = changePosition(myGameInfo, 0, -1, true);
                 }
             }
             //Else if specific key is pressed:
             else if((GetKeyState('S') & 0x8000) || (GetKeyState(VK_DOWN) & 0x8000))
             {
-                if((current_y + 1) > 45 ) //Check to see if new position is legal
+                if((myGameInfo.current_y + 1) > 45 ) //Check to see if new position is legal
                 {
                     displayRedText(">- ERROR, item can not move there", true);
                     cout << ">- Directive: Please type a different command" << endl;
                 }
                 else
                 {
-                    myGameInfo.gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
-                    savedCharacter = myGameInfo.gameMap[current_x][current_y + 1]; //Save the character of the future value
-                    myGameInfo.gameMap[current_x][current_y + 1] = '@'; //Replace the future spot with an @ symbol
-                    current_y += 1; //Update current position
-
-                    system("CLS");
-                    readMapArray(myGameInfo);
-                    displayRedText(">- Press escape to exit keyboard mode", true);
+                    //Update position of base
+                    myGameInfo = changePosition(myGameInfo, 0, 1, true);
                 }
             }
             //Else if specific key is pressed:
             else if((GetKeyState('A') & 0x8000) || (GetKeyState(VK_LEFT) & 0x8000))
             {
-                if((current_x - 1) < 0 ) //Check to see if new position is legal
+                if((myGameInfo.current_x - 1) < 0 ) //Check to see if new position is legal
                 {
                     displayRedText(">- ERROR, item can not move there", true);
                     cout << ">- Directive: Please type a different command" << endl;
                 }
                 else
                 {
-                    myGameInfo.gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
-                    savedCharacter = myGameInfo.gameMap[current_x - 1][current_y]; //Save the character of the future value
-                    myGameInfo.gameMap[current_x - 1][current_y] = '@'; //Replace the future spot with an @ symbol
-                    current_x -= 1; //Update current position
-
-                    system("CLS");
-                    readMapArray(myGameInfo);
-                    displayRedText(">- Press escape to exit keyboard mode", true);
+                    //Update position of base
+                    myGameInfo = changePosition(myGameInfo, -1, 0, true);
                 }
             }
             //Else if specific key is pressed:
             else if((GetKeyState('D') & 0x8000) || (GetKeyState(VK_RIGHT) & 0x8000))
             {
-                if((current_x + 1) > 199 ) //Check to see if new position is legal
+                if((myGameInfo.current_x + 1) > 199 ) //Check to see if new position is legal
                 {
                     displayRedText("ERROR, item can not move there", true);
                     cout << "Directive: Please type a different command" << endl;
                 }
                 else
                 {
-                    myGameInfo.gameMap[current_x][current_y] = savedCharacter; //Replace current position with the saved character
-                    savedCharacter = myGameInfo.gameMap[current_x + 1][current_y]; //Save the character of the future value
-                    myGameInfo.gameMap[current_x + 1][current_y] = '@'; //Replace the future spot with an @ symbol
-                    current_x += 1; //Update current position
-
-                    system("CLS");
-                    readMapArray(myGameInfo);
-                    displayRedText(">- Press escape to exit keyboard mode", true);
+                    //Update position of base
+                    myGameInfo = changePosition(myGameInfo, 1, 0, true);
                 }
             }
             //Else if escape is pressed, exit
@@ -360,23 +334,17 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
 
                         if(inputCommand == 1) //If they answer yes, repeat process done above in keyboard mode
                         {
-                            myGameInfo.gameMap[current_x][current_y] = savedCharacter; //place saved character back
-                            savedCharacter = myGameInfo.gameMap[saved_x][saved_y]; //save new position character
-                            myGameInfo.gameMap[saved_x][saved_y] = '@'; //Replace new position on map with @ sign
-                            current_x = saved_x; //Save current position as the new values
-                            current_y = saved_y;
-
+                            //Update position of base
+                            myGameInfo = changePosition(myGameInfo, -myGameInfo.current_x + saved_x, -myGameInfo.current_y + saved_y, false);
                             findingCoordinate = false;
                         }
                     }
                 }
-            system("CLS");
-            readMapArray(myGameInfo);
             }while(findingCoordinate);
         }
         else if(inputCommand == 3)
         {
-            cout << endl << ">- Are you sure you want to place the base on [" << current_x << "," << current_y << "]? This action is not reversable. Press 1 to confirm." << endl;
+            cout << endl << ">- Are you sure you want to place the base on [" << myGameInfo.current_x << "," << myGameInfo.current_y << "]? This action is not reversable. Press 1 to confirm." << endl;
             inputCommand = getAnswer();
 
             system("CLS");
@@ -396,7 +364,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             if(inputCommand == 1)
             {
                 //wipe the base symbol from the map array
-                myGameInfo.gameMap[current_x][current_y] = savedCharacter;
+                myGameInfo.gameMap[myGameInfo.current_x][myGameInfo.current_y] = myGameInfo.savedCharacter;
 
                 //For some reason the base character is not being wiped so I have to refresh two times
                 system("CLS");
@@ -412,9 +380,21 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
     }
 }
 
-gameInfo changePosition(gameInfo myGameInfo)
+gameInfo changePosition(gameInfo myGameInfo, int x_change, int y_change, bool usingKeyboard)
 {
-    return myGameInfo;
+    myGameInfo.gameMap[myGameInfo.current_x][myGameInfo.current_y] = myGameInfo.savedCharacter; //Replace current position with the saved character
+    myGameInfo.savedCharacter = myGameInfo.gameMap[myGameInfo.current_x + x_change][myGameInfo.current_y + y_change]; //Save the character of the future value
+    myGameInfo.gameMap[myGameInfo.current_x + x_change][myGameInfo.current_y + y_change] = '@'; //Replace the future spot with an @ symbol
+    myGameInfo.current_x = myGameInfo.current_x + x_change; //Update current position
+    myGameInfo.current_y = myGameInfo.current_y + y_change;
+
+    system("CLS"); //Wipe console
+    readMapArray(myGameInfo); //Re-output map
+    if(usingKeyboard)
+    {
+        displayRedText(">- Press escape to exit keyboard mode", true); //Output warning/directions on how to exit
+    }
+    return myGameInfo; //return
 }
 
 //Game start menu
@@ -426,8 +406,6 @@ void loadStartGame()
     char ch;
 
     system("color A"); //Fake server connection animation
-
-    //When server is connected
     cout << ">- -UNSC User Management System-" << endl << "================================" << endl << "________________________________" << endl;
     cout << "UNSC TacOS  v.337" <<  endl << "(S) 2294 FLEETCOM" << endl << "=======================" <<  endl << "|  User Log:" << endl;
     cout << "|  >> Administrator (UNSC ID 8384-C)" << endl << "|  >>> " << "unknown.GUEST_userGroup" << endl << endl;
@@ -512,4 +490,3 @@ void displayRedText(string inputOne, bool returnTrue)
         cout << endl;
     }
 }
-
