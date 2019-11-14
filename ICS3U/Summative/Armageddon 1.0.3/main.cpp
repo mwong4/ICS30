@@ -10,6 +10,11 @@
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
+>- Turn based or RTS?
+>- UI design
+>- Income
+>- Different buildings
+>- Efficiency
 >- cleaning
 >-
 */
@@ -25,6 +30,7 @@
     //Always a nuclear ending, no winning
     //Research tech
     //Communiquges with the other military department
+    //Defcon indicator
 
 //Events that could affect income:
     //Soviets become more agressive, US Government becomes more worried and increases military spending (+)
@@ -39,15 +45,17 @@
     //Civial war in south america supports an anti-soviet regime
 
 //Specific events
-    //Soviets invade afghanistan
-    //Cuban missile crisis begins
-    //Berlin wall falls
-    //Large uprising in hungary begins
-    //Soviet submarine acceident happens (K-219)
-    //Macarthur calls for 100 nuclear bombs for Korea
-    //Civil actions against the government for Vietnam are started
-    //U-2 shot down
-    //Space Race begins
+    //ww2 ends (September 2, 1945)
+    //Korean war starts (June 25, 1950)
+    //Space Race begins (1955)
+    //Large uprising in hungary begins (October 23, 1956)
+    //Civil actions against the government for Vietnam are started (1960s)
+    //U-2 shot down (May 1, 1960)
+    //Cuban missile crisis begins (October 16, 1962)
+    //Soviets invade afghanistan (December 25, 1979)
+    //Soviet submarine acceident happens (K-219) (March 8, 1986)
+    //Chernobyle (April 26, 1986)
+    //Berlin wall falls (October 3, 1990)
 
 //Declaring all used libraries
 #include <iostream>
@@ -72,6 +80,8 @@ struct gameInfo
     int current_x; //temporarily holds the x value while placing building
     int current_y; //temporarily holds the y value while placing building
     char savedCharacter; //Temporarily saves a character while placing building
+
+    int currentYear = 1945;
 };
 
 //Declaring all functions
@@ -82,6 +92,7 @@ gameInfo placeBase(gameInfo, string[]); //This function is used to select the lo
 gameInfo changePosition(gameInfo, int, int, bool); //This function is used to update the position of an object
 
 void loadStartGame(); //Fake loading screen to start the game
+void loadConsoleFeed();
 
 void displayRedText(string, bool);
 void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
@@ -200,7 +211,6 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
     bool findingCoordinate = false; //Boolean that checks if an error has occured
 
     int inputCommand = 0; //Stirng to take inputs from player
-
     int saved_x; //Saves coordinate for the custom choice of coordinate feature
     int saved_y;
 
@@ -231,13 +241,9 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
         inputCommand = getAnswer();
 
         //If player inputs /k, activate keyboard mode
-        if(inputCommand == 1)
-        {
-            cout << ">- Please use arrow keys or WASD" << endl;
-        }
-
         while(inputCommand == 1)
         {
+            cout << ">- Please use arrow keys or WASD" << endl;
             //If specific key is pressed:
             if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
             {
@@ -376,10 +382,10 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
         {
                 cout << endl << ">- hmm, try choosing a number from 1-4" << endl;
         }
-
     }
 }
 
+//Functiont that will update the position of the base depending on the valeus inputted
 gameInfo changePosition(gameInfo myGameInfo, int x_change, int y_change, bool usingKeyboard)
 {
     myGameInfo.gameMap[myGameInfo.current_x][myGameInfo.current_y] = myGameInfo.savedCharacter; //Replace current position with the saved character
@@ -466,6 +472,7 @@ float getAnswer ()
     return playerInput;//Otherwise input is good, return input
 }
 
+//Displays the menu
 void displayMenu(string options[], int arraySize)
 {
     cout << ">- Please enter a direct command. Below are the primary listed commands." << endl;
@@ -477,6 +484,7 @@ void displayMenu(string options[], int arraySize)
     return;
 }
 
+//Displays text in red
 void displayRedText(string inputOne, bool returnTrue)
 {
     HANDLE hConsole;
