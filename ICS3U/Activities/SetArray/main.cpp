@@ -1,13 +1,10 @@
 /*
 >- Author: Max Wong
 >- Date: Nov 22, 2019
->- Updated: Nov 26, 2019
+>- Updated: Nov 28, 2019
 >- Purpose: To write functions to manipulate arrays
 >-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
-
-TO DO List:
- Check requirements
 */
 
 //Declaring used libraries
@@ -23,110 +20,109 @@ TO DO List:
 using namespace std;
 
 //Declaring functions used
-void resetValues(int[], int, int); //This function resets the values to 0
-void randomizeValues(int[], int); //This function randomizes the values in the function
-void outputValues(int[], int, bool); //This function outputs the values to the console
-float getAverage(int[], int); //This function get's the average of all values in the array
+void resetValues(int[], int); //This function resets the values to 0
+void randomizeValues(int[]); //This function randomizes the values in the function
+void outputValues(int[], bool); //This function outputs the values to the console
+float getAverage(int[]); //This function get's the average of all values in the array
 int getSmallest(int[], int); //This function determines what is the smallest value in the array
-void determineSmallestPosition(int[], int, int[]); //This function determines the position of the smallest value in the array
+void determineSmallestPosition(int[], int[], int); //This function determines the position of the smallest value in the array
 void replacePosition(int[], int, int); //Thsis fuction replaces a specific position in the array with a value
 void swapValues(int[], int, int); //This function swaps the values of two positions in the array
-void orderValues(int[]); //This function swaps the values of two positions in the array
+void orderValues(int[], int[]); //This function swaps the values of two positions in the array
 
 void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
 int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
 void getInput();
 
+const int ARRAYSIZE = 10; //This sets the array size for the whole program
+
 int main()
 {
-    int myValues[10]; //Initiate main array
-    int lowestValuesPosition[10]; //Initiate array that stores all lowest value positions;
+    int myValues[ARRAYSIZE]; //Initiate main array
+    int lowestValuesPosition[ARRAYSIZE]; //Initiate array that stores all lowest value positions;
     int replacementPosition; //this int is used to determine the position in the array to be edited
     int replacementValue; //This int is to store what value is to be replaced in the array, corresponding to the integer above
 
     int arrayPositionOne; //This stores the first position to be swapped
     int arrayPositionTwo; //This stores the second position to be swapped
 
-    int randomValue = 0;
+    int inputValue = 0;
+    randomizeValues(myValues); //Call randomize function to initiate
 
     //This array of strings holds the value of all options displayed in the menu function
     string menuOptions[10] = {"set all values to 0", "set all values at random", "output all values in array", "get average of all values", "get smallest value", "get position of smallest value", "edit array", "swap two positions in array", "order values", "to quit"};
 
     srand (time(NULL)); //Randomize seed according to time
 
-    while(randomValue < 10)
+    while(inputValue < 10)
     {
-        system("CLS"); //Wipe console
-        outputValues(myValues, 10, true); //Call output function
         displayMenu(menuOptions, 10); //Display the menu
-        randomValue = getAnswer(10, 1); //Get player input
+        inputValue = getAnswer(ARRAYSIZE, 1); //Get player input
 
-        if(randomValue == 1)
+        if(inputValue == 1)
         {
-            resetValues(myValues, 10, 0); //Call reset function
+            resetValues(myValues, 0); //Call reset function
         }
-        else if(randomValue == 2)
+        else if(inputValue == 2)
         {
-            randomizeValues(myValues, 10); //Call randomize function
+            randomizeValues(myValues); //Call randomize function
             cout << "randomized" << endl;
         }
-        else if(randomValue == 3)
+        else if(inputValue == 3)
         {
             system("CLS"); //Wipe console
-            outputValues(myValues, 10, true); //Call output function
+            outputValues(myValues, true); //Call output function
         }
-        else if(randomValue == 4)
+        else if(inputValue == 4)
         {
-            cout << "total average: " << getAverage(myValues, 10) << endl; //Output avergae using total/average function
-            getInput();
+            cout << "total average: " << getAverage(myValues) << endl; //Output avergae using total/average function
         }
-        else if(randomValue == 5)
+        else if(inputValue == 5)
         {
             //Call determine smallest value function
-            cout << "Smallest value in the array: " << getSmallest(myValues, 10) << endl; //output found value
-            getInput();
+            cout << "Smallest value in the array: " << getSmallest(myValues, ARRAYSIZE) << endl; //output found value
         }
-        else if(randomValue == 6)
+        else if(inputValue == 6)
         {
-            determineSmallestPosition(myValues, 10, lowestValuesPosition); //Call determine smallest value function
-            outputValues(lowestValuesPosition, 10, false); //ouput array again
-            getInput();
+            determineSmallestPosition(myValues, lowestValuesPosition, ARRAYSIZE); //Call determine smallest value function
+            outputValues(lowestValuesPosition, false); //ouput array again
         }
-        else if(randomValue == 7)
+        else if(inputValue == 7)
         {
-            cout << endl << "Please enter the position (0 to 9) you would like to replace." << endl;
-            replacementPosition = getAnswer(9, 0); //Get first player input
+            cout << endl << "Please enter the position (0 to " << ARRAYSIZE-1 << ") you would like to replace." << endl;
+            replacementPosition = getAnswer(ARRAYSIZE-1, 0); //Get first player input
 
             cout << "Please enter the value with wich the position is to be replaced with" << endl;
             replacementValue = getAnswer(10000, -10000); //Get second player input
 
             replacePosition(myValues, replacementPosition, replacementValue); //Thsis fuction replaces a specific position in the array with a value
-            outputValues(myValues, 10, true); //Call output function
-            getInput();
         }
-        else if(randomValue == 8)
+        else if(inputValue == 8)
         {
-            cout << endl << "Please enter the first position (0-9) you would like to swap." << endl;
-            arrayPositionOne = getAnswer(9, 0); //get first player input
+            cout << endl << "Please enter the first position (0-" << ARRAYSIZE-1 << ") you would like to swap." << endl;
+            arrayPositionOne = getAnswer(ARRAYSIZE-1, 0); //get first player input
 
-            cout << "Please enter the second position (0-9) you would like to swap" << endl;
-            arrayPositionTwo = getAnswer(9, 0); //get second player input
+            cout << "Please enter the second position (0-" << ARRAYSIZE-1 << ") you would like to swap" << endl;
+            arrayPositionTwo = getAnswer(ARRAYSIZE-1, 0); //get second player input
 
             swapValues(myValues, arrayPositionOne, arrayPositionTwo); //Swap the values of the two positions chosen above
         }
-        else if(randomValue == 9)
+        else if(inputValue == 9)
         {
-            orderValues(myValues); //Call function to order array
+            orderValues(myValues, lowestValuesPosition); //Call function to order array
+            cout << ">- ordered" << endl;//Tell user that values have been ordered
         }
+        getInput();
+        system("CLS"); //Wipe console
     }
     return 0;
 }
 
  //This function resets the values to 0
-void resetValues(int myValues[], int arraySize, int setValue)
+void resetValues(int myValues[], int setValue)
 {
     //Have a foor loop go through all values in the array and set them to 0
-    for(int i = 0; i < arraySize; i++)
+    for(int i = 0; i < ARRAYSIZE; i++)
     {
         myValues[i] = setValue;
     }
@@ -134,23 +130,29 @@ void resetValues(int myValues[], int arraySize, int setValue)
 }
 
  //This function randomizes the values in the function
-void randomizeValues(int myValues[], int arraySize)
+void randomizeValues(int myValues[])
 {
+    int randomValue; //This value is a randomly generared number
     //Have the for loop go through the whole aray and set all values to a random value
-    for(int i = 0; i < arraySize; i++)
+    for(int i = 0; i < ARRAYSIZE; i++)
     {
-        myValues[i] = rand()%10;
+        myValues[i] = rand()%20;
+        randomValue = rand() % 2;
+        if(randomValue == 0)
+        {
+            myValues[i] *= -1;
+        }
     }
     return;
 }
 
  //This function outputs the values to the console
-void outputValues(int myValues[], int arraySize, bool displayPosition)
+void outputValues(int myValues[], bool displayPosition)
 {
     //Have the for loop go through the whole array and read out the values to console
-    for(int i = 0; i < arraySize; i++)
+    for(int i = 0; i < ARRAYSIZE; i++)
     {
-        if(myValues[i] != 20) //Output value only if it is not "empty". 20 represents the value of null with my array
+        if(myValues[i] != 54321) //Output value only if it is not "empty". 54321 represents the value of null with my array
         {
             cout << "position: ";
             if(displayPosition) //If displayOption is true, display position
@@ -164,41 +166,37 @@ void outputValues(int myValues[], int arraySize, bool displayPosition)
 }
 
  //This function get's the average of all values in the array
-float getAverage(int myValues[], int arraySize)
+float getAverage(int myValues[])
 {
     float totalValue = 0; //Initiate a varaibel that will hold the total
-    for(int i = 0; i < arraySize; i++)
+    for(int i = 0; i < ARRAYSIZE; i++)
     {
         //Go through all values in the array and add it to the total varuable
         totalValue += myValues[i];
     }
     //Return average (total/# of array positions)
-    return totalValue/arraySize;
+    return totalValue/ARRAYSIZE;
 }
 
  //This function determines what is the smallest value in the array
 int getSmallest(int myValues[], int arraySize)
 {
-    int smallestValue = 10; //Variable used to temporarily store the largest variable
+    int smallestValue = 100000; //Variable used to temporarily store the largest variable
     for(int i = 0; i < arraySize; i++)
     {
         //Go through the array and if a new greater value is found, save into temporary variable
         if(myValues[i] < smallestValue)
         {
             smallestValue = myValues[i]; //save current smallest found value
-            if(smallestValue == 0) //If smallest value is zero, return
-            {
-                return smallestValue;
-            }
         }
     }
     return smallestValue;
 }
 
  //This function determines the position of the smallest value in the array
-void determineSmallestPosition(int myValues[], int arraySize, int lowestValuesPosition[])
+void determineSmallestPosition(int myValues[], int lowestValuesPosition[], int arraySize)
 {
-    resetValues(lowestValuesPosition, 10, 20); //reset all values in lowest value position array to 20 (my null value)
+    resetValues(lowestValuesPosition, 54321); //reset all values in lowest value position array to 54321 (my null value)
     int counter = 0; //Set counter to 0
     int smallestValue = getSmallest(myValues, arraySize); //get the smallest value
     for(int i = 0; i < arraySize; i++) //running through all the positions in the array
@@ -231,15 +229,14 @@ void swapValues(int myValues[], int positionOne, int positionTwo)
 }
 
  //This function swaps the values of two positions in the array
-void orderValues(int myValues[])
+void orderValues(int myValues[], int smallestPosition[])
 {
     int smallestValue; //This integer stores the smallest value
-    int myListArray[10]; //This array is to store the smallest values
-    for(int i = 9; i > 0; i--) //Run a for loop for all positions in the array
+    for(int i = ARRAYSIZE-1; i > 0; i--) //Run a for loop for all positions in the array
     {
         smallestValue = getSmallest(myValues, i+1); //assign the smallest value
-        determineSmallestPosition(myValues, i+1, myListArray); //determine the smallest value position
-        swapValues(myValues, myListArray[0], i); //swap the position of the first smallest value and the i position. Reassign array
+        determineSmallestPosition(myValues, smallestPosition,  i+1); //determine the smallest value position
+        swapValues(myValues, smallestPosition[0], i); //swap the position of the first smallest value and the i position. Reassign array
     }
     return; //when finished, return;
 }
