@@ -232,11 +232,20 @@ void swapValues(int myValues[], int positionOne, int positionTwo)
 void orderValues(int myValues[], int smallestPosition[])
 {
     int smallestValue; //This integer stores the smallest value
+    int counter = -1; //This is to check if there are more than one of the found smallest number
     for(int i = ARRAYSIZE-1; i > 0; i--) //Run a for loop for all positions in the array
     {
-        smallestValue = getSmallest(myValues, i+1); //assign the smallest value
-        determineSmallestPosition(myValues, smallestPosition,  i+1); //determine the smallest value position
-        swapValues(myValues, smallestPosition[0], i); //swap the position of the first smallest value and the i position. Reassign array
+        do //The loop below, summarized, will find all of the smallest value first within the limit, which is gradually decreasing. It will then assign the smallest
+        { //value into the array at the end, backfilling over time. If there is a duplicate of a value, the code will NOT try and find all the smallest value positions again.
+            counter ++; //Every time we loop, we add one to counter
+            if(counter == 0) //If we are running the loop for the first time, find the smallest value and all the positions
+            {
+                smallestValue = getSmallest(myValues, i+1); //assign the smallest value
+                determineSmallestPosition(myValues, smallestPosition,  i+1); //determine the smallest value position
+            }
+            swapValues(myValues, smallestPosition[counter], i); //swap the position of the first smallest value and the i position. Reassign array
+        }while(smallestPosition[counter + 1] == smallestValue); //If the smallest value has a duplicate, loop, but skip finding the next duplicates
+        counter = -1;//Reset variable
     }
     return; //when finished, return;
 }
