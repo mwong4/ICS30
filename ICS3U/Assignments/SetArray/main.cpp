@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: Nov 22, 2019
->- Updated: Nov 28, 2019
+>- Updated: Nov 29, 2019
 >- Purpose: To write functions to manipulate arrays
 >-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
@@ -14,6 +14,7 @@
 #include <time.h>       /* time */
 #include<limits> //For error trapping
 #include <conio.h> //For getch();
+#include <tgmath.h> //For floor function
 
 
 //Declaring used namespace
@@ -29,17 +30,19 @@ void determineSmallestPosition(int[], int[], int); //This function determines th
 void replacePosition(int[], int, int); //Thsis fuction replaces a specific position in the array with a value
 void swapValues(int[], int, int); //This function swaps the values of two positions in the array
 void orderValues(int[], int[]); //This function swaps the values of two positions in the array
+float determineMedium(int[], int[], int[]); //This function is to determine what is the medium value
 
 void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
 int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
-void getInput();
+void getInput(); //Better system pause system
 
-const int ARRAYSIZE = 10; //This sets the array size for the whole program
+const int ARRAYSIZE = 9; //This sets the array size for the whole program
 
 int main()
 {
     int myValues[ARRAYSIZE]; //Initiate main array
     int lowestValuesPosition[ARRAYSIZE]; //Initiate array that stores all lowest value positions;
+    int determineMediumArray[ARRAYSIZE]; //This array is to determine help in determining the medium of the array
     int replacementPosition; //this int is used to determine the position in the array to be edited
     int replacementValue; //This int is to store what value is to be replaced in the array, corresponding to the integer above
 
@@ -50,14 +53,14 @@ int main()
     randomizeValues(myValues); //Call randomize function to initiate
 
     //This array of strings holds the value of all options displayed in the menu function
-    string menuOptions[10] = {"set all values to 0", "set all values at random", "output all values in array", "get average of all values", "get smallest value", "get position of smallest value", "edit array", "swap two positions in array", "order values", "to quit"};
+    string menuOptions[11] = {"set all values to 0", "set all values at random", "output all values in array", "get average of all values", "get smallest value", "get position of smallest value", "edit array", "swap two positions in array", "order values", "Get Medium", "to quit" };
 
     srand (time(NULL)); //Randomize seed according to time
 
-    while(inputValue < 10)
+    while(inputValue < 11)
     {
-        displayMenu(menuOptions, 10); //Display the menu
-        inputValue = getAnswer(ARRAYSIZE, 1); //Get player input
+        displayMenu(menuOptions, 11); //Display the menu
+        inputValue = getAnswer(11, 1); //Get player input
 
         if(inputValue == 1)
         {
@@ -111,6 +114,10 @@ int main()
         {
             orderValues(myValues, lowestValuesPosition); //Call function to order array
             cout << ">- ordered" << endl;//Tell user that values have been ordered
+        }
+        else if(inputValue == 10)
+        {
+            cout << ">- Medium: " << determineMedium(myValues, determineMediumArray, lowestValuesPosition) << endl;
         }
         getInput();
         system("CLS"); //Wipe console
@@ -250,6 +257,27 @@ void orderValues(int myValues[], int smallestPosition[])
     return; //when finished, return;
 }
 
+ //This function is to determine what is the medium value
+float determineMedium(int myValues[], int secondArray[], int smallestPosition[])
+{
+    int midle;
+    for(int i = 0; i < ARRAYSIZE; i++)
+    { //Go through every value in the secondary array and set to match the values of the first array
+        replacePosition( secondArray, i, myValues[i]);
+    }
+    orderValues(secondArray, smallestPosition);
+
+    if(ARRAYSIZE % 2 == 0)
+    {
+        return (secondArray[ARRAYSIZE/2-1] + secondArray[ARRAYSIZE/2])/2.0;
+    }
+    else
+    {
+        midle = floor(ARRAYSIZE/2.0);
+        return secondArray[midle];
+    }
+}
+
 //Displays the menu
 void displayMenu(string options[], int arraySize)
 {
@@ -288,6 +316,7 @@ int getAnswer (int limitMax, int limitMin)
     return playerInput;//Otherwise input is good, return input
 }
 
+ //Better system pause system
 void getInput()
 {
     cout << endl << ">- [Input anything to continue]" << endl;

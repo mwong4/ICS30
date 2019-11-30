@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.1.4]
+>- [version 1.1.5]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -60,15 +60,17 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <stdlib.h>
 #include <windows.h>   // WinApi header
 #include <sstream>
 #include <iomanip>
 #include <math.h>
 #include <conio.h>
 
-//For error trapping
-#include<limits>
+#include <stdio.h>      /* printf, NULL */
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
+
+#include<limits> //For error trapping
 
 
 using namespace std;
@@ -82,8 +84,8 @@ struct gameInfo
 
     int currentYear = 1945; //Year is 1945
     float currentGDP = 2000000; //The stating US GDP is 2 trillion
-    float currentIncome = 0.008; //The starting military funding is 0.8%
-    int currentBalance = 100; //The current military balance is 1000 million
+    float currentIncome = 0.001; //The starting military funding is 0.001%
+    float currentBalance = 0.5; //The current military balance is 500 millsion dollars
 };
 
 //Declaring all functions
@@ -100,7 +102,7 @@ void loadConsoleFeed();
 
 void displayRedText(string, bool);
 void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
-float getAnswer(); //Function used to get the players response as an integer (with error trapping)
+float getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
 
 int main()
 {
@@ -112,6 +114,8 @@ int main()
     bool gameStart = true; //This boolean is used to determine if the game is running for the first time
 
     int inputCommand = 0;//This variable is used to get the players input
+
+    srand (time(NULL)); //Randomize seed according to time
 
     //Reset the map double array to blank/null
     for(int i = 0; i < 55; i++)
@@ -127,10 +131,10 @@ int main()
     //Get map from text file and save it
     myGameInfo = getMapFile(myGameInfo);
 
-    myGameInfo.currentYear = 1945;
-    myGameInfo.currentGDP = 2000000;
-    myGameInfo.currentIncome = 0.008; //The starting military funding is 0.8%
-    myGameInfo.currentBalance = 100; //The current military balance is 1000 million
+    myGameInfo.currentYear = 1945; //Year is 1945
+    myGameInfo.currentGDP = 20000; //The stating US GDP is 2 trillion
+    myGameInfo.currentIncome = 0.001; //The starting military funding is 0.001%
+    myGameInfo.currentBalance = 0.5; //The current military balance is 500 million dollars
 
 
     //main loop of the game
@@ -149,7 +153,7 @@ int main()
         myOptions[1] = "to refresh";
         myOptions[2] = "|| Finish Turn >>";
         displayMenu(myOptions, 3);
-        inputCommand = getAnswer(); //Get player input
+        inputCommand = getAnswer(3, 1); //Get player input
 
         if(inputCommand == 1) //If player enters /spawn, create a base
         {
@@ -169,18 +173,30 @@ int main()
 
 gameInfo endTurn(gameInfo myGameInfo)
 {
+    float randomValue; //This number is randomly generated
     system("CLS"); //Clear console
 
     myGameInfo.currentYear ++;
     cout << ">- [January 1, " << myGameInfo.currentYear << "]" << endl;
 
-    myGameInfo.currentGDP *= (rand()%5-1)/100;
+    randomValue = (rand()%4+1)/100.0;
+    if(rand() % 5 == 0 && randomValue < 3 )
+    {
+        cout << "Economy decreased by -> " << randomValue*100 << "%" << endl;
+        myGameInfo.currentGDP -= myGameInfo.currentGDP*randomValue;
+    }
+    else
+    {
+        cout << "Economy increased by -> " << randomValue*100 << "%" << endl;
+        myGameInfo.currentGDP += myGameInfo.currentGDP*randomValue;
+    }
+
     cout << ">- GDP is Now:" << myGameInfo.currentGDP << endl;
 
     //Change income percent
 
-    myGameInfo.currentBalance += myGameInfo.currentGDP*myGameInfo.currentIncome;
-    cout << ">- Current Balance is Now:" << myGameInfo.currentBalance << endl;
+    myGameInfo.currentBalance += (myGameInfo.currentGDP*myGameInfo.currentIncome)/100.0;
+    cout << ">- Current Department Anual Budget: " << myGameInfo.currentBalance << " billion dollars" << endl;
 
     system("PAUSE");
     return myGameInfo;
@@ -272,7 +288,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
         displayMenu(myOptions,4);
 
         inputCommand = 0;
-        inputCommand = getAnswer();
+        inputCommand = getAnswer(4, 1);
 
         //If player inputs /k, activate keyboard mode
         while(inputCommand == 1)
@@ -347,7 +363,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             do
             {
                 cout << endl << ">- Please enter your specific X-coordinate below between 3 and 198. Press 0 to exit" << endl;
-                saved_x = getAnswer();
+                saved_x = getAnswer(198, 3);
 
                 if(saved_x == 0) //If they choose to exit, exit
                 {
@@ -358,7 +374,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
                     if(saved_x <  3) saved_x = 3;
 
                     cout << endl << ">- Please enter your specific Y-coordinate below between 3 and 43. Press 0 to exit" << endl;
-                    saved_y = getAnswer(); //Get input for specific y-input
+                    saved_y = getAnswer(43, 3); //Get input for specific y-input
 
                     if(saved_y == 0)
                     {
@@ -366,11 +382,9 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
                     }
                     else
                     {
-                        if(saved_y > 44) saved_y = 44; //If input is not legal, set to default values
-                        if(saved_y <  3) saved_y = 3;
 
                         cout << ">- Your coordinate is [" << saved_x << "," << saved_y << "]. Press 1 to confirm." << endl;
-                        inputCommand = getAnswer(); //Get player confirmation for their input
+                        inputCommand = getAnswer(1, 0); //Get player confirmation for their input
 
                         if(inputCommand == 1) //If they answer yes, repeat process done above in keyboard mode
                         {
@@ -385,7 +399,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
         else if(inputCommand == 3)
         {
             cout << endl << ">- Are you sure you want to place the base on [" << myGameInfo.current_x << "," << myGameInfo.current_y << "]? This action is not reversable. Press 1 to confirm." << endl;
-            inputCommand = getAnswer();
+            inputCommand = getAnswer(1, 0);
 
             system("CLS");
             readMapArray(myGameInfo);
@@ -397,7 +411,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
         else if(inputCommand == 4)
         {
             cout << endl << ">- You are Attempting to exit. Are you sure? Press 1 to quit" << endl;
-            inputCommand = getAnswer();
+            inputCommand = getAnswer(1, 0);
 
             system("CLS");
             readMapArray(myGameInfo);
@@ -477,7 +491,7 @@ void loadStartGame()
 }
 
 //Error trapping funcion that only accepts integers
-float getAnswer ()
+float getAnswer (int maxLimit, int minLimit)
 {
     int playerInput; //This variable is used to get the player's input
     bool findingInput; //This bool determines if the loop continues running
@@ -495,10 +509,10 @@ float getAnswer ()
             displayRedText("==================================================", true);
             findingInput = true; //If the input is invalid, then the loop will loop
         }
-        else if(playerInput > 198 || playerInput < 0 ) //Otherwise, print an error message
+        else if(playerInput > maxLimit || playerInput < minLimit ) //Otherwise, print an error message
         {
             displayRedText("==================================================", true);
-            displayRedText(">- Please enter a number between 0 and 198 ", true);
+            cout << ">- Please enter a number between " << minLimit << " and " << maxLimit << endl;
             displayRedText("==================================================", true);
             findingInput = true; //If the input is invalid, then the loop will loop
         }
