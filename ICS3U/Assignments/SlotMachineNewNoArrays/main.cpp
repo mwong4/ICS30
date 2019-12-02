@@ -16,11 +16,14 @@ using namespace std;
 
 //declaring functions
 int getAnswer(); //Function used to get the players response as an integer (with error trapping)
-void runSlotMachine(int, int, int, int&, int&, int&); //This function acts as all three slot machines, being preset by each call for different settings
+void runSlotMachine(int, int, int&, int&, int&); //This function acts as all three slot machines, being preset by each call for different settings
 
 int main()
 {
-    int payoutCounters[3] = {0, 0, 0}; //These variable holds the amount of times a slot machine is used to determine when to pay out
+    int payoutCounterOne = 0; //These variable holds the amount of times a slot machine is used to determine when to pay out
+    int payoutCounterTwo = 0;
+    int payoutCounterThree = 0;
+
     int coinsCount; //This variable keeps track of remaining coins
     int currentPlays = 0; //This variable keeps track of how many tiems the player has played
 
@@ -34,17 +37,17 @@ int main()
 
         //Get slot machine input
         cout << endl << ">- Please enter the case situation for each slot machine" << endl << ">- Machine one: ";
-        payoutCounters[0] = getAnswer(); //Call the function to get the first slot machine preset
+        payoutCounterOne = getAnswer(); //Call the function to get the first slot machine preset
         cout << ">- Machine 2: ";
-        payoutCounters[1] = getAnswer(); //Call the function to get the second slot machine preset
+        payoutCounterTwo = getAnswer(); //Call the function to get the second slot machine preset
         cout << ">- Machine 3: ";
-        payoutCounters[2] = getAnswer(); //Call the function to get the third slot machine preset
+        payoutCounterThree = getAnswer(); //Call the function to get the third slot machine preset
 
         while(coinsCount > 0)
         {
-            runSlotMachine(0, 35, 30, payoutCounters[0], coinsCount, currentPlays); //Call the function to run machine 1
-            runSlotMachine(1, 100, 60, payoutCounters[1], coinsCount, currentPlays); //Call function to run machine 2
-            runSlotMachine(2, 10, 9, payoutCounters[2], coinsCount, currentPlays); //Call function to run machine 3
+            runSlotMachine(35, 30, payoutCounterOne, coinsCount, currentPlays); //Call the function to run machine 1
+            runSlotMachine(100, 60, payoutCounterTwo, coinsCount, currentPlays); //Call function to run machine 2
+            runSlotMachine(10, 9, payoutCounterThree, coinsCount, currentPlays); //Call function to run machine 3
         }
         //Display how many tries martha has been able to try using the counter variable
         cout << endl << ">- Martha plays " << currentPlays << " times" << endl;
@@ -88,7 +91,7 @@ int getAnswer ()
 }
 
 //This function acts as all three slot machines, being preset by each call for different settings
-void runSlotMachine(int currentMachine, int _payoutWhen, int _payoutQuantity, int& _payoutCounter, int& _coinsCount, int& _currentPlays)
+void runSlotMachine(int _payoutWhen, int _payoutQuantity, int& _payoutCounter, int& _coinsCount, int& _currentPlays)
 {
     if(_coinsCount > 0) //Check if player has coins. If yes, run section below
     {
