@@ -5,17 +5,13 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.1.5]
+>- [version 1.1.6]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
->- Turn based or RTS?
->- UI design
->- Income
->- Different buildings
 >- Efficiency
+>- Different buildings
 >- cleaning
->-
 */
 
 //Game features to be finished
@@ -101,7 +97,7 @@ void loadStartGame(); //Fake loading screen to start the game
 void loadConsoleFeed();
 
 void displayRedText(string, bool);
-void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
+void displayMenu(string[], int, gameInfo); //Function to show the menu: All positions are options except last which is reserved for quit number
 float getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
 
 int main()
@@ -143,16 +139,11 @@ int main()
         //Print out the map
         readMapArray(myGameInfo);
 
-        cout << ">- [January 1, " << myGameInfo.currentYear << "]" << endl;
-        cout << ">- GDP is Now:" << myGameInfo.currentGDP << endl;
-        cout << ">- Current Balance is Now:" << myGameInfo.currentBalance << endl;
-
-
         //Ask for a input from the player
         myOptions[0] = "create a new base";
         myOptions[1] = "to refresh";
         myOptions[2] = "|| Finish Turn >>";
-        displayMenu(myOptions, 3);
+        displayMenu(myOptions, 3, myGameInfo);
         inputCommand = getAnswer(3, 1); //Get player input
 
         if(inputCommand == 1) //If player enters /spawn, create a base
@@ -177,26 +168,26 @@ gameInfo endTurn(gameInfo myGameInfo)
     system("CLS"); //Clear console
 
     myGameInfo.currentYear ++;
-    cout << ">- [January 1, " << myGameInfo.currentYear << "]" << endl;
+    cout << "         >- [January 1, " << myGameInfo.currentYear << "]" << endl;
 
     randomValue = (rand()%4+1)/100.0;
     if(rand() % 5 == 0 && randomValue < 3 )
     {
-        cout << "Economy decreased by -> " << randomValue*100 << "%" << endl;
+        cout << "         >- Economy decreased by -> " << randomValue*100 << "%" << endl;
         myGameInfo.currentGDP -= myGameInfo.currentGDP*randomValue;
     }
     else
     {
-        cout << "Economy increased by -> " << randomValue*100 << "%" << endl;
+        cout << "         >- Economy increased by -> " << randomValue*100 << "%" << endl;
         myGameInfo.currentGDP += myGameInfo.currentGDP*randomValue;
     }
 
-    cout << ">- GDP is Now:" << myGameInfo.currentGDP << endl;
+    cout << "         >- GDP is Now:" << myGameInfo.currentGDP << endl;
 
     //Change income percent
 
     myGameInfo.currentBalance += (myGameInfo.currentGDP*myGameInfo.currentIncome)/100.0;
-    cout << ">- Current Department Anual Budget: " << myGameInfo.currentBalance << " billion dollars" << endl;
+    cout << "         >- Current Department Anual Budget: " << myGameInfo.currentBalance << " billion dollars" << endl;
 
     system("PAUSE");
     return myGameInfo;
@@ -285,7 +276,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
         myOptions[1] = ">- to place on a custom coordinate";
         myOptions[2] = ">- to place base";
         myOptions[3] = ">- Cancel/exit";
-        displayMenu(myOptions,4);
+        displayMenu(myOptions,4, myGameInfo);
 
         inputCommand = 0;
         inputCommand = getAnswer(4, 1);
@@ -498,22 +489,22 @@ float getAnswer (int maxLimit, int minLimit)
     do
     {
         findingInput = false; //By default, the loop will end
-        cout << ">- Your input: "; //Get player input
+        cout << "         >- Your input: "; //Get player input
         cin >> playerInput;
         if(cin.fail())//Check to see if player entered a "bad" input type
         {
             cin.clear(); //Clear all flags
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //ignore incorrect symbols
-            displayRedText("==================================================", true);
-            displayRedText(">- Please enter a valid input number", true);
-            displayRedText("==================================================", true);
+            displayRedText("  ==================================================", true);
+            displayRedText("  >- Please enter a valid input number", true);
+            displayRedText("  ==================================================", true);
             findingInput = true; //If the input is invalid, then the loop will loop
         }
         else if(playerInput > maxLimit || playerInput < minLimit ) //Otherwise, print an error message
         {
-            displayRedText("==================================================", true);
-            cout << ">- Please enter a number between " << minLimit << " and " << maxLimit << endl;
-            displayRedText("==================================================", true);
+            displayRedText("  ==================================================", true);
+            cout << "  >- Please enter a number between " << minLimit << " and " << maxLimit << endl;
+            displayRedText("  ==================================================", true);
             findingInput = true; //If the input is invalid, then the loop will loop
         }
     }while(findingInput);
@@ -521,13 +512,14 @@ float getAnswer (int maxLimit, int minLimit)
 }
 
 //Displays the menu
-void displayMenu(string options[], int arraySize)
+void displayMenu(string options[], int arraySize, gameInfo myGameInfo)
 {
-    cout << ">- Please enter a direct command. Below are the primary listed commands." << endl;
+    cout << "         >- Please enter a direct command. Below are the primary listed commands.                                                      ";
+    cout << "[January 1, " << myGameInfo.currentYear << "] <> Current Department Balance:" << myGameInfo.currentBalance<< endl;
     //Display instructions
     for(int i = 0; i < arraySize; i++)
     {
-        cout << ">- [" << i+1 << "] " << options[i] << endl;
+        cout << "         >- [" << i+1 << "] " << options[i] << endl;
     }
     return;
 }
