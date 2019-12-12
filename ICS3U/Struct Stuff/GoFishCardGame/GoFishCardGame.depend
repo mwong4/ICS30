@@ -1,0 +1,17 @@
+# depslib dependency file v1.0
+1576074296 source:c:\users\maxwong\documents\github\ics30\ics3u\assignments\gofishcardgame\main.cpp
+	<iostream>
+	<limits>
+	<tgmath.h>
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
+1576074296 source:c:\users\maxwong\documents\github\ics30\ics3u\struct stuff\gofishcardgame\main.cpp
+	<iostream>
+	<limits>
+	<tgmath.h>
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
