@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1576270698 source:c:\users\maxwong\documents\github\ics30\ics3u\assignments\fractionstructureprogram\main.cpp
+	<iostream>
+	<tgmath.h>
+	<limits>
+	<conio.h>
+
