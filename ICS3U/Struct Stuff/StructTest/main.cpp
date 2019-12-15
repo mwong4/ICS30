@@ -3,20 +3,28 @@
 
 using namespace std;
 
-struct Card{
-    char cardSuit; //Card suit saved as char
-    string cardRank; //Card rank saved as string
-    int cardValue; //Card value saved as integer
-    int identity; //Card indetity saved as integer
-} myCards[52]; //Have an array of structures/cards
+//This function is used to find the greatest common denominator between two numbers
+findGCD(int _numOne, int _numTwo)
+{
+    int remainder = 0; //This integer is used to store the remainder temporarily from each mod.
+    if(_numTwo > _numOne)
+    { //To avoid an error, if num2 is greater than num1, swap them
+        remainder = _numOne;
+        _numOne = _numTwo;
+        _numTwo = remainder;
+    }
+    cout << _numOne << " , " << _numTwo << endl;
+    while(_numOne % _numTwo != 0) //Run Euclidean's Algorithm to find the greatest common denominator
+    {
+        remainder = _numOne % _numTwo; //get remainder of num1 mod num2
+        _numOne = _numTwo; //Set num1 as num2
+        _numTwo = remainder; //Set num2 as remainder
+    }
+    return _numTwo; //When done, return num2
+}
 
 int main()
 {
-    int cool[4] = {1,2,3,4};
-
-    cout << floor(15/13) << endl;
-    int num = floor(15/13);
-
-    cout << cool[num] << endl;
+cout << findGCD(2,8) << endl;
     return 0;
 }

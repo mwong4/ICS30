@@ -30,7 +30,7 @@ Fraction mul(Fraction, Fraction); //This function is to multiply two fractions
 Fraction div(Fraction, Fraction); //This function is to divide two fractions
 void compare(Fraction, Fraction); //This function is to compare two fractions
 
-Fraction reduce(Fraction);
+int findGCD(int, int); //This function is used to find the greatest common denominator between two numbers
 void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
 int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
 void tapAny(); //Better system pause system
@@ -39,15 +39,15 @@ int main()
 {
     //Declare the fraction structures and initialize them
     Fraction fracOne, fracTwo, answer;
-    initialize(fracOne, 1, 2);
-    initialize(fracTwo, 2, 8);
+    initialize(fracOne, 1, 3);
+    initialize(fracTwo, 1, 9);
     int getInput = 0; //This integer is used to get player's input
     //This array of strings show the possible options that can be picked and are displayed by the menu function
     string menuOptions[7] = {"Display", "Addition", "Subtraction", "Multiplication", "Division", "Compare", "Quit"};
 
-    while(getInput != 6)
+    while(getInput != 7)
     { //Display menu and get player input
-        displayMenu(menuOptions, 6);
+        displayMenu(menuOptions, 7);
         getInput = getAnswer(7, 1);
 
         if(getInput == 1)
@@ -80,7 +80,7 @@ int main()
             cout << "# / # = ";
             display(answer);
         }
-        else if(getInput == 5)
+        else if(getInput == 6)
         {
             compare(fracOne, fracTwo);
         }
@@ -108,11 +108,15 @@ void initialize(Fraction& _frac, int _newNum, int _newDen)
 Fraction add(Fraction _fracOne, Fraction _fracTwo)
 {
     Fraction answer; //Define a new fraction as the answer
-    //multiply each fracion by the opposite denominator, then add to other fraction
-    answer.numerator = _fracOne.numerator*_fracTwo.denominator + _fracTwo.numerator*_fracOne.denominator;
-    answer.denominator = _fracOne.denominator*_fracTwo.denominator;
-    //Reduce fraction to lowest multiple using the assigned function
-    answer = reduce(answer);
+    int greatestCD = 0; //This integer stores the value of the greatest common denominator
+
+    //Find the GCD between the numerator and the denominator
+    greatestCD = findGCD(_fracOne.numerator*_fracTwo.denominator + _fracTwo.numerator*_fracOne.denominator, _fracOne.denominator*_fracTwo.denominator);\
+    cout << greatestCD << endl;
+    //multiply each fracion by the opposite denominator, then add to other fraction, then divide total by the GCD
+    answer.numerator = (_fracOne.numerator*_fracTwo.denominator + _fracTwo.numerator*_fracOne.denominator)/greatestCD;
+    answer.denominator = (_fracOne.denominator*_fracTwo.denominator)/greatestCD;
+
     return answer; //Return answer
 }
 
@@ -120,9 +124,13 @@ Fraction add(Fraction _fracOne, Fraction _fracTwo)
 Fraction sub(Fraction _fracOne, Fraction _fracTwo)
 {
     Fraction answer; //Define a new fraction as the answer
-    //multiply each fracion by the opposite denominator, then add to other fraction
-    answer.numerator = _fracOne.numerator*_fracTwo.denominator - _fracTwo.numerator*_fracOne.denominator;
-    answer.denominator = _fracOne.denominator*_fracTwo.denominator;
+    int greatestCD; //This integer stores the value of the greatest common denominator
+
+    //Find the GCD between the numerator and the denominator
+    greatestCD = findGCD(_fracOne.numerator*_fracTwo.denominator - _fracTwo.numerator*_fracOne.denominator, _fracOne.denominator*_fracTwo.denominator);
+    //multiply each fracion by the opposite denominator, then add to other fraction, then divide total by the GCD
+    answer.numerator = (_fracOne.numerator*_fracTwo.denominator - _fracTwo.numerator*_fracOne.denominator)/greatestCD;
+    answer.denominator = (_fracOne.denominator*_fracTwo.denominator)/greatestCD;
 
     if(answer.denominator < 0)
     { //case 1: if numerator is positive but denominator is negative, multiply both by -1 to convert numerator to negative and denominator to positive
@@ -131,8 +139,6 @@ Fraction sub(Fraction _fracOne, Fraction _fracTwo)
         answer.numerator *= -1;
         answer.denominator *= -1;
     }
-    //Reduce fraction to lowest multiple using the assigned function
-    answer = reduce(answer);
     return answer; //Return answer
 }
 
@@ -140,8 +146,14 @@ Fraction sub(Fraction _fracOne, Fraction _fracTwo)
 Fraction mul(Fraction _fracOne, Fraction _fracTwo)
 {
     Fraction answer; //Define a new fraction as the answer
-    answer.numerator = _fracOne.numerator*_fracTwo.numerator; //multiply the numerators
-    answer.denominator = _fracOne.denominator*_fracTwo.denominator; //multiply the denominator
+    int greatestCD; //This integer stores the value of the greatest common denominator
+
+    //Find the GCD between the numerator and the denominator of the result
+    greatestCD = findGCD(_fracOne.numerator*_fracTwo.numerator, _fracOne.denominator*_fracTwo.denominator);
+
+    //Multiply the numerators and denominators together, then divide each by their GCD
+    answer.numerator = (_fracOne.numerator*_fracTwo.numerator)/greatestCD; //multiply the numerators
+    answer.denominator = (_fracOne.denominator*_fracTwo.denominator)/greatestCD; //multiply the denominator
     return answer; //Return answer fraction
 }
 
@@ -149,8 +161,14 @@ Fraction mul(Fraction _fracOne, Fraction _fracTwo)
 Fraction div(Fraction _fracOne, Fraction _fracTwo)
 {
     Fraction answer; //Define a new fraction as the answer
-    answer.numerator = _fracOne.numerator*_fracTwo.denominator; //multiply the numerators
-    answer.denominator = _fracOne.denominator*_fracTwo.numerator; //multiply the denominator
+    int greatestCD; //This integer stores the value of the greatest common denominator
+
+    //Find the GCD between the numerator and the denominator of the result
+    greatestCD = findGCD(_fracOne.numerator*_fracTwo.denominator, _fracOne.denominator*_fracTwo.numerator);
+
+    //Flip second fraction, Multiply the numerators and denominators together, then divide each by their GCD
+    answer.numerator = (_fracOne.numerator*_fracTwo.denominator)/greatestCD; //multiply the numerators
+    answer.denominator = (_fracOne.denominator*_fracTwo.numerator)/greatestCD; //multiply the denominator
     return answer; //Return answer fraction
 }
 
@@ -158,11 +176,11 @@ Fraction div(Fraction _fracOne, Fraction _fracTwo)
 void compare(Fraction _fracOne, Fraction _fracTwo)
 {
     display(_fracOne);
-    if(_fracOne.numerator/_fracOne.denominator == _fracTwo.numerator/_fracTwo.denominator)
+    if(_fracOne.numerator*_fracTwo.denominator == _fracTwo.numerator*_fracOne.denominator)
     {
         cout << " = ";
     }
-    else if(_fracOne.numerator/_fracOne.denominator > _fracTwo.numerator/_fracTwo.denominator)
+    else if(_fracOne.numerator*_fracTwo.denominator > _fracTwo.numerator*_fracOne.denominator)
     {
         cout << " > ";
     }
@@ -174,17 +192,23 @@ void compare(Fraction _fracOne, Fraction _fracTwo)
     return;
 }
 
-Fraction reduce(Fraction _frac)
+//This function is used to find the greatest common denominator between two numbers
+findGCD(int _numOne, int _numTwo)
 {
-    for(int i = 2; i < ceil(sqrt(_frac.denominator)); i++)
-    { //Go through all possible prime factors
-        if(_frac.numerator % i == 0 && _frac.denominator % i == 0)
-        { //And check to see if they are indeed factors. If they are, reduce the fraction by that prime factor
-            _frac.numerator /= i;
-            _frac.denominator /= i;
-        }
+    int remainder = 0; //This integer is used to store the remainder temporarily from each mod.
+    if(_numTwo > _numOne)
+    { //To avoid an error, if num2 is greater than num1, swap them
+        remainder = _numOne;
+        _numOne = _numTwo;
+        _numTwo = remainder;
     }
-    return _frac; //Return fraction when done
+    while(_numOne % _numTwo != 0) //Run Euclidean's Algorithm to find the greatest common denominator
+    {
+        remainder = _numOne % _numTwo; //get remainder of num1 mod num2
+        _numOne = _numTwo; //Set num1 as num2
+        _numTwo = remainder; //Set num2 as remainder
+    }
+    return _numTwo; //When done, return num2
 }
 
 //Displays the menu
