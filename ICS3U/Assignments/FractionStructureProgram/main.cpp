@@ -1,13 +1,10 @@
 /*
 >- Author: Max Wong
 >- Date: Dec 13, 2019
->- Updated: Dec 13, 2019
+>- Updated: Dec 16, 2019
 >- Purpose: To write functions to manipulate fractions with structures
 >-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
-TO DO
-
--efficient reduction
 */
 
 #include <iostream>
@@ -34,16 +31,22 @@ int findGCD(int, int); //This function is used to find the greatest common denom
 void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
 int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
 void tapAny(); //Better system pause system
+bool fracCheck(Fraction); //Check's to see if the fraction is legal, if the denominator is zero
 
 int main()
 {
     //Declare the fraction structures and initialize them
     Fraction fracOne, fracTwo, answer;
-    initialize(fracOne, 1, 3);
-    initialize(fracTwo, 1, 9);
+    initialize(fracOne, 3, 7);
+    initialize(fracTwo, 49, 11);
     int getInput = 0; //This integer is used to get player's input
     //This array of strings show the possible options that can be picked and are displayed by the menu function
     string menuOptions[7] = {"Display", "Addition", "Subtraction", "Multiplication", "Division", "Compare", "Quit"};
+
+    if(!fracCheck(fracOne) || !fracCheck(fracTwo)) //Check to see if fractions inputted are legal. If no, close program
+    {
+        getInput = 7;
+    }
 
     while(getInput != 7)
     { //Display menu and get player input
@@ -93,7 +96,18 @@ int main()
 //This function is used to display the fraction
 void display(Fraction frac)
 {
-    cout << frac.numerator << "/" << frac.denominator;
+    if(frac.numerator == 0) //If value is zero, display zero
+    {
+        cout << "0";
+    }
+    else if(frac.denominator == 1) //If value is over one (denominator), show only numerator
+    {
+        cout << frac.numerator;
+    }
+    else //otherwise display regular fraction
+    {
+        cout << frac.numerator << "/" << frac.denominator;
+    }
     return;
 }
 
@@ -195,18 +209,21 @@ void compare(Fraction _fracOne, Fraction _fracTwo)
 //This function is used to find the greatest common denominator between two numbers
 findGCD(int _numOne, int _numTwo)
 {
-    int remainder = 0; //This integer is used to store the remainder temporarily from each mod.
-    if(_numTwo > _numOne)
-    { //To avoid an error, if num2 is greater than num1, swap them
-        remainder = _numOne;
-        _numOne = _numTwo;
-        _numTwo = remainder;
-    }
-    while(_numOne % _numTwo != 0) //Run Euclidean's Algorithm to find the greatest common denominator
+    int remainder = 1; //This integer is used to store the remainder temporarily from each mod.
+    if(_numOne*_numTwo != 0) //check and avoid the error where one of the numers is zero
     {
-        remainder = _numOne % _numTwo; //get remainder of num1 mod num2
-        _numOne = _numTwo; //Set num1 as num2
-        _numTwo = remainder; //Set num2 as remainder
+        if(_numTwo > _numOne)
+        { //To avoid an error, if num2 is greater than num1, swap them
+            remainder = _numOne;
+            _numOne = _numTwo;
+            _numTwo = remainder;
+        }
+        while(_numOne % _numTwo != 0) //Run Euclidean's Algorithm to find the greatest common denominator
+        {
+            remainder = _numOne % _numTwo; //get remainder of num1 mod num2
+            _numOne = _numTwo; //Set num1 as num2
+            _numTwo = remainder; //Set num2 as remainder
+        }
     }
     return _numTwo; //When done, return num2
 }
@@ -254,5 +271,16 @@ void tapAny()
 {
     cout << endl << ">- [Input anything to continue]" << endl;
     getch(); //Get any player input before continuing
+}
+
+//Check's to see if the fraction is legal, if the denominator is zero
+bool fracCheck(Fraction frac)
+{
+    if(frac.denominator == 0)
+    {
+        cout << "ERROR: The crows are looming because a denominator is zero" << endl;
+        return false;
+    }
+    return true;
 }
 
