@@ -22,9 +22,9 @@ struct Fraction{
 void display(Fraction); //This function is used to display the fraction
 void initialize(Fraction&, int, int); //This function is used to set the value of the fraction
 Fraction add(Fraction, Fraction); //This function is to add two fractions together
-Fraction sub(Fraction, Fraction); //This function is to subtract one fraction from another
-Fraction mul(Fraction, Fraction); //This function is to multiply two fractions
-Fraction div(Fraction, Fraction); //This function is to divide two fractions
+Fraction subtract(Fraction, Fraction); //This function is to subtract one fraction from another
+Fraction multiply(Fraction, Fraction); //This function is to multiply two fractions
+Fraction divide(Fraction, Fraction); //This function is to divide two fractions
 void compare(Fraction, Fraction); //This function is to compare two fractions
 
 Fraction denomCheck(Fraction); //This checks for a possible error with the denominator being negative
@@ -69,19 +69,19 @@ int main()
         }
         else if(getInput == 3)
         {
-            answer = sub(fracOne, fracTwo);
+            answer = subtract(fracOne, fracTwo);
             cout << "# - # = ";
             display(answer);
         }
         else if(getInput == 4)
         {
-            answer = mul(fracOne, fracTwo);
+            answer = multiply(fracOne, fracTwo);
             cout << "# * # = ";
             display(answer);
         }
         else if(getInput == 5)
         {
-            answer = div(fracOne, fracTwo);
+            answer = divide(fracOne, fracTwo);
             cout << "# / # = ";
             display(answer);
         }
@@ -94,6 +94,36 @@ int main()
     }
     cout << "To enable or disable menu, initialize getInput varibale as 0 or 7 respectively" << endl;
     */
+
+    Fraction one, two , answer;
+
+    initialize(one, 3, 24);
+    initialize(two, 16,56);
+
+    answer = add(one, two);
+    display(answer);
+    cout << endl;
+
+    answer = subtract(one, two);
+    display(answer);
+    cout << endl;
+
+
+    initialize(one, 9,25);
+    initialize(two, 5,12);
+    answer = multiply(one, two);
+    display(answer);
+    cout << endl;
+
+    initialize(one, 12,30);
+    initialize(two, 8,35);
+    answer = divide(one, two);
+    display(answer);
+    cout << endl;
+
+    initialize(one, 8, 35);
+    initialize(two, 11, 37);
+    compare(one, two);
     return 0;
 }
 
@@ -130,7 +160,6 @@ Fraction add(Fraction _fracOne, Fraction _fracTwo)
 
     //Find the GCD between the numerator and the denominator
     greatestCD = findGCD(_fracOne.numerator*_fracTwo.denominator + _fracTwo.numerator*_fracOne.denominator, _fracOne.denominator*_fracTwo.denominator);\
-    cout << greatestCD << endl;
     //multiply each fracion by the opposite denominator, then add to other fraction, then divide total by the GCD
     answer.numerator = (_fracOne.numerator*_fracTwo.denominator + _fracTwo.numerator*_fracOne.denominator)/greatestCD;
     answer.denominator = (_fracOne.denominator*_fracTwo.denominator)/greatestCD;
@@ -139,7 +168,7 @@ Fraction add(Fraction _fracOne, Fraction _fracTwo)
 }
 
 //This function is to subtract one fraction from another
-Fraction sub(Fraction _fracOne, Fraction _fracTwo)
+Fraction subtract(Fraction _fracOne, Fraction _fracTwo)
 {
     Fraction answer; //Define a new fraction as the answer
     int greatestCD; //This integer stores the value of the greatest common denominator
@@ -156,7 +185,7 @@ Fraction sub(Fraction _fracOne, Fraction _fracTwo)
 }
 
 //This function is to multiply two fractions
-Fraction mul(Fraction _fracOne, Fraction _fracTwo)
+Fraction multiply(Fraction _fracOne, Fraction _fracTwo)
 {
     Fraction answer; //Define a new fraction as the answer
     int greatestCD; //This integer stores the value of the greatest common denominator
@@ -171,7 +200,7 @@ Fraction mul(Fraction _fracOne, Fraction _fracTwo)
 }
 
 //This function is to divide two fractions
-Fraction div(Fraction _fracOne, Fraction _fracTwo)
+Fraction divide(Fraction _fracOne, Fraction _fracTwo)
 {
     Fraction answer; //Define a new fraction as the answer
     int greatestCD; //This integer stores the value of the greatest common denominator
@@ -310,4 +339,3 @@ bool fracCheck(Fraction frac)
     }
     return true;
 }
-
