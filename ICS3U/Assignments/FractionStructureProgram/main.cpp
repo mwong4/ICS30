@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: Dec 13, 2019
->- Updated: Dec 16, 2019
+>- Updated: Dec 17, 2019
 >- Purpose: To write functions to manipulate fractions with structures
 >-
 >-Thanks to Thomas Maloley for teaching me how to program with C++
@@ -27,6 +27,8 @@ Fraction mul(Fraction, Fraction); //This function is to multiply two fractions
 Fraction div(Fraction, Fraction); //This function is to divide two fractions
 void compare(Fraction, Fraction); //This function is to compare two fractions
 
+Fraction denomCheck(Fraction); //This checks for a possible error with the denominator being negative
+Fraction denomFix(Fraction); //This corrects an error with the denominator being negative
 int findGCD(int, int); //This function is used to find the greatest common denominator between two numbers
 void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
 int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
@@ -35,11 +37,11 @@ bool fracCheck(Fraction); //Check's to see if the fraction is legal, if the deno
 
 int main()
 {
-    //Declare the fraction structures and initialize them
+   /* //Declare the fraction structures and initialize them
     Fraction fracOne, fracTwo, answer;
     initialize(fracOne, 3, 7);
-    initialize(fracTwo, 49, 11);
-    int getInput = 0; //This integer is used to get player's input
+    initialize(fracTwo, 3, 7);
+    int getInput = 0; //<-- If this starts at 7, menu is disabled, else set to 0(This integer is used to get player's input)
     //This array of strings show the possible options that can be picked and are displayed by the menu function
     string menuOptions[7] = {"Display", "Addition", "Subtraction", "Multiplication", "Division", "Compare", "Quit"};
 
@@ -90,6 +92,8 @@ int main()
         tapAny(); //Get player's input before wiping console and reseting
         system("CLS");
     }
+    cout << "To enable or disable menu, initialize getInput varibale as 0 or 7 respectively" << endl;
+    */
     return 0;
 }
 
@@ -146,13 +150,8 @@ Fraction sub(Fraction _fracOne, Fraction _fracTwo)
     answer.numerator = (_fracOne.numerator*_fracTwo.denominator - _fracTwo.numerator*_fracOne.denominator)/greatestCD;
     answer.denominator = (_fracOne.denominator*_fracTwo.denominator)/greatestCD;
 
-    if(answer.denominator < 0)
-    { //case 1: if numerator is positive but denominator is negative, multiply both by -1 to convert numerator to negative and denominator to positive
-      //case 2: if numerator is negative but denominator is negative, multiply both by -1 to convert numerator to negative and positive to positive
-      //This section detects these cases and fixed them below
-        answer.numerator *= -1;
-        answer.denominator *= -1;
-    }
+
+    answer = denomCheck(answer);
     return answer; //Return answer
 }
 
@@ -188,8 +187,15 @@ Fraction div(Fraction _fracOne, Fraction _fracTwo)
 
 //This function is to compare two fractions
 void compare(Fraction _fracOne, Fraction _fracTwo)
-{
-    display(_fracOne);
+{ //Correct possible problems with negative signs
+    Fraction copyOne, copyTwo; //These two fractions are a copy of the original in order to display the original
+    initialize(copyOne, _fracOne.numerator, _fracOne.denominator);
+    initialize(copyTwo, _fracTwo.numerator, _fracTwo.denominator);
+
+    _fracOne = denomCheck(_fracOne);
+    _fracTwo = denomCheck(_fracTwo);
+
+    display(copyOne);
     if(_fracOne.numerator*_fracTwo.denominator == _fracTwo.numerator*_fracOne.denominator)
     {
         cout << " = ";
@@ -202,8 +208,29 @@ void compare(Fraction _fracOne, Fraction _fracTwo)
     {
         cout << " < ";
     }
-    display(_fracTwo);
+    display(copyTwo);
     return;
+}
+
+//This checks for a possible error with the denominator being negative
+Fraction denomCheck(Fraction _frac)
+{
+    //case 1: if numerator is positive but denominator is negative, multiply both by -1 to convert numerator to negative and denominator to positive
+    //case 2: if numerator is negative but denominator is negative, multiply both by -1 to convert numerator to negative and positive to positive
+    //This section detects these cases and fixed them below
+    if(_frac.denominator < 0)
+    {
+        _frac = denomFix(_frac);
+    }
+    return _frac;
+}
+
+//This corrects an error with the denominator being negative
+Fraction denomFix(Fraction _frac)
+{
+    _frac.numerator *= -1;
+    _frac.denominator *= -1;
+    return _frac;
 }
 
 //This function is used to find the greatest common denominator between two numbers
