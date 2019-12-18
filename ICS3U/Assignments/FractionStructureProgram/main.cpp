@@ -221,10 +221,12 @@ void compare(Fraction _fracOne, Fraction _fracTwo)
     initialize(copyOne, _fracOne.numerator, _fracOne.denominator);
     initialize(copyTwo, _fracTwo.numerator, _fracTwo.denominator);
 
-    _fracOne = denomCheck(_fracOne);
+    _fracOne = denomCheck(_fracOne); //Make sure all negative signs are corrected
     _fracTwo = denomCheck(_fracTwo);
 
-    display(copyOne);
+    display(copyOne); //Display first fraction
+
+    //Compare the sum of of opposite numerators and denominators, then print result
     if(_fracOne.numerator*_fracTwo.denominator == _fracTwo.numerator*_fracOne.denominator)
     {
         cout << " = ";
@@ -237,7 +239,7 @@ void compare(Fraction _fracOne, Fraction _fracTwo)
     {
         cout << " < ";
     }
-    display(copyTwo);
+    display(copyTwo); //Display second fraction
     return;
 }
 
@@ -332,7 +334,7 @@ void tapAny()
 //Check's to see if the fraction is legal, if the denominator is zero
 bool fracCheck(Fraction frac)
 {
-    if(frac.denominator == 0)
+    if(frac.denominator == 0) //If denominator is zero, notify the code
     {
         cout << "ERROR: The crows are looming because a denominator is zero" << endl;
         return false;
