@@ -68,7 +68,6 @@
 
 #include<limits> //For error trapping
 
-
 using namespace std;
 
 struct gameInfo
@@ -281,17 +280,18 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
         inputCommand = 0;
         inputCommand = getAnswer(4, 1);
 
+
+        cout << "         >- Please use arrow keys or WASD" << endl;
         //If player inputs /k, activate keyboard mode
         while(inputCommand == 1)
         {
-            cout << ">- Please use arrow keys or WASD" << endl;
             //If specific key is pressed:
             if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
             {
                 if((myGameInfo.current_y - 1) < 5 ) //Check to see if new position is legal
                 {
-                    displayRedText(">- ERROR, item can not move there", true);
-                    cout << ">- Directive: Please type a different command" << endl;
+                    displayRedText("         >- ERROR, item can not move there", true);
+                    cout << "         >- Directive: Please type a different command" << endl;
                 }
                 else
                 {
@@ -304,8 +304,8 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             {
                 if((myGameInfo.current_y + 1) > 45 ) //Check to see if new position is legal
                 {
-                    displayRedText(">- ERROR, item can not move there", true);
-                    cout << ">- Directive: Please type a different command" << endl;
+                    displayRedText("         >- ERROR, item can not move there", true);
+                    cout << "         >- Directive: Please type a different command" << endl;
                 }
                 else
                 {
@@ -318,8 +318,8 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             {
                 if((myGameInfo.current_x - 1) < 0 ) //Check to see if new position is legal
                 {
-                    displayRedText(">- ERROR, item can not move there", true);
-                    cout << ">- Directive: Please type a different command" << endl;
+                    displayRedText("         >- ERROR, item can not move there", true);
+                    cout << "         >- Directive: Please type a different command" << endl;
                 }
                 else
                 {
@@ -332,8 +332,8 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             {
                 if((myGameInfo.current_x + 1) > 199 ) //Check to see if new position is legal
                 {
-                    displayRedText("ERROR, item can not move there", true);
-                    cout << "Directive: Please type a different command" << endl;
+                    displayRedText("         >- ERROR, item can not move there", true);
+                    cout << "         >- Directive: Please type a different command" << endl;
                 }
                 else
                 {
@@ -353,7 +353,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
             findingCoordinate = true;
             do
             {
-                cout << endl << ">- Please enter your specific X-coordinate below between 3 and 198. Press 0 to exit" << endl;
+                cout << endl << "         >- Please enter your specific X-coordinate below between 3 and 198. Press 0 to exit" << endl;
                 saved_x = getAnswer(198, 3);
 
                 if(saved_x == 0) //If they choose to exit, exit
@@ -364,7 +364,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
                 {
                     if(saved_x <  3) saved_x = 3;
 
-                    cout << endl << ">- Please enter your specific Y-coordinate below between 3 and 43. Press 0 to exit" << endl;
+                    cout << endl << "         >- Please enter your specific Y-coordinate below between 3 and 43. Press 0 to exit" << endl;
                     saved_y = getAnswer(43, 3); //Get input for specific y-input
 
                     if(saved_y == 0)
@@ -374,7 +374,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
                     else
                     {
 
-                        cout << ">- Your coordinate is [" << saved_x << "," << saved_y << "]. Press 1 to confirm." << endl;
+                        cout << "         >- Your coordinate is [" << saved_x << "," << saved_y << "]. Press 1 to confirm." << endl;
                         inputCommand = getAnswer(1, 0); //Get player confirmation for their input
 
                         if(inputCommand == 1) //If they answer yes, repeat process done above in keyboard mode
@@ -389,7 +389,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
         }
         else if(inputCommand == 3)
         {
-            cout << endl << ">- Are you sure you want to place the base on [" << myGameInfo.current_x << "," << myGameInfo.current_y << "]? This action is not reversable. Press 1 to confirm." << endl;
+            cout << endl << "         >- Are you sure you want to place the base on [" << myGameInfo.current_x << "," << myGameInfo.current_y << "]? This action is not reversable. Press 1 to confirm." << endl;
             inputCommand = getAnswer(1, 0);
 
             system("CLS");
@@ -401,7 +401,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
         }
         else if(inputCommand == 4)
         {
-            cout << endl << ">- You are Attempting to exit. Are you sure? Press 1 to quit" << endl;
+            cout << endl << "         >- You are Attempting to exit. Are you sure? Press 1 to quit" << endl;
             inputCommand = getAnswer(1, 0);
 
             system("CLS");
@@ -419,7 +419,7 @@ gameInfo placeBase(gameInfo myGameInfo, string myOptions[])
         }
         else
         {
-                cout << endl << ">- hmm, try choosing a number from 1-4" << endl;
+            cout << endl << "         >- hmm, try choosing a number from 1-4" << endl;
         }
     }
 }
@@ -437,7 +437,7 @@ gameInfo changePosition(gameInfo myGameInfo, int x_change, int y_change, bool us
     readMapArray(myGameInfo); //Re-output map
     if(usingKeyboard)
     {
-        displayRedText(">- Press escape to exit keyboard mode", true); //Output warning/directions on how to exit
+        displayRedText("         >- Press escape to exit keyboard mode", true); //Output warning/directions on how to exit
     }
     return myGameInfo; //return
 }
@@ -515,7 +515,7 @@ float getAnswer (int maxLimit, int minLimit)
 void displayMenu(string options[], int arraySize, gameInfo myGameInfo)
 {
     cout << "         >- Please enter a direct command. Below are the primary listed commands.                                                      ";
-    cout << "[January 1, " << myGameInfo.currentYear << "] <> Current Department Balance:" << myGameInfo.currentBalance<< endl;
+    cout << "[January 1, " << myGameInfo.currentYear << "] <> Current Department Balance:" << myGameInfo.currentBalance<< " billion dollars" << endl;
     //Display instructions
     for(int i = 0; i < arraySize; i++)
     {
