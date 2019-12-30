@@ -455,7 +455,7 @@ void loadStartGame()
     cout << "UNSC TacOS  v.337" <<  endl << "(S) 2294 FLEETCOM" << endl << "=======================" <<  endl << "|  User Log:" << endl;
     cout << "|  >> Administrator (UNSC ID 8384-C)" << endl << "|  >>> " << "unknown.GUEST_userGroup" << endl << endl;
     cout << "________________________________" << endl << "================================" << endl << endl << ">- Please enter your pin and ID" << endl << endl;
-
+0
     cout << ">- ID: ";
     cin >> userID;
     cout << ">- PIN: ";

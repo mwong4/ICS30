@@ -1,6 +1,8 @@
 # depslib dependency file v1.0
-1576767130 source:c:\users\maxwong\documents\github\ics30\ics3u\summative\armageddon v1.2\main.cpp
+1576857564 source:c:\users\maxwong\documents\github\ics30\ics3u\summative\armageddon v1.2\main.cpp
 	<iostream>
 	<windows.h>
 	<limits>
+	<fstream>
+	<conio.h>
 
