@@ -31,16 +31,16 @@ using namespace std;
 //Delcaring used structures
 struct gameInfo //This struct holds the core game data
 {
-    int currentYear = 1945; //Year is 1945
+    int currentYear; //Year counter
     char gameMap [199][55];//This is the double array that houses the whole map
 };
 
 struct playerData //This struct holds the data for each player
 {
     string playerName;
-    float currentGDP = 2000; //The stating US GDP is 2 trillion
-    float currentIncome = 0.01; //The starting military funding is 0.001%
-    float currentBalance = 0.5; //The current military balance is 500 millsion dollars
+    float currentGDP; //The US GDP
+    float currentIncome; //The % funding for the department
+    float currentBalance; //The military budget, how much funding in dollars
 };
 
 //Delcaring function prototypes
@@ -65,12 +65,18 @@ int main()
 
     //Declare and initialize game data -> specifically the map
     gameInfo gameData; //This struct represents the important information for the whole game
+    gameData.currentYear = 1945; //Set the starting year to 1945
     //gameData = getMap(gameData);
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Fix This
 
     playerData usa; //This struct represents the important information for player usa
-    usa.playerName = getName(); //Initialize it
+    //Set default values (initialize)
+    usa.currentGDP = 2000; //The stating US GDP is 2 trillion
+    usa.currentIncome = 0.01; //The starting military funding is 0.01%
+    usa.currentBalance = 0.5; //The current military balance is 500 million dollars
+    usa.playerName = getName(); //Initialize name by using the loading screen
 
+    gameData = goThroughMap(gameData, ' ', true); //clear out whole map
     gameData = goThroughMap(gameData, ' ', false); //Read out whole map
     string primaryOptions[3] = {"create a new base","|| Finish Turn >>", "quit"}; //This array represents the optiosn available in the main menu
 
@@ -94,7 +100,7 @@ int main()
         }
         else
         { //Quit game
-            cout << ">- Quitting..." << endl << ">- [Please press any key to continue]" << endl;
+            cout << "    >- Quitting..." << endl << ">- [Please press any key to continue]" << endl;
             anyInput();//Get any input before continuing
         }
         system("CLS"); //Cleans console
@@ -180,24 +186,24 @@ playerData endTurn(playerData _data, float _budgetChange) //This function is in 
     if(rand() % 5 == 0 && randomValue < 3 )
     {
         //In decrease (less likely), display percent and update GDP
-        cout << "         >- Economy decreased by -> " << randomValue*100 << "%" << endl;
+        cout << "    >- Economy decreased by -> " << randomValue*100 << "%" << endl;
         _data.currentGDP -= _data.currentGDP*randomValue;
     }
     else
     {
         //In increase (more likely), display percent and update GDP
-        cout << "         >- Economy increased by -> " << randomValue*100 << "%" << endl;
+        cout << "    >- Economy increased by -> " << randomValue*100 << "%" << endl;
         _data.currentGDP += _data.currentGDP*randomValue;
     }
     //Show new GDP
-    cout << "         >- GDP is Now:" << _data.currentGDP << " billion" << endl;
+    cout << "    >- GDP is Now: " << _data.currentGDP << " billion dollars" << endl;
 
     //Change income percent if government changes it
     _data.currentIncome += _budgetChange;
 
     //Update the income of the department
     _data.currentBalance += (_data.currentGDP*_data.currentIncome)/100.0;
-    cout << "         >- Current Department Anual Budget: " << _data.currentBalance << " billion dollars" << endl;
+    cout << "    >- Current Department Anual Budget: " << _data.currentBalance << " billion dollars" << endl;
 
     anyInput();//Get any input before continuing
     return _data;
@@ -212,7 +218,7 @@ int getAnswer (int _maxLimit, int _minLimit)
     do
     {
         findingInput = false; //By default, the loop will end
-        cout << "         >- Your input: "; //Get player input
+        cout << "    >- Your input: "; //Get player input
         cin >> playerInput;
         if(cin.fail())//Check to see if player entered a "bad" input type
         {
@@ -238,12 +244,12 @@ int getAnswer (int _maxLimit, int _minLimit)
 void displayMenu(string _options[], int _arraySize, playerData _data, int _year)
 {
     //Display UI
-    cout << "         >- Please enter a direct command. Below are the primary listed commands.                                                      ";
+    cout << "    >- Please enter a direct command. Below are the primary listed commands.                                                      ";
     cout << "[January 1, " << _year << "] <> Current Department Balance: " << _data.currentBalance<< " billion dollars" << endl;
     //Display instructions
     for(int i = 0; i < _arraySize; i++)
     {
-        cout << "         >- [" << i+1 << "] " << _options[i] << endl;
+        cout << "    >- [" << i+1 << "] " << _options[i] << endl;
     }
     return;
 }
@@ -266,7 +272,7 @@ void displayRedText(string _inputOne, bool _returnTrue)
 //This is an integrated version of getch(); and a message
 void anyInput()
 {
-    cout << ">- [Press Any Key To Continue]" << endl;
+    cout << "    >- [Press Any Key To Continue]" << endl;
     getch();
     return;
 }
@@ -279,14 +285,14 @@ string getName()
     string randInput = ""; //This represents the password inputted by the user
     char ch; //This is used to get each individual input
 
-    cout << ">- -UNSC User Management System-" << endl << "================================" << endl << "________________________________" << endl;
-    cout << "UNSC TacOS  v.337" <<  endl << "(S) 2294 FLEETCOM" << endl << "=======================" <<  endl << "|  User Log:" << endl;
-    cout << "|  >> Administrator (UNSC ID 8384-C)" << endl << "|  >>> " << "unknown.IDENTIFY_userGroup" << endl << endl;
-    cout << "________________________________" << endl << "================================" << endl << endl << ">- Please enter your pin and ID" << endl << endl;
+    cout << "    >- -UNSC User Management System-" << endl << "    ================================" << endl << "    ________________________________" << endl;
+    cout << "    UNSC TacOS  v.337" <<  endl << "    (S) 2294 FLEETCOM" << endl << "    =======================" <<  endl << "    |  User Log:" << endl;
+    cout << "    |  >> Administrator (UNSC ID 8384-C)" << endl << "    |  >>> " << "unknown.IDENTIFY_userGroup" << endl << endl;
+    cout << "    ________________________________" << endl << "    ================================" << endl << endl << "    >- Please enter your pin and ID" << endl << endl;
 
-    cout << ">- ID: ";
+    cout << "    >- ID: ";
     cin >> userID;
-    cout << ">- PIN: ";
+    cout << "    >- PIN: ";
 
     //Fake username and password system. Converts all letters into *'s
     ch = _getch();
@@ -296,7 +302,7 @@ string getName()
         cout << '*';
         ch = _getch();
     }
-    cout << endl << ">- \Acess Granted." << endl << ">- Welcome " << userID << endl;
+    cout << endl << "    >- \Acess Granted." << endl << "    >- Welcome " << userID << endl;
     anyInput();
 
     return userID;
