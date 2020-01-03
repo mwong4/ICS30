@@ -1,15 +1,20 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Dec 19, 2019
+>- Updated: Jan 3, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.1.7]
+>- [version 1.1.9]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 >- Efficiency
+    //Fix all !! parts
+        //Fix struct bug
+        //Add loading menu
+        //Get placement done
+    //Commenting
 */
 
 //Declaring all used libraries
@@ -17,6 +22,7 @@
 #include <windows.h>   // WinApi header(red text)
 #include<limits>    //For error trapping
 #include <fstream> //For the map saving
+#include <conio.h> //For getch();
 
 
 //Declaring used namespaces
@@ -31,8 +37,8 @@ struct gameInfo //This struct holds the core game data
 
 struct playerData //This struct holds the data for each player
 {
-    float currentGDP = 2000000; //The stating US GDP is 2 trillion
-    float currentIncome = 0.001; //The starting military funding is 0.001%
+    float currentGDP = 2000; //The stating US GDP is 2 trillion
+    float currentIncome = 0.01; //The starting military funding is 0.001%
     float currentBalance = 0.5; //The current military balance is 500 millsion dollars
 };
 
@@ -44,22 +50,59 @@ gameInfo goThroughMap(gameInfo, char, bool); //This function is to go through ev
 gameInfo getMap(gameInfo); //This function is used to find each line in the map txt file
 gameInfo saveMap(std::string, gameInfo, int); //This function is used to extract each character in a map file line
 
-float getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
-void displayMenu(string[], int, gameInfo); //Function to show the menu: All positions are options except last which is reserved for quit number
+playerData endTurn(playerData, float); //This function is in charge of updating the player data for the next turn
+
+int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
+void displayMenu(string[], int, playerData, int); //Function to show the menu: All positions are options except last which is reserved for quit number
 void displayRedText(string, bool); //This function is used to display red text
+void anyInput(); //This is an integrated version of getch(); and a message
 
 int main()
 {
     //Declaring all variables
 
     //Declare and initialize game data -> specifically the map
-    gameInfo myGameInfo;
-    myGameInfo = getMap(myGameInfo);
-    myGameInfo = goThroughMap(myGameInfo, ' ', false);
+    gameInfo gameData; //This struct represents the important information for the whole game
+    //gameData = getMap(gameData);
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Fix This
 
 
+    //!!!!!!!!!!!!!!!!!! Loading Screen
+
+    gameData = goThroughMap(gameData, ' ', false);
+    string primaryOptions[3] = {"create a new base","|| Finish Turn >>", "quit"}; //This array represents the optiosn available in the main menu
+    playerData usa; //This struct represents the important information for player usa
+
+    int menuInput = 1; //This int represents the input taken from user
+
+    while(menuInput != 3)//While player does not choose to quit
+    {
+        //Display map
+        gameData = goThroughMap(gameData, ' ', false);
+        //Display all menu options
+        displayMenu(primaryOptions, 3, usa, gameData.currentYear);
+        //Get player input
+        menuInput = getAnswer(3,0);
 
 
+        if(menuInput == 1)
+        {
+            //Go to place base function
+            //!!!!!!!!!!!!!!!!!!!! Get this done
+        }
+        else if(menuInput == 2)
+        {
+            //Go to end turn function
+            gameData.currentYear ++;//Update year
+            usa = endTurn(usa, 0); //Calls function to update income
+        }
+        else
+        {
+            cout << ">- Quitting..." << endl << ">- [Please press any key to continue]" << endl;
+            anyInput();//Get any input before continuing
+        }
+        system("CLS"); //Cleans console
+    }
     return 0;
 }
 
@@ -118,6 +161,7 @@ gameInfo getMap(gameInfo _gameData)
         }
         file_.close();
     }
+    cout << "hello";
     return _gameData;
 }
 
@@ -131,9 +175,41 @@ gameInfo saveMap(std::string _line, gameInfo _gameData, int _currentRow)
     return _gameData;
 }
 
+playerData endTurn(playerData _data, float _budgetChange) //This function is in charge of updating the player data for the next turn
+{
+    float randomValue; //This number is randomly generated
+    system("CLS"); //Clear console first
+
+    randomValue = (rand()%4+1)/100.0; //Get the random increase or decrease of the GDP
+    if(rand() % 5 == 0 && randomValue < 3 )
+    {
+        //In decrease (less likely), display percent and update GDP
+        cout << "         >- Economy decreased by -> " << randomValue*100 << "%" << endl;
+        _data.currentGDP -= _data.currentGDP*randomValue;
+    }
+    else
+    {
+        //In increase (more likely), display percent and update GDP
+        cout << "         >- Economy increased by -> " << randomValue*100 << "%" << endl;
+        _data.currentGDP += _data.currentGDP*randomValue;
+    }
+    //Show new GDP
+    cout << "         >- GDP is Now:" << _data.currentGDP << " billion" << endl;
+
+    //Change income percent if government changes it
+    _data.currentIncome += _budgetChange;
+
+    //Update the income of the department
+    _data.currentBalance += (_data.currentGDP*_data.currentIncome)/100.0;
+    cout << "         >- Current Department Anual Budget: " << _data.currentBalance << " billion dollars" << endl;
+
+    anyInput();//Get any input before continuing
+    return _data;
+}
+
 
 //Error trapping funcion that only accepts integers
-float getAnswer (int _maxLimit, int _minLimit)
+int getAnswer (int _maxLimit, int _minLimit)
 {
     int playerInput; //This variable is used to get the player's input
     bool findingInput; //This bool determines if the loop continues running
@@ -189,4 +265,12 @@ void displayRedText(string _inputOne, bool _returnTrue)
     {
         cout << endl;
     }
+}
+
+//This is an integrated version of getch(); and a message
+void anyInput()
+{
+    cout << ">- [Press Any Key To Continue]" << endl;
+    getch();
+    return;
 }
