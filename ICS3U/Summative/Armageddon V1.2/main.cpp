@@ -12,9 +12,9 @@
 >- Efficiency
     //Fix all !! parts
         //Fix struct bug
-        //Add loading menu
         //Get placement done
     //Commenting
+    //Get rid of set values in structs
 */
 
 //Declaring all used libraries
@@ -37,6 +37,7 @@ struct gameInfo //This struct holds the core game data
 
 struct playerData //This struct holds the data for each player
 {
+    string playerName;
     float currentGDP = 2000; //The stating US GDP is 2 trillion
     float currentIncome = 0.01; //The starting military funding is 0.001%
     float currentBalance = 0.5; //The current military balance is 500 millsion dollars
@@ -56,6 +57,7 @@ int getAnswer(int, int); //Function used to get the players response as an integ
 void displayMenu(string[], int, playerData, int); //Function to show the menu: All positions are options except last which is reserved for quit number
 void displayRedText(string, bool); //This function is used to display red text
 void anyInput(); //This is an integrated version of getch(); and a message
+string getName(); //This function is used to get the player's name, disguised as the start menu
 
 int main()
 {
@@ -66,24 +68,19 @@ int main()
     //gameData = getMap(gameData);
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Fix This
 
-
-    //!!!!!!!!!!!!!!!!!! Loading Screen
-
-    gameData = goThroughMap(gameData, ' ', false);
-    string primaryOptions[3] = {"create a new base","|| Finish Turn >>", "quit"}; //This array represents the optiosn available in the main menu
     playerData usa; //This struct represents the important information for player usa
+    usa.playerName = getName(); //Initialize it
+
+    gameData = goThroughMap(gameData, ' ', false); //Read out whole map
+    string primaryOptions[3] = {"create a new base","|| Finish Turn >>", "quit"}; //This array represents the optiosn available in the main menu
 
     int menuInput = 1; //This int represents the input taken from user
 
     while(menuInput != 3)//While player does not choose to quit
     {
-        //Display map
-        gameData = goThroughMap(gameData, ' ', false);
-        //Display all menu options
-        displayMenu(primaryOptions, 3, usa, gameData.currentYear);
-        //Get player input
-        menuInput = getAnswer(3,0);
-
+        gameData = goThroughMap(gameData, ' ', false); //Display map
+        displayMenu(primaryOptions, 3, usa, gameData.currentYear); //Display all menu options
+        menuInput = getAnswer(3,1); //Get player input
 
         if(menuInput == 1)
         {
@@ -91,13 +88,12 @@ int main()
             //!!!!!!!!!!!!!!!!!!!! Get this done
         }
         else if(menuInput == 2)
-        {
-            //Go to end turn function
+        { //Go to end turn function
             gameData.currentYear ++;//Update year
             usa = endTurn(usa, 0); //Calls function to update income
         }
         else
-        {
+        { //Quit game
             cout << ">- Quitting..." << endl << ">- [Please press any key to continue]" << endl;
             anyInput();//Get any input before continuing
         }
@@ -243,7 +239,7 @@ void displayMenu(string _options[], int _arraySize, playerData _data, int _year)
 {
     //Display UI
     cout << "         >- Please enter a direct command. Below are the primary listed commands.                                                      ";
-    cout << "[January 1, " << _year << "] <> Current Department Balance:" << _data.currentBalance<< " billion dollars" << endl;
+    cout << "[January 1, " << _year << "] <> Current Department Balance: " << _data.currentBalance<< " billion dollars" << endl;
     //Display instructions
     for(int i = 0; i < _arraySize; i++)
     {
@@ -273,4 +269,35 @@ void anyInput()
     cout << ">- [Press Any Key To Continue]" << endl;
     getch();
     return;
+}
+
+//This function is used to get the player's name, disguised as the start menu
+string getName()
+{
+    //Defining the variables
+    string userID = "unknown"; //This represents the username
+    string randInput = ""; //This represents the password inputted by the user
+    char ch; //This is used to get each individual input
+
+    cout << ">- -UNSC User Management System-" << endl << "================================" << endl << "________________________________" << endl;
+    cout << "UNSC TacOS  v.337" <<  endl << "(S) 2294 FLEETCOM" << endl << "=======================" <<  endl << "|  User Log:" << endl;
+    cout << "|  >> Administrator (UNSC ID 8384-C)" << endl << "|  >>> " << "unknown.IDENTIFY_userGroup" << endl << endl;
+    cout << "________________________________" << endl << "================================" << endl << endl << ">- Please enter your pin and ID" << endl << endl;
+
+    cout << ">- ID: ";
+    cin >> userID;
+    cout << ">- PIN: ";
+
+    //Fake username and password system. Converts all letters into *'s
+    ch = _getch();
+    while(ch != 13)
+    {
+        randInput.push_back(ch);
+        cout << '*';
+        ch = _getch();
+    }
+    cout << endl << ">- \Acess Granted." << endl << ">- Welcome " << userID << endl;
+    anyInput();
+
+    return userID;
 }
