@@ -10,8 +10,9 @@
 >-
 >- [TO DO]
 >- Efficiency
-    //Fix all !! parts
-        //Get placement done
+    //Fix placement
+        //Keyboard
+        //Initial position
     //Commenting
 */
 
@@ -51,16 +52,17 @@ gameInfo saveMap(std::string, gameInfo, int); //This function is used to extract
 
 playerData endTurn(playerData, float); //This function is in charge of updating the player data for the next turn
 
-gameInfo buildingMode(gameInfo); //This function is for the general mode of building
+gameInfo buildingMode(gameInfo, playerData); //This function is for the general mode of building
 gameInfo keyboardMode(gameInfo); //This function is for placing base using keyboard
-gameInfo coordinateMode(gameInfo); //This function is for placing base using a coordinate system
-gameInfo updatePosition(gameInfo, int, int); //This function is for updating the position of the base
+gameInfo coordinateMode(gameInfo, int&, int&, char&); //This function is for placing base using a coordinate system
+gameInfo updatePosition(gameInfo, int, int, bool, int&, int&, char&); //This function is for updating the position of the base
 
 int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
 void displayMenu(string[], int, playerData, int); //Function to show the menu: All positions are options except last which is reserved for quit number
 void displayRedText(string, bool); //This function is used to display red text
 void anyInput(); //This is an integrated version of getch(); and a message
 string getName(); //This function is used to get the player's name, disguised as the start menu
+bool getConfirmation(); //This function is to get a boolean response from the player
 
 int main()
 {
@@ -89,8 +91,9 @@ int main()
 
         if(menuInput == 1)
         {
+            system("CLS"); //Wipe console
             //Go to place base function
-            //!!!!!!!!!!!!!!!!!!!! Get this done
+            gameData = buildingMode(gameData, usa);
         }
         else if(menuInput == 2)
         { //Go to end turn function
@@ -110,7 +113,14 @@ int main()
 //This function is for displaying a single character
 void display(char _mapSpot)
 {
-    cout << _mapSpot;
+    if(_mapSpot == '@')
+    {
+        displayRedText("@", false);
+    }
+    else
+    {
+        cout << _mapSpot;
+    }
     return;
 }
 
@@ -162,7 +172,6 @@ gameInfo getMap(gameInfo _gameData)
         }
         file_.close();
     }
-    cout << "hello";
     return _gameData;
 }
 
@@ -208,13 +217,68 @@ playerData endTurn(playerData _data, float _budgetChange) //This function is in 
     return _data;
 }
 //This function is for the general mode of building
-//gameInfo buildingMode(gameInfo);
+gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo)
+{
+    //These are the menu options for build mode
+    string menuOptions[4] = {"Place using keyboard", "Place using coordinate", "Confirm place", "Cancel/Exit build mode"};
+    int menuInput = 1; //Integer used to get input from player
+
+    char savedChar = _gameData.gameMap[100][20]; //This represents the temporary character saved
+    int currentX = 100; //This represents the current x position of the base
+    int currentY = 20; //This represents the current y position of the base
+
+    setSpot(_gameData.gameMap[currentX][currentY], '@'); //Set initial spot of the base on the map
+
+    while(menuInput != 4) //Kepp loop running unless quit option is chosen
+    {
+        _gameData = goThroughMap(_gameData, ' ', false); //Display map
+        displayMenu(menuOptions, 4, _playerInfo, _gameData.currentYear); //Display options
+        menuInput = getAnswer(4,1); //Get player input
+
+        if(menuInput == 1)
+        {
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! place with keyboard
+        }
+        else if(menuInput == 2)
+        {
+            _gameData = coordinateMode(_gameData, currentX, currentY, savedChar);
+        }
+        else if(menuInput == 3)
+        {
+            cout << endl << "    >- Do you want to confirm this spot to place your item? The change is ";
+            displayRedText("permanent", true); //Display message
+            if(getConfirmation()) //If player confirms yes to placement, save and exit function
+            {
+                menuInput = 4; //Trigger quit option
+            }
+        }
+        else
+        {
+            setSpot(_gameData.gameMap[currentX][currentY], savedChar); //Set spot of map back to saved character before exiting
+        }
+        system("CLS");
+    }
+    return _gameData;
+}
 
 //This function is for placing base using keyboard
 //gameInfo keyboardMode(gameInfo);
 
 //This function is for placing base using a coordinate system
-//gameInfo coordinateMode(gameInfo);
+gameInfo coordinateMode(gameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar)
+{
+    int tempX; //x position input chosen by player
+    int tempY; //y position input chosen by player
+
+    cout << endl << "    >- Please input your x-position between 3 - 198 " << endl;
+    tempX = getAnswer(198, 3);
+
+    cout << "    >- Please input your y-position between 3 - 43 " << endl;
+    tempY = getAnswer(43, 3);
+
+    _gameData = updatePosition(_gameData, -_currentX + tempX, -_currentY + tempY, false, _currentX, _currentY, _savedChar);
+    return _gameData;
+}
 
 //This function is for updating the position of the base
 gameInfo updatePosition(gameInfo _gameData, int _xChange, int _yChange, bool _usingKeyboard, int& _currentX, int& _currentY, char& _savedChar)
@@ -225,11 +289,11 @@ gameInfo updatePosition(gameInfo _gameData, int _xChange, int _yChange, bool _us
     _currentX = _currentX + _xChange; //Update current position
     _currentY = _currentY + _yChange;
 
-    system("CLS"); //Wipe console
-    _gameData = goThroughMap(_gameData, ' ', false); //Display map
     if(_usingKeyboard)
     {
-        displayRedText("  >- Press escape to exit keyboard mode", true); //Output warning/directions on how to exit
+        system("CLS"); //Wipe console
+        _gameData = goThroughMap(_gameData, ' ', false); //Display map
+        displayRedText("    >- Press escape to exit keyboard mode", true); //Output warning/directions on how to exit
     }
     return _gameData; //return
 }
@@ -330,4 +394,17 @@ string getName()
     anyInput();
 
     return userID;
+}
+
+//This function is to get a boolean response from the player
+bool getConfirmation()
+{
+    int input; //This integer is to get the player's input
+    cout << "    >- Type [1] to answer YES. Type [2] to answer NO " << endl; //Output message
+    input = getAnswer(2,1); //Get answer from user
+    if(input == 1) //If they answer yes, return true
+    {
+        return true;
+    }
+    return false; //Otherwise, return false
 }
