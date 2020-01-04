@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.2.4]
+>- [version 1.2.6]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -13,9 +13,6 @@
     ////////////////////////////// Goals for today
 
 >- Commenting
-
->- Defcon counter
-    >- If reaches 1, loose game
 
 >- End turn random events
     >- Common ones
@@ -25,6 +22,9 @@
 >- Restricted placement system
     >-Fill map?
     >- Russia
+
+>- If defcon reaches 1, loose game
+>- Every time silo is built, decon increases
 */
 
 //Declaring all used libraries
@@ -33,6 +33,7 @@
 #include<limits>     //For error trapping
 #include <fstream>   //For the map saving
 #include <conio.h>   //For getch();
+#include <tgmath.h>  //For rounding
 
 
 //Declaring used namespaces
@@ -43,6 +44,7 @@ struct gameInfo //This struct holds the core game data
 {
     float baseCost; //This is the price of the buildings
     int currentYear; //Year counter
+    float defcon;
     char gameMap [199][55];//This is the double array that houses the whole map
 };
 
@@ -62,7 +64,8 @@ gameInfo goThroughMap(gameInfo, char, bool); //This function is to go through ev
 gameInfo getMap(gameInfo); //This function is used to find each line in the map txt file
 gameInfo saveMap(std::string, gameInfo, int); //This function is used to extract each character in a map file line
 
-playerData endTurn(playerData, float, float&); //This function is in charge of updating the player data for the next turn
+playerData endTurn(playerData, float, float&, float&, string[]); //This function is in charge of updating the player data for the next turn
+void defconCounter(string[], float); //This function is to display the defcon state
 
 gameInfo chooseBuilding(gameInfo, playerData, string[], string[], float&); //This function is for player to choose their building
 gameInfo buildingMode(gameInfo, playerData, string[], char, float&); //This function is for the general mode of building
@@ -84,7 +87,8 @@ int main()
     //Declare and initialize game data -> specifically the map
     gameInfo gameData; //This struct represents the important information for the whole game
     gameData.currentYear = 1945; //Set the starting year to 1945
-    gameData.baseCost = 0.4; //Set the starting cost of buildings to 0.1 billion dollars
+    gameData.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
+    gameData.defcon = 5;
     gameData = getMap(gameData); //Initialize the value of the map array
 
     playerData usa; //This struct represents the important information for player usa
@@ -97,6 +101,7 @@ int main()
     string primaryOptions[3] = {"Enter building mode","|| Finish Turn >>", "Quit"}; //This array represents the optiosn available in the main menu
     string buildingOptions[3] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex", "Quit"}; //This represents the available options for buildings
     string buildModeOptions[4] = {"Place using keyboard", "Place using coordinate", "Confirm place", "Cancel/Exit build mode"}; //These are the menu options for build mode
+    string defconOptions[5]= {"CRITICAL|| Nuclear War Imminent","SEVERE|| Armed Forces Ready to Deploy in 6 hours","SUBSTANTIAL|| Air Force Mobilizes in 15 Minutes","MODERATE|| Increase Security Readiness","LOW|| Normal Peacetime Readiness"}; //These are the five states of DEFCON advance warning
     int menuInput = 1; //This int represents the input taken from user
 
     while(menuInput != 3)//While player does not choose to quit
@@ -112,7 +117,7 @@ int main()
         else if(menuInput == 2)
         { //Go to end turn function
             gameData.currentYear ++;//Update year
-            usa = endTurn(usa, 0, gameData.baseCost); //Calls function to update income
+            usa = endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions); //Calls function to update income
         }
         else
         { //Quit game
@@ -137,7 +142,7 @@ void display(char _mapSpot)
     }
     else if(_mapSpot == '!')
     {
-        displayColorText("!", false, 12); //Red
+        displayColorText("!", false, 4); //Red
     }
     else if(_mapSpot == '?')
     {
@@ -215,10 +220,15 @@ gameInfo saveMap(std::string _line, gameInfo _gameData, int _currentRow)
     return _gameData;
 }
 
-playerData endTurn(playerData _data, float _budgetChange, float& _baseCost) //This function is in charge of updating the player data for the next turn
+//This function is in charge of updating the player data for the next turn
+playerData endTurn(playerData _data, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[])
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
+
+    _defcon -= 0.05; //Increase defcon naturally
+    defconCounter(_defconOptions, _defcon); //Call function to display defcon information
+
 
     randomValue = (rand()%5+1)/100.0; //Get the random increase or decrease of the GDP
     if(rand() % 5 == 0 && randomValue < 3 )
@@ -251,6 +261,43 @@ playerData endTurn(playerData _data, float _budgetChange, float& _baseCost) //Th
     return _data;
 }
 
+//This function is to display the defcon state
+void defconCounter(string _defconOptions[], float _defcon)
+{
+    int defconLevel; //This integer represents the rounded defcon level
+    defconLevel = round(_defcon);
+
+    cout << "    >- DEFCON: [";
+    if(defconLevel == 1)
+    {
+        displayColorText("1", false, 4);
+    }
+    else if(defconLevel == 2)
+    {
+        displayColorText("2", false, 12);
+    }
+    else if(defconLevel == 3)
+    {
+        displayColorText("3", false, 14);
+    }
+    else if(defconLevel == 4)
+    {
+        displayColorText("4", false, 9);
+    }
+    else if(defconLevel == 5)
+    {
+        displayColorText("5", false, 10);
+    }
+    else
+    {
+        //Trigger end game screen
+    }
+    cout << "]" << endl;
+
+    cout << "    >- " << _defconOptions[defconLevel-1] << endl << endl;
+    return;
+}
+
 //This function is for player to choose their building
 gameInfo chooseBuilding(gameInfo _gameData, playerData _playerInfo, string _buildingOptions[], string _buildModeOptions[], float& _budget)
 {
@@ -263,7 +310,7 @@ gameInfo chooseBuilding(gameInfo _gameData, playerData _playerInfo, string _buil
 
     if(_budget < _gameData.baseCost)
     { //If you do not have enough money, tell player
-        displayColorText( "    >- You do not have the funds to build anything| Returning to menu now", true, 12);
+        displayColorText( "    >- You do not have the funds to build anything| Returning to menu now", true, 4);
     }
 
     inputValue = getAnswer(3,1); //Get player's input
@@ -302,7 +349,7 @@ gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo, string _menuOp
 
         if(menuInput == 1)
         {
-            displayColorText("    >- Use WASD  or Arrow keys to move", true, 12); //Display instructions
+            displayColorText("    >- Use WASD  or Arrow keys to move", true, 4); //Display instructions
             _gameData = keyboardMode(_gameData, currentX, currentY, savedChar, _building); //Call function to place using keyboard
         }
         else if(menuInput == 2)
@@ -312,7 +359,7 @@ gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo, string _menuOp
         else if(menuInput == 3)
         {
             cout << endl << "    >- Do you want to confirm this spot to place your item? The change is ";
-            displayColorText("permanent", true, 12); //Display message
+            displayColorText("permanent", true, 4); //Display message
             if(getConfirmation()) //If player confirms yes to placement, save and exit function
             {
                 menuInput = 4; //Trigger quit option
@@ -406,7 +453,7 @@ gameInfo updatePosition(gameInfo _gameData, int _xChange, int _yChange, bool _us
     {
         system("CLS"); //Wipe console
         _gameData = goThroughMap(_gameData, ' ', false); //Display map
-        displayColorText("    >- Press escape to exit keyboard mode", true, 12); //Output warning/directions on how to exit
+        displayColorText("    >- Press escape to exit keyboard mode", true, 4); //Output warning/directions on how to exit
     }
     return _gameData; //return
 }
@@ -425,16 +472,16 @@ int getAnswer (int _maxLimit, int _minLimit)
         {
             cin.clear(); //Clear all flags
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //ignore incorrect symbols
-            displayColorText("  ==================================================", true, 12);
+            displayColorText("  ==================================================", true, 4);
             displayColorText("  >- Please enter a valid input number", true, 12);
-            displayColorText("  ==================================================", true, 12);
+            displayColorText("  ==================================================", true, 4);
             findingInput = true; //If the input is invalid, then the loop will loop
         }
         else if(playerInput > _maxLimit || playerInput < _minLimit ) //Otherwise, print an error message
         {
-            displayColorText("  ==================================================", true, 12);
+            displayColorText("  ==================================================", true, 4);
             cout << "  >- Please enter a number between " << _minLimit << " and " << _maxLimit << endl;
-            displayColorText("  ==================================================", true, 12);
+            displayColorText("  ==================================================", true, 4);
             findingInput = true; //If the input is invalid, then the loop will loop
         }
     }while(findingInput);

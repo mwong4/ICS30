@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1578174621 source:c:\users\max pc\documents\github\ics30\ics3u\summative\c++tests\colortest\main.cpp
+	<iostream>
+	<windows.h>
+
