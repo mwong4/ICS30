@@ -5,16 +5,14 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.1.9]
+>- [version 1.2.0]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 >- Efficiency
     //Fix all !! parts
-        //Fix struct bug
         //Get placement done
     //Commenting
-    //Get rid of set values in structs
 */
 
 //Declaring all used libraries
@@ -66,8 +64,7 @@ int main()
     //Declare and initialize game data -> specifically the map
     gameInfo gameData; //This struct represents the important information for the whole game
     gameData.currentYear = 1945; //Set the starting year to 1945
-    //gameData = getMap(gameData);
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Fix This
+    gameData = getMap(gameData); //Initialize the value of the map array
 
     playerData usa; //This struct represents the important information for player usa
     //Set default values (initialize)
@@ -76,10 +73,7 @@ int main()
     usa.currentBalance = 0.5; //The current military balance is 500 million dollars
     usa.playerName = getName(); //Initialize name by using the loading screen
 
-    gameData = goThroughMap(gameData, ' ', true); //clear out whole map
-    gameData = goThroughMap(gameData, ' ', false); //Read out whole map
     string primaryOptions[3] = {"create a new base","|| Finish Turn >>", "quit"}; //This array represents the optiosn available in the main menu
-
     int menuInput = 1; //This int represents the input taken from user
 
     while(menuInput != 3)//While player does not choose to quit
@@ -244,7 +238,7 @@ int getAnswer (int _maxLimit, int _minLimit)
 void displayMenu(string _options[], int _arraySize, playerData _data, int _year)
 {
     //Display UI
-    cout << "    >- Please enter a direct command. Below are the primary listed commands.                                                      ";
+    cout << "    >- Please enter a direct command. Below are the primary listed commands.                                                  ";
     cout << "[January 1, " << _year << "] <> Current Department Balance: " << _data.currentBalance<< " billion dollars" << endl;
     //Display instructions
     for(int i = 0; i < _arraySize; i++)
