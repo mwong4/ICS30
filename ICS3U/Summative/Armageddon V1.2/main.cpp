@@ -9,14 +9,18 @@
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
+
+    ////////////////////////////// Goals for today
+
 >- Commenting
 
->- Payment system
 >- Defcon counter
     >- If reaches 1, loose game
 
 >- End turn random events
     >- Common ones
+
+    ////////////////////////////// Goal for tmrw
 
 >- Restricted placement system
     >-Fill map?
@@ -24,11 +28,11 @@
 */
 
 //Declaring all used libraries
-#include <iostream>
-#include <windows.h>   // WinApi header(red text)
-#include<limits>    //For error trapping
-#include <fstream> //For the map saving
-#include <conio.h> //For getch();
+#include <iostream>  //For basic input output
+#include <windows.h> // WinApi header(red text)
+#include<limits>     //For error trapping
+#include <fstream>   //For the map saving
+#include <conio.h>   //For getch();
 
 
 //Declaring used namespaces
@@ -37,6 +41,7 @@ using namespace std;
 //Delcaring used structures
 struct gameInfo //This struct holds the core game data
 {
+    float baseCost; //This is the price of the buildings
     int currentYear; //Year counter
     char gameMap [199][55];//This is the double array that houses the whole map
 };
@@ -57,10 +62,10 @@ gameInfo goThroughMap(gameInfo, char, bool); //This function is to go through ev
 gameInfo getMap(gameInfo); //This function is used to find each line in the map txt file
 gameInfo saveMap(std::string, gameInfo, int); //This function is used to extract each character in a map file line
 
-playerData endTurn(playerData, float); //This function is in charge of updating the player data for the next turn
+playerData endTurn(playerData, float, float&); //This function is in charge of updating the player data for the next turn
 
-gameInfo chooseBuilding(gameInfo, playerData, string[], string[]); //This function is for player to choose their building
-gameInfo buildingMode(gameInfo, playerData, string[], char); //This function is for the general mode of building
+gameInfo chooseBuilding(gameInfo, playerData, string[], string[], float&); //This function is for player to choose their building
+gameInfo buildingMode(gameInfo, playerData, string[], char, float&); //This function is for the general mode of building
 gameInfo keyboardMode(gameInfo, int&, int&, char&, char); //This function is for placing base using keyboard
 gameInfo coordinateMode(gameInfo, int&, int&, char&, char); //This function is for placing base using a coordinate system
 gameInfo updatePosition(gameInfo, int, int, bool, int&, int&, char&, char); //This function is for updating the position of the base
@@ -79,6 +84,7 @@ int main()
     //Declare and initialize game data -> specifically the map
     gameInfo gameData; //This struct represents the important information for the whole game
     gameData.currentYear = 1945; //Set the starting year to 1945
+    gameData.baseCost = 0.4; //Set the starting cost of buildings to 0.1 billion dollars
     gameData = getMap(gameData); //Initialize the value of the map array
 
     playerData usa; //This struct represents the important information for player usa
@@ -101,12 +107,12 @@ int main()
 
         if(menuInput == 1)
         {
-            gameData = chooseBuilding(gameData, usa, buildingOptions, buildModeOptions);
+            gameData = chooseBuilding(gameData, usa, buildingOptions, buildModeOptions, usa.currentBalance);
         }
         else if(menuInput == 2)
         { //Go to end turn function
             gameData.currentYear ++;//Update year
-            usa = endTurn(usa, 0); //Calls function to update income
+            usa = endTurn(usa, 0, gameData.baseCost); //Calls function to update income
         }
         else
         { //Quit game
@@ -209,12 +215,12 @@ gameInfo saveMap(std::string _line, gameInfo _gameData, int _currentRow)
     return _gameData;
 }
 
-playerData endTurn(playerData _data, float _budgetChange) //This function is in charge of updating the player data for the next turn
+playerData endTurn(playerData _data, float _budgetChange, float& _baseCost) //This function is in charge of updating the player data for the next turn
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
 
-    randomValue = (rand()%4+1)/100.0; //Get the random increase or decrease of the GDP
+    randomValue = (rand()%5+1)/100.0; //Get the random increase or decrease of the GDP
     if(rand() % 5 == 0 && randomValue < 3 )
     {
         //In decrease (less likely), display percent and update GDP
@@ -237,37 +243,48 @@ playerData endTurn(playerData _data, float _budgetChange) //This function is in 
     _data.currentBalance += (_data.currentGDP*_data.currentIncome)/100.0;
     cout << "    >- Current Department Anual Budget: " << _data.currentBalance << " billion dollars" << endl;
 
+
+    randomValue = (rand()%3+7)/100.0; //Get the random increase in inflation
+    _baseCost += _baseCost*randomValue; //Increase price of buildings
+
     anyInput();//Get any input before continuing
     return _data;
 }
 
 //This function is for player to choose their building
-gameInfo chooseBuilding(gameInfo _gameData, playerData _playerInfo, string _buildingOptions[], string _buildModeOptions[])
+gameInfo chooseBuilding(gameInfo _gameData, playerData _playerInfo, string _buildingOptions[], string _buildModeOptions[], float& _budget)
 {
     int inputValue; //This is used to get the input of the player
 
     //Output message
     cout << endl << endl << "    ===================================" << endl << "    >- What would you like to build?" << endl;
     displayMenu(_buildingOptions, 3, _playerInfo, _gameData.currentYear, false); //Display all buidling options
+    cout << "    >- Each building cost: [" << _gameData.baseCost << "] billion dollars" << endl;
+
+    if(_budget < _gameData.baseCost)
+    { //If you do not have enough money, tell player
+        displayColorText( "    >- You do not have the funds to build anything| Returning to menu now", true, 12);
+    }
+
     inputValue = getAnswer(3,1); //Get player's input
 
-    if(inputValue != 3)
+    if(inputValue != 3 && _budget > _gameData.baseCost)
     {
         system("CLS"); //Wipe console
         if(inputValue == 1)
         { //Call build mode function
-            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '@');
+            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '@', _budget);
         }
         else
         { //Call build mode function
-            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '#');
+            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '#', _budget);
         }
     }
     return _gameData; //Otherwise, return to main
 }
 
 //This function is for the general mode of building
-gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo, string _menuOptions[], char _building)
+gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo, string _menuOptions[], char _building, float& _budget)
 {
     int menuInput = 1; //Integer used to get input from player
 
@@ -299,6 +316,7 @@ gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo, string _menuOp
             if(getConfirmation()) //If player confirms yes to placement, save and exit function
             {
                 menuInput = 4; //Trigger quit option
+                _budget -= _gameData.baseCost;
             }
         }
         else
