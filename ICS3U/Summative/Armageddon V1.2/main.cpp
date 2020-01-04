@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 3, 2020
+>- Updated: Jan 4, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
@@ -10,6 +10,18 @@
 >-
 >- [TO DO]
 >- Commenting
+
+>- Choose different buildings
+    >- Radar -> Green
+    >- Missile silo -> Yellow
+    >- Change all colors
+        >-Enemies -> Red
+>- Payment system
+>- Defcon counter
+    >- If reaches 1, loose game
+
+>- End turn random events
+    >- Common ones
 */
 
 //Declaring all used libraries
