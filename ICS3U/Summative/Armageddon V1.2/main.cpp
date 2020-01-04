@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.2.0]
+>- [version 1.2.2]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
