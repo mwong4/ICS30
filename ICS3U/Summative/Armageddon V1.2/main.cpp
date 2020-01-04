@@ -9,11 +9,7 @@
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
->- Efficiency
-    //Fix placement
-        //Keyboard
-        //Initial position
-    //Commenting
+>- Commenting
 */
 
 //Declaring all used libraries
@@ -53,7 +49,7 @@ gameInfo saveMap(std::string, gameInfo, int); //This function is used to extract
 playerData endTurn(playerData, float); //This function is in charge of updating the player data for the next turn
 
 gameInfo buildingMode(gameInfo, playerData); //This function is for the general mode of building
-gameInfo keyboardMode(gameInfo); //This function is for placing base using keyboard
+gameInfo keyboardMode(gameInfo, int&, int&, char&); //This function is for placing base using keyboard
 gameInfo coordinateMode(gameInfo, int&, int&, char&); //This function is for placing base using a coordinate system
 gameInfo updatePosition(gameInfo, int, int, bool, int&, int&, char&); //This function is for updating the position of the base
 
@@ -237,11 +233,12 @@ gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo)
 
         if(menuInput == 1)
         {
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! place with keyboard
+            displayRedText("    >- Use WASD  or Arrow keys to move", true); //Display instructions
+            _gameData = keyboardMode(_gameData, currentX, currentY, savedChar); //Call function to place using keyboard
         }
         else if(menuInput == 2)
         {
-            _gameData = coordinateMode(_gameData, currentX, currentY, savedChar);
+            _gameData = coordinateMode(_gameData, currentX, currentY, savedChar);  //Call function to place using coordinates
         }
         else if(menuInput == 3)
         {
@@ -254,7 +251,11 @@ gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo)
         }
         else
         {
-            setSpot(_gameData.gameMap[currentX][currentY], savedChar); //Set spot of map back to saved character before exiting
+            cout << endl << "    >- Are you sure you want to quit build mode?";
+            if(getConfirmation()) //If player confirms yes to placement, save and exit function
+            {
+                setSpot(_gameData.gameMap[currentX][currentY], savedChar); //Set spot of map back to saved character before exiting
+            }
         }
         system("CLS");
     }
@@ -262,7 +263,49 @@ gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo)
 }
 
 //This function is for placing base using keyboard
-//gameInfo keyboardMode(gameInfo);
+gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar)
+{
+    while(true) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Check this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    {
+        if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
+        {
+            if((_currentY - 1) >= 5) //Check to see if new position is legal
+            {
+                _gameData = updatePosition(_gameData, 0, -1, true, _currentX, _currentY, _savedChar); //Set spot of map back to saved character before exiting
+            }
+        }
+        //Else if specific key is pressed:
+        else if((GetKeyState('S') & 0x8000) || (GetKeyState(VK_DOWN) & 0x8000))
+        {
+            if((_currentY + 1) <= 45) //Check to see if new position is legal
+            {
+                _gameData = updatePosition(_gameData, 0, 1, true, _currentX, _currentY, _savedChar); //Set spot of map back to saved character before exiting
+            }
+        }
+        //Else if specific key is pressed:
+        else if((GetKeyState('A') & 0x8000) || (GetKeyState(VK_LEFT) & 0x8000))
+        {
+            if((_currentX - 1) >= 0) //Check to see if new position is legal
+            {
+                _gameData = updatePosition(_gameData, -1, 0, true, _currentX, _currentY, _savedChar); //Set spot of map back to saved character before exiting
+            }
+        }
+        //Else if specific key is pressed:
+        else if((GetKeyState('D') & 0x8000) || (GetKeyState(VK_RIGHT) & 0x8000))
+        {
+            if((_currentX + 1) <= 199) //Check to see if new position is legal
+            {
+                _gameData = updatePosition(_gameData, 1, 0, true, _currentX, _currentY, _savedChar); //Set spot of map back to saved character before exiting
+            }
+        }
+        //Else if escape is pressed, exit
+        else if((GetKeyState(VK_ESCAPE) & 0x8000))
+        {
+            system("CLS"); //Wipe console
+            return _gameData;
+        }
+    }
+}
 
 //This function is for placing base using a coordinate system
 gameInfo coordinateMode(gameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar)
