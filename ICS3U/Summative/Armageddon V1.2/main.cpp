@@ -51,6 +51,11 @@ gameInfo saveMap(std::string, gameInfo, int); //This function is used to extract
 
 playerData endTurn(playerData, float); //This function is in charge of updating the player data for the next turn
 
+gameInfo buildingMode(gameInfo); //This function is for the general mode of building
+gameInfo keyboardMode(gameInfo); //This function is for placing base using keyboard
+gameInfo coordinateMode(gameInfo); //This function is for placing base using a coordinate system
+gameInfo updatePosition(gameInfo, int, int); //This function is for updating the position of the base
+
 int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
 void displayMenu(string[], int, playerData, int); //Function to show the menu: All positions are options except last which is reserved for quit number
 void displayRedText(string, bool); //This function is used to display red text
@@ -202,7 +207,32 @@ playerData endTurn(playerData _data, float _budgetChange) //This function is in 
     anyInput();//Get any input before continuing
     return _data;
 }
+//This function is for the general mode of building
+//gameInfo buildingMode(gameInfo);
 
+//This function is for placing base using keyboard
+//gameInfo keyboardMode(gameInfo);
+
+//This function is for placing base using a coordinate system
+//gameInfo coordinateMode(gameInfo);
+
+//This function is for updating the position of the base
+gameInfo updatePosition(gameInfo _gameData, int _xChange, int _yChange, bool _usingKeyboard, int& _currentX, int& _currentY, char& _savedChar)
+{
+    _gameData.gameMap[_currentX][_currentY] = _savedChar; //Replace current position with the saved character
+    _savedChar = _gameData.gameMap[_currentX + _xChange][_currentY + _yChange]; //Save the character of the future value
+    _gameData.gameMap[_currentX + _xChange][_currentY + _yChange] = '@'; //Replace the future spot with an @ symbol
+    _currentX = _currentX + _xChange; //Update current position
+    _currentY = _currentY + _yChange;
+
+    system("CLS"); //Wipe console
+    _gameData = goThroughMap(_gameData, ' ', false); //Display map
+    if(_usingKeyboard)
+    {
+        displayRedText("  >- Press escape to exit keyboard mode", true); //Output warning/directions on how to exit
+    }
+    return _gameData; //return
+}
 
 //Error trapping funcion that only accepts integers
 int getAnswer (int _maxLimit, int _minLimit)
