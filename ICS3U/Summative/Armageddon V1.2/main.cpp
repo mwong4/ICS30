@@ -5,23 +5,22 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.2.2]
+>- [version 1.2.4]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 >- Commenting
 
->- Choose different buildings
-    >- Radar -> Green
-    >- Missile silo -> Yellow
-    >- Change all colors
-        >-Enemies -> Red
 >- Payment system
 >- Defcon counter
     >- If reaches 1, loose game
 
 >- End turn random events
     >- Common ones
+
+>- Restricted placement system
+    >-Fill map?
+    >- Russia
 */
 
 //Declaring all used libraries
@@ -60,14 +59,15 @@ gameInfo saveMap(std::string, gameInfo, int); //This function is used to extract
 
 playerData endTurn(playerData, float); //This function is in charge of updating the player data for the next turn
 
-gameInfo buildingMode(gameInfo, playerData); //This function is for the general mode of building
-gameInfo keyboardMode(gameInfo, int&, int&, char&); //This function is for placing base using keyboard
-gameInfo coordinateMode(gameInfo, int&, int&, char&); //This function is for placing base using a coordinate system
-gameInfo updatePosition(gameInfo, int, int, bool, int&, int&, char&); //This function is for updating the position of the base
+gameInfo chooseBuilding(gameInfo, playerData, string[], string[]); //This function is for player to choose their building
+gameInfo buildingMode(gameInfo, playerData, string[], char); //This function is for the general mode of building
+gameInfo keyboardMode(gameInfo, int&, int&, char&, char); //This function is for placing base using keyboard
+gameInfo coordinateMode(gameInfo, int&, int&, char&, char); //This function is for placing base using a coordinate system
+gameInfo updatePosition(gameInfo, int, int, bool, int&, int&, char&, char); //This function is for updating the position of the base
 
 int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
-void displayMenu(string[], int, playerData, int); //Function to show the menu: All positions are options except last which is reserved for quit number
-void displayRedText(string, bool); //This function is used to display red text
+void displayMenu(string[], int, playerData, int, bool); //Function to show the menu: All positions are options except last which is reserved for quit number
+void displayColorText(string, bool, int); //This function is used to display Color text
 void anyInput(); //This is an integrated version of getch(); and a message
 string getName(); //This function is used to get the player's name, disguised as the start menu
 bool getConfirmation(); //This function is to get a boolean response from the player
@@ -88,20 +88,20 @@ int main()
     usa.currentBalance = 0.5; //The current military balance is 500 million dollars
     usa.playerName = getName(); //Initialize name by using the loading screen
 
-    string primaryOptions[3] = {"create a new base","|| Finish Turn >>", "quit"}; //This array represents the optiosn available in the main menu
+    string primaryOptions[3] = {"Enter building mode","|| Finish Turn >>", "Quit"}; //This array represents the optiosn available in the main menu
+    string buildingOptions[3] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex", "Quit"}; //This represents the available options for buildings
+    string buildModeOptions[4] = {"Place using keyboard", "Place using coordinate", "Confirm place", "Cancel/Exit build mode"}; //These are the menu options for build mode
     int menuInput = 1; //This int represents the input taken from user
 
     while(menuInput != 3)//While player does not choose to quit
     {
         gameData = goThroughMap(gameData, ' ', false); //Display map
-        displayMenu(primaryOptions, 3, usa, gameData.currentYear); //Display all menu options
+        displayMenu(primaryOptions, 3, usa, gameData.currentYear, true); //Display all menu options
         menuInput = getAnswer(3,1); //Get player input
 
         if(menuInput == 1)
         {
-            system("CLS"); //Wipe console
-            //Go to place base function
-            gameData = buildingMode(gameData, usa);
+            gameData = chooseBuilding(gameData, usa, buildingOptions, buildModeOptions);
         }
         else if(menuInput == 2)
         { //Go to end turn function
@@ -123,7 +123,23 @@ void display(char _mapSpot)
 {
     if(_mapSpot == '@')
     {
-        displayRedText("@", false);
+        displayColorText("@", false, 14); //yellow
+    }
+    else if(_mapSpot == '#')
+    {
+        displayColorText("#", false, 2); //Dark green
+    }
+    else if(_mapSpot == '!')
+    {
+        displayColorText("!", false, 12); //Red
+    }
+    else if(_mapSpot == '?')
+    {
+        displayColorText("?", false, 9); //Blue
+    }
+    else if(_mapSpot == '&')
+    {
+        displayColorText("&", false, 10); //Light green
     }
     else
     {
@@ -224,38 +240,62 @@ playerData endTurn(playerData _data, float _budgetChange) //This function is in 
     anyInput();//Get any input before continuing
     return _data;
 }
-//This function is for the general mode of building
-gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo)
+
+//This function is for player to choose their building
+gameInfo chooseBuilding(gameInfo _gameData, playerData _playerInfo, string _buildingOptions[], string _buildModeOptions[])
 {
-    //These are the menu options for build mode
-    string menuOptions[4] = {"Place using keyboard", "Place using coordinate", "Confirm place", "Cancel/Exit build mode"};
+    int inputValue; //This is used to get the input of the player
+
+    //Output message
+    cout << endl << endl << "    ===================================" << endl << "    >- What would you like to build?" << endl;
+    displayMenu(_buildingOptions, 3, _playerInfo, _gameData.currentYear, false); //Display all buidling options
+    inputValue = getAnswer(3,1); //Get player's input
+
+    if(inputValue != 3)
+    {
+        system("CLS"); //Wipe console
+        if(inputValue == 1)
+        { //Call build mode function
+            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '@');
+        }
+        else
+        { //Call build mode function
+            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '#');
+        }
+    }
+    return _gameData; //Otherwise, return to main
+}
+
+//This function is for the general mode of building
+gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo, string _menuOptions[], char _building)
+{
     int menuInput = 1; //Integer used to get input from player
 
     char savedChar = _gameData.gameMap[100][20]; //This represents the temporary character saved
     int currentX = 100; //This represents the current x position of the base
     int currentY = 20; //This represents the current y position of the base
 
-    setSpot(_gameData.gameMap[currentX][currentY], '@'); //Set initial spot of the base on the map
+    setSpot(_gameData.gameMap[currentX][currentY], _building); //Set initial spot of the base on the map
 
     while(menuInput != 4) //Kepp loop running unless quit option is chosen
     {
         _gameData = goThroughMap(_gameData, ' ', false); //Display map
-        displayMenu(menuOptions, 4, _playerInfo, _gameData.currentYear); //Display options
+        displayMenu(_menuOptions, 4, _playerInfo, _gameData.currentYear, true); //Display options
         menuInput = getAnswer(4,1); //Get player input
 
         if(menuInput == 1)
         {
-            displayRedText("    >- Use WASD  or Arrow keys to move", true); //Display instructions
-            _gameData = keyboardMode(_gameData, currentX, currentY, savedChar); //Call function to place using keyboard
+            displayColorText("    >- Use WASD  or Arrow keys to move", true, 12); //Display instructions
+            _gameData = keyboardMode(_gameData, currentX, currentY, savedChar, _building); //Call function to place using keyboard
         }
         else if(menuInput == 2)
         {
-            _gameData = coordinateMode(_gameData, currentX, currentY, savedChar);  //Call function to place using coordinates
+            _gameData = coordinateMode(_gameData, currentX, currentY, savedChar, _building);  //Call function to place using coordinates
         }
         else if(menuInput == 3)
         {
             cout << endl << "    >- Do you want to confirm this spot to place your item? The change is ";
-            displayRedText("permanent", true); //Display message
+            displayColorText("permanent", true, 12); //Display message
             if(getConfirmation()) //If player confirms yes to placement, save and exit function
             {
                 menuInput = 4; //Trigger quit option
@@ -275,7 +315,7 @@ gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo)
 }
 
 //This function is for placing base using keyboard
-gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar)
+gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
 {
     while(true) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Check this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     {
@@ -283,7 +323,7 @@ gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& 
         {
             if((_currentY - 1) >= 5) //Check to see if new position is legal
             {
-                _gameData = updatePosition(_gameData, 0, -1, true, _currentX, _currentY, _savedChar); //Set spot of map back to saved character before exiting
+                _gameData = updatePosition(_gameData, 0, -1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
         }
         //Else if specific key is pressed:
@@ -291,7 +331,7 @@ gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& 
         {
             if((_currentY + 1) <= 45) //Check to see if new position is legal
             {
-                _gameData = updatePosition(_gameData, 0, 1, true, _currentX, _currentY, _savedChar); //Set spot of map back to saved character before exiting
+                _gameData = updatePosition(_gameData, 0, 1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
         }
         //Else if specific key is pressed:
@@ -299,7 +339,7 @@ gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& 
         {
             if((_currentX - 1) >= 0) //Check to see if new position is legal
             {
-                _gameData = updatePosition(_gameData, -1, 0, true, _currentX, _currentY, _savedChar); //Set spot of map back to saved character before exiting
+                _gameData = updatePosition(_gameData, -1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
         }
         //Else if specific key is pressed:
@@ -307,7 +347,7 @@ gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& 
         {
             if((_currentX + 1) <= 199) //Check to see if new position is legal
             {
-                _gameData = updatePosition(_gameData, 1, 0, true, _currentX, _currentY, _savedChar); //Set spot of map back to saved character before exiting
+                _gameData = updatePosition(_gameData, 1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
         }
         //Else if escape is pressed, exit
@@ -320,7 +360,7 @@ gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& 
 }
 
 //This function is for placing base using a coordinate system
-gameInfo coordinateMode(gameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar)
+gameInfo coordinateMode(gameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
 {
     int tempX; //x position input chosen by player
     int tempY; //y position input chosen by player
@@ -331,16 +371,16 @@ gameInfo coordinateMode(gameInfo _gameData, int& _currentX, int& _currentY, char
     cout << "    >- Please input your y-position between 3 - 43 " << endl;
     tempY = getAnswer(43, 3);
 
-    _gameData = updatePosition(_gameData, -_currentX + tempX, -_currentY + tempY, false, _currentX, _currentY, _savedChar);
+    _gameData = updatePosition(_gameData, -_currentX + tempX, -_currentY + tempY, false, _currentX, _currentY, _savedChar, _building);
     return _gameData;
 }
 
 //This function is for updating the position of the base
-gameInfo updatePosition(gameInfo _gameData, int _xChange, int _yChange, bool _usingKeyboard, int& _currentX, int& _currentY, char& _savedChar)
+gameInfo updatePosition(gameInfo _gameData, int _xChange, int _yChange, bool _usingKeyboard, int& _currentX, int& _currentY, char& _savedChar, char _building)
 {
     _gameData.gameMap[_currentX][_currentY] = _savedChar; //Replace current position with the saved character
     _savedChar = _gameData.gameMap[_currentX + _xChange][_currentY + _yChange]; //Save the character of the future value
-    _gameData.gameMap[_currentX + _xChange][_currentY + _yChange] = '@'; //Replace the future spot with an @ symbol
+    _gameData.gameMap[_currentX + _xChange][_currentY + _yChange] = _building; //Replace the future spot with an @ symbol
     _currentX = _currentX + _xChange; //Update current position
     _currentY = _currentY + _yChange;
 
@@ -348,7 +388,7 @@ gameInfo updatePosition(gameInfo _gameData, int _xChange, int _yChange, bool _us
     {
         system("CLS"); //Wipe console
         _gameData = goThroughMap(_gameData, ' ', false); //Display map
-        displayRedText("    >- Press escape to exit keyboard mode", true); //Output warning/directions on how to exit
+        displayColorText("    >- Press escape to exit keyboard mode", true, 12); //Output warning/directions on how to exit
     }
     return _gameData; //return
 }
@@ -367,16 +407,16 @@ int getAnswer (int _maxLimit, int _minLimit)
         {
             cin.clear(); //Clear all flags
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //ignore incorrect symbols
-            displayRedText("  ==================================================", true);
-            displayRedText("  >- Please enter a valid input number", true);
-            displayRedText("  ==================================================", true);
+            displayColorText("  ==================================================", true, 12);
+            displayColorText("  >- Please enter a valid input number", true, 12);
+            displayColorText("  ==================================================", true, 12);
             findingInput = true; //If the input is invalid, then the loop will loop
         }
         else if(playerInput > _maxLimit || playerInput < _minLimit ) //Otherwise, print an error message
         {
-            displayRedText("  ==================================================", true);
+            displayColorText("  ==================================================", true, 12);
             cout << "  >- Please enter a number between " << _minLimit << " and " << _maxLimit << endl;
-            displayRedText("  ==================================================", true);
+            displayColorText("  ==================================================", true, 12);
             findingInput = true; //If the input is invalid, then the loop will loop
         }
     }while(findingInput);
@@ -384,11 +424,15 @@ int getAnswer (int _maxLimit, int _minLimit)
 }
 
 //Displays the menu
-void displayMenu(string _options[], int _arraySize, playerData _data, int _year)
+void displayMenu(string _options[], int _arraySize, playerData _data, int _year, bool showInfo)
 {
     //Display UI
     cout << "    >- Please enter a direct command. Below are the primary listed commands.                                                  ";
-    cout << "[January 1, " << _year << "] <> Current Department Balance: " << _data.currentBalance<< " billion dollars" << endl;
+    if(showInfo)
+    {
+        cout << "[January 1, " << _year << "] <> Current Department Balance: " << _data.currentBalance<< " billion dollars";
+    }
+    cout << endl;
     //Display instructions
     for(int i = 0; i < _arraySize; i++)
     {
@@ -397,15 +441,15 @@ void displayMenu(string _options[], int _arraySize, playerData _data, int _year)
     return;
 }
 
-//Displays text in red
-void displayRedText(string _inputOne, bool _returnTrue)
+//Displays text in Color
+void displayColorText(string _inputOne, bool _returnTrue, int color)
 {
     HANDLE hConsole;
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //HANDLE and hCOnsole are using the windows.h lbrary to color individual letters
 
-    SetConsoleTextAttribute(hConsole, 12); //Set color to red
+    SetConsoleTextAttribute(hConsole, color); //Set color to Color
     cout << _inputOne;
-    SetConsoleTextAttribute(hConsole, 15); //Set color to red
+    SetConsoleTextAttribute(hConsole, 15); //Set color to white again
     if(_returnTrue)
     {
         cout << endl;
