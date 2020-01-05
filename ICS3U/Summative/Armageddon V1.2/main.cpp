@@ -5,17 +5,16 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.2.6]
+>- [version 1.2.9]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
+//!!!!!!!!! Check with Mr. M on while(true)
+
     ////////////////////////////// Goals for today
 
 >- Commenting
-
->- End turn random events
-    >- Common ones
 
     ////////////////////////////// Goal for tmrw
 
@@ -34,6 +33,9 @@
 #include <fstream>   //For the map saving
 #include <conio.h>   //For getch();
 #include <tgmath.h>  //For rounding
+#include <stdio.h>    //For NULL (srand)
+#include <stdlib.h>   //For srand, rand
+#include <time.h>     //For time
 
 
 //Declaring used namespaces
@@ -64,8 +66,9 @@ gameInfo goThroughMap(gameInfo, char, bool); //This function is to go through ev
 gameInfo getMap(gameInfo); //This function is used to find each line in the map txt file
 gameInfo saveMap(std::string, gameInfo, int); //This function is used to extract each character in a map file line
 
-playerData endTurn(playerData, float, float&, float&, string[]); //This function is in charge of updating the player data for the next turn
+playerData endTurn(playerData, float, float&, float&, string[], string[]); //This function is in charge of updating the player data for the next turn
 void defconCounter(string[], float); //This function is to display the defcon state
+void worldEvent(float&, string[]); //This function is to display the world events
 
 gameInfo chooseBuilding(gameInfo, playerData, string[], string[], float&); //This function is for player to choose their building
 gameInfo buildingMode(gameInfo, playerData, string[], char, float&); //This function is for the general mode of building
@@ -82,6 +85,7 @@ bool getConfirmation(); //This function is to get a boolean response from the pl
 
 int main()
 {
+    srand (time(NULL)); //Randomize seed according to time
     //Declaring all variables
 
     //Declare and initialize game data -> specifically the map
@@ -101,7 +105,11 @@ int main()
     string primaryOptions[3] = {"Enter building mode","|| Finish Turn >>", "Quit"}; //This array represents the optiosn available in the main menu
     string buildingOptions[3] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex", "Quit"}; //This represents the available options for buildings
     string buildModeOptions[4] = {"Place using keyboard", "Place using coordinate", "Confirm place", "Cancel/Exit build mode"}; //These are the menu options for build mode
-    string defconOptions[5]= {"CRITICAL|| Nuclear War Imminent","SEVERE|| Armed Forces Ready to Deploy in 6 hours","SUBSTANTIAL|| Air Force Mobilizes in 15 Minutes","MODERATE|| Increase Security Readiness","LOW|| Normal Peacetime Readiness"}; //These are the five states of DEFCON advance warning
+    //These are the five states of DEFCON advance warning
+    string defconOptions[5]= {"CRITICAL|| Nuclear War Imminent","SEVERE|| Armed Forces Ready to Deploy in 6 hours","SUBSTANTIAL|| Air Force Mobilizes in 15 Minutes","MODERATE|| Increase Security Readiness","LOW|| Normal Peacetime Readiness"};
+    //World events that may or may not change your income/funding
+    string worldEvents[10] = {"Funding is re-directed to Boost the Economy","New Governemnt Against-Military","Anti-War Protests are Widespread","Sovites Become More Agresive","New US Government is Pro-Military","Public Opinion Swings Pro-Military","NATO Military Exercise Occurs in Western Europe","Warsaw Pact Meet For Annual Military Sumit","Refugees Continue to Flee Eastern Europe","Civil War Occurs in South America"};
+
     int menuInput = 1; //This int represents the input taken from user
 
     while(menuInput != 3)//While player does not choose to quit
@@ -117,7 +125,7 @@ int main()
         else if(menuInput == 2)
         { //Go to end turn function
             gameData.currentYear ++;//Update year
-            usa = endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions); //Calls function to update income
+            usa = endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents); //Calls function to update income
         }
         else
         { //Quit game
@@ -221,13 +229,15 @@ gameInfo saveMap(std::string _line, gameInfo _gameData, int _currentRow)
 }
 
 //This function is in charge of updating the player data for the next turn
-playerData endTurn(playerData _data, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[])
+playerData endTurn(playerData _data, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[], string _worldEvents[])
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
 
     _defcon -= 0.05; //Increase defcon naturally
     defconCounter(_defconOptions, _defcon); //Call function to display defcon information
+
+    worldEvent(_data.currentIncome, _worldEvents); //Call function to display current world issues
 
 
     randomValue = (rand()%5+1)/100.0; //Get the random increase or decrease of the GDP
@@ -295,6 +305,49 @@ void defconCounter(string _defconOptions[], float _defcon)
     cout << "]" << endl;
 
     cout << "    >- " << _defconOptions[defconLevel-1] << endl << endl;
+    return;
+}
+
+//This function is to display the world events
+void worldEvent(float& _budgetPercent, string _worldEvents[])
+{
+    int randomInt; //This represents a random value generated by the program
+    float randomFloat; //This represents a random value henerated for change in income budget
+    randomInt = (rand()%50); //Get the random event
+
+    cout << endl << endl << "    ===========================================" << endl << "    >- Major International Events Summary (M.I.E.S) -< " << endl;
+
+    if(randomInt - 37 > 0)
+    {
+        cout << "        + no major events" << endl;
+    }
+    else if(randomInt - 29 > 0)
+    {
+        cout << "        + ";
+        cout << _worldEvents[(randomInt - 28) % 4 + 6] << endl; //Show world event
+    }
+    else if(randomInt - 8 > 0)
+    {
+        cout << "        + ";
+        cout << _worldEvents[(randomInt - 7) % 3 + 3] << endl; //Show world event
+        cout << "        + Increase US Military Spending by ";
+        randomFloat = ((rand()%5+1)/100.0);//Get the random increase in inflation
+        cout << randomFloat*100 << "%" << endl; //Display change
+        _budgetPercent += randomFloat; //Increase funding
+    }
+    else
+    {
+        cout << "        + ";
+        cout << _worldEvents[(randomInt + 1) % 3] << endl; //Show world event
+        cout << "        + Decrease US Military Spending by ";
+        randomFloat = ((rand()%2+1)/100.0);//Get the random decrease in inflation
+        cout << randomFloat*100 << "%" << endl; //Display change
+        if(_budgetPercent > 0.03) //Make sure you dont have negative funding
+        {
+            _budgetPercent -= randomFloat; //Decrease funding
+        }
+    }
+    cout << endl << endl << "    ===========================================" << endl;
     return;
 }
 
