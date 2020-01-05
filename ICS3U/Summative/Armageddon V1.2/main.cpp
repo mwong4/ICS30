@@ -1,29 +1,33 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 4, 2020
+>- Updated: Jan 5, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.2.9]
+>- [version 1.3.0]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
 
->- Commenting
+>- If defcon reaches 1, loose game
+
+>- Random Aircraft Spawn
+
+>- Scan aircraft
+    >- Tag them different colors
+
+>- Advance Events
 
 >- Restricted placement system
     >-Fill map?
     >- Russia
     >- Ocean
->- If defcon reaches 1, loose game
->- Every time silo is built, decon increases
->- Random Aircraft Spawn
->- Scan aircraft
-    >- Tag them different colors
->- Advance Events
+
+>- Commenting
+
 
     ////////////////////////////// Goal for tmrw
 
@@ -420,7 +424,11 @@ gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo, string _menuOp
             if(getConfirmation()) //If player confirms yes to placement, save and exit function
             {
                 menuInput = 4; //Trigger quit option
-                _budget -= _gameData.baseCost;
+                _budget -= _gameData.baseCost; //Use up money
+                if(_building == '@')
+                { //If building built is missile silo
+                    _gameData.defcon -= 0.1; //Decrease Defcon (increase level)
+                }
             }
         }
         else

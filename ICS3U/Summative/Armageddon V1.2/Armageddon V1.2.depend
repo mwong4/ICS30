@@ -6,10 +6,14 @@
 	<fstream>
 	<conio.h>
 
-1578108533 source:c:\users\max pc\documents\github\ics30\ics3u\summative\armageddon v1.2\main.cpp
+1578258996 source:c:\users\max pc\documents\github\ics30\ics3u\summative\armageddon v1.2\main.cpp
 	<iostream>
 	<windows.h>
 	<limits>
 	<fstream>
 	<conio.h>
+	<tgmath.h>
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
 
