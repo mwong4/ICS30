@@ -5,31 +5,29 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.3.0]
+>- [version 1.3.5]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
 
->- If defcon reaches 1, loose game
-
 >- Random Aircraft Spawn
 
 >- Scan aircraft
     >- Tag them different colors
 
->- Advance Events
-
->- Restricted placement system
-    >-Fill map?
-    >- Russia
-    >- Ocean
-
 >- Commenting
 
 
     ////////////////////////////// Goal for tmrw
+
+    >- Advance Events
+
+    >- Restricted placement system
+        >-Fill map?
+        >- Russia
+        >- Ocean
 
 >- !!!!!!!!! Check with Mr. M on while(true)
 */
@@ -71,12 +69,15 @@ struct playerData //This struct holds the data for each player
 void display(char); //This function is for displaying a single character
 void setSpot(char&, char); //This function is to set a specific spot in the map
 gameInfo goThroughMap(gameInfo, char, bool); //This function is to go through every spot in the map. It can use other functions to set it all or display it
-gameInfo getMap(gameInfo); //This function is used to find each line in the map txt file
+gameInfo getMap(gameInfo, bool); //This function is used to find each line in the map txt file
 gameInfo saveMap(std::string, gameInfo, int); //This function is used to extract each character in a map file line
 
 playerData endTurn(playerData, float, float&, float&, string[], string[]); //This function is in charge of updating the player data for the next turn
 void defconCounter(string[], float); //This function is to display the defcon state
 void worldEvent(float&, string[]); //This function is to display the world events
+bool gameOverScreen(gameInfo); //This function is for ending the game
+gameInfo resetGame(gameInfo); //This function is for resting game info
+playerData resetPlayer(playerData); //This function is for reseting a player
 
 gameInfo chooseBuilding(gameInfo, playerData, string[], string[], float&); //This function is for player to choose their building
 gameInfo buildingMode(gameInfo, playerData, string[], char, float&); //This function is for the general mode of building
@@ -96,19 +97,13 @@ int main()
     srand (time(NULL)); //Randomize seed according to time
     //Declaring all variables
 
-    //Declare and initialize game data -> specifically the map
+    //Declare and initialize game data and playerData
     gameInfo gameData; //This struct represents the important information for the whole game
-    gameData.currentYear = 1945; //Set the starting year to 1945
-    gameData.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
-    gameData.defcon = 5;
-    gameData = getMap(gameData); //Initialize the value of the map array
-
     playerData usa; //This struct represents the important information for player usa
-    //Set default values (initialize)
-    usa.currentGDP = 2000; //The stating US GDP is 2 trillion
-    usa.currentIncome = 0.01; //The starting military funding is 0.01%
-    usa.currentBalance = 0.5; //The current military balance is 500 million dollars
-    usa.playerName = getName(); //Initialize name by using the loading screen
+
+    //Calling function to reset all (Game and Player) data
+    gameData = resetGame(gameData);
+    usa = resetPlayer(usa);
 
     string primaryOptions[3] = {"Enter building mode","|| Finish Turn >>", "Quit"}; //This array represents the optiosn available in the main menu
     string buildingOptions[3] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex", "Quit"}; //This represents the available options for buildings
@@ -132,8 +127,24 @@ int main()
         }
         else if(menuInput == 2)
         { //Go to end turn function
-            gameData.currentYear ++;//Update year
-            usa = endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents); //Calls function to update income
+            if(gameData.defcon - 0.05 <= 1)
+            { //If gameover trigger is detected
+                if(gameOverScreen(gameData))
+                {
+                    return 0;
+                }
+                else
+                {
+                    //Calling function to reset all (Game and Player) data
+                    gameData = resetGame(gameData);
+                    usa = resetPlayer(usa);
+                }
+            }
+            else
+            {
+                gameData.currentYear ++;//Update year
+                usa = endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents); //Calls function to update income
+            }
         }
         else
         { //Quit game
@@ -206,22 +217,68 @@ gameInfo goThroughMap(gameInfo _gameData, char _clearValue, bool _setMap)
     return _gameData;
 }
 
+//This function is for ending the game
+bool gameOverScreen(gameInfo _data)
+{
+    system("CLS"); //Wipe consol
+    _data = getMap(_data, false); //Print game over screen
+    cout << endl << endl << "            =========================================================================================================================" << endl;
+    cout << "            >- GAMEOVER: The world has ended by nuclear war. At your hands, billions have died. There really is no winning is there?" << endl;
+    cout << "            >- Maybe you can be the savior that this world needs, and change it for the better. Stay DETERMINED" << endl;
+    cout << "               >- Would you like to play again?" << endl << "            ";
+    if(getConfirmation()) //If they want to play again: return false
+    {
+        return false;
+    }
+    return true; //Else, return true
+}
+
+//This function is for resting game info
+gameInfo resetGame(gameInfo _data)
+{
+    _data.currentYear = 1945; //Set the starting year to 1945
+    _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
+    _data.defcon = 5;
+    _data = getMap(_data, true); //Initialize the value of the map array
+    return _data;
+}
+
+//This function is for reseting a player
+playerData resetPlayer(playerData _data)
+{
+    _data.currentGDP = 2000; //The stating US GDP is 2 trillion
+    _data.currentIncome = 0.01; //The starting military funding is 0.01%
+    _data.currentBalance = 0.5; //The current military balance is 500 million dollars
+    _data.playerName = getName(); //Initialize name by using the loading screen
+    return _data;
+}
+
 //This function is used to find each line in the map txt file
-gameInfo getMap(gameInfo _gameData)
+gameInfo getMap(gameInfo _gameData, bool _saveFile)
 {
     std::string line;
-    ifstream file_("MapFile.txt");
+    ifstream mapFile_("MapFile.txt");
+    ifstream endFile_("NuclearEnding.txt");
 
     int currentRow = 0;
 
-    if(file_.is_open())
+    if(mapFile_.is_open() && _saveFile) //If instricted to save the file
     {
-        while(getline(file_,line)) //This function uses the builtin function: getline
+        while(getline(mapFile_,line)) //This function uses the builtin function: getline
         {
             _gameData = saveMap(line, _gameData, currentRow); //It then references the saveMapFile function in order to save it into a doubel array.
             currentRow += 1;
+
         }
-        file_.close();
+        mapFile_.close();
+    }
+    else if(endFile_.is_open() && !_saveFile) //Otherwise, if instructed to read out file
+    {
+        while(getline(endFile_,line)) //This function uses the builtin function: getline
+        {
+            cout << line << endl; //Find each line and print it out
+        }
+        endFile_.close();
     }
     return _gameData;
 }
@@ -242,7 +299,7 @@ playerData endTurn(playerData _data, float _budgetChange, float& _baseCost, floa
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
 
-    _defcon -= 0.05; //Increase defcon naturally
+    _defcon -= 1.05; //Increase defcon naturally
     defconCounter(_defconOptions, _defcon); //Call function to display defcon information
 
     worldEvent(_data.currentIncome, _worldEvents); //Call function to display current world issues
@@ -602,6 +659,7 @@ string getName()
     string randInput = ""; //This represents the password inputted by the user
     char ch; //This is used to get each individual input
 
+    system("CLS"); //Wiping consol
     cout << "    >- -UNSC User Management System-" << endl << "    ================================" << endl << "    ________________________________" << endl;
     cout << "    UNSC TacOS  v.337" <<  endl << "    (S) 2294 FLEETCOM" << endl << "    =======================" <<  endl << "    |  User Log:" << endl;
     cout << "    |  >> Administrator (UNSC ID 8384-C)" << endl << "    |  >>> " << "unknown.IDENTIFY_userGroup" << endl << endl;
