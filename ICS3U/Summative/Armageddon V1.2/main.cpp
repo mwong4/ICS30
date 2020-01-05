@@ -10,20 +10,24 @@
 >-
 >- [TO DO]
 
-//!!!!!!!!! Check with Mr. M on while(true)
-
     ////////////////////////////// Goals for today
 
 >- Commenting
 
-    ////////////////////////////// Goal for tmrw
-
 >- Restricted placement system
     >-Fill map?
     >- Russia
-
+    >- Ocean
 >- If defcon reaches 1, loose game
 >- Every time silo is built, decon increases
+>- Random Aircraft Spawn
+>- Scan aircraft
+    >- Tag them different colors
+>- Advance Events
+
+    ////////////////////////////// Goal for tmrw
+
+>- !!!!!!!!! Check with Mr. M on while(true)
 */
 
 //Declaring all used libraries
