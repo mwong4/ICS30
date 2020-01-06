@@ -5,16 +5,14 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.3.5]
+>- [version 1.3.7]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
 
->- Random Aircraft Spawn
-
-    ////////////////////////////// Goal for tmrw
+    >- Caps
 
     >- Scan aircraft
     >- Tag them different colors
@@ -28,7 +26,9 @@
 
     >- Commenting
 
->- !!!!!!!!! Check with Mr. M on while(true)
+    ////////////////////////////// Goal for tmrw
+
+    >- UFO array can't be in struct bug
 */
 
 //Declaring all used libraries
@@ -47,15 +47,6 @@
 using namespace std;
 
 //Delcaring used structures
-struct gameInfo //This struct holds the core game data
-{
-    int ufoCount;
-    float baseCost; //This is the price of the buildings
-    int currentYear; //Year counter
-    float defcon;
-    char gameMap [199][55];//This is the double array that houses the whole map
-};
-
 struct playerData //This struct holds the data for each player
 {
     string playerName;
@@ -74,6 +65,15 @@ struct UFO //This struct holds the core data for each UFO spawned in the game
     char savedChar; //This represents the char of the original spot of the object
     int xPos; //This represents the x position of the object
     int yPos; //This represents the y position of the object
+};
+
+struct gameInfo //This struct holds the core game data
+{
+    int ufoCount;
+    float baseCost; //This is the price of the buildings
+    int currentYear; //Year counter
+    float defcon; //This is the world tension counter. If it reaches 1, everyone dies
+    char gameMap [199][55];//This is the double array that houses the whole map
 };
 
 //Delcaring function prototypes
@@ -104,8 +104,9 @@ void anyInput(); //This is an integrated version of getch(); and a message
 string getName(); //This function is used to get the player's name, disguised as the start menu
 bool getConfirmation(); //This function is to get a boolean response from the player
 
-void spawnUFO(UFO[], int, string[], string[], char[]); //This function is in charge of spawning all unscanned planes
-UFO setUFO(UFO, string[], string[], char[]); //This function is in charge of setting the information on the plane
+gameInfo spawnUFO(UFO[], int, string[], string[], char[], gameInfo); //This function is in charge of spawning all unscanned planes
+UFO setUFO(UFO, string[], string[], char[], char[199][55]); //This function is in charge of setting the information on the plane
+void resetUFOs(UFO[]); //This resets the position of the ufo's
 
 int main()
 {
@@ -115,10 +116,12 @@ int main()
     //Declare and initialize game data and playerData
     gameInfo gameData; //This struct represents the important information for the whole game
     playerData usa; //This struct represents the important information for player usa
+    UFO ufosOnMap[20]; //This is an array containing the information on every ufo on the map
 
     //Calling function to reset all (Game and Player) data
     gameData = resetGame(gameData);
     usa = resetPlayer(usa);
+    resetUFOs(ufosOnMap);
 
     string primaryOptions[3] = {"Enter building mode","|| Finish Turn >>", "Quit"}; //This array represents the optiosn available in the main menu
     string buildingOptions[3] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex", "Quit"}; //This represents the available options for buildings
@@ -134,7 +137,6 @@ int main()
     char symbols[2] = {'^', '!'}; //Symbols of possible enemy planes
 
     int menuInput = 1; //This int represents the input taken from user
-
     while(menuInput != 3)//While player does not choose to quit
     {
         gameData = goThroughMap(gameData, ' ', false); //Display map
@@ -164,6 +166,7 @@ int main()
             {
                 gameData.currentYear ++;//Update year
                 usa = endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents); //Calls function to update income
+                gameData = spawnUFO(ufosOnMap, gameData.ufoCount, origin, type, symbols, gameData); //Call function to spawn all the UFO's
             }
         }
         else
@@ -263,8 +266,8 @@ gameInfo resetGame(gameInfo _data)
     _data.currentYear = 1945; //Set the starting year to 1945
     _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
     _data.defcon = 5;
-    _data = getMap(_data, true); //Initialize the value of the map array
-    _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
+    _data = getMap(_data, true); //Initialize the value of the map array //error
+    _data.ufoCount = 10; //Set amount of ufo's in the sky to 0
     return _data;
 }
 
@@ -293,7 +296,6 @@ gameInfo getMap(gameInfo _gameData, bool _saveFile)
         {
             _gameData = saveMap(line, _gameData, currentRow); //It then references the saveMapFile function in order to save it into a doubel array.
             currentRow += 1;
-
         }
         mapFile_.close();
     }
@@ -324,7 +326,7 @@ playerData endTurn(playerData _data, float _budgetChange, float& _baseCost, floa
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
 
-    _defcon -= 1.05; //Increase defcon naturally
+    _defcon -= 0.05; //Increase defcon naturally
     defconCounter(_defconOptions, _defcon); //Call function to display defcon information
 
     worldEvent(_data.currentIncome, _worldEvents); //Call function to display current world issues
@@ -528,8 +530,8 @@ gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo, string _menuOp
 
 //This function is for placing base using keyboard
 gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
-{
-    while(true) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Check this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+{ //If escape is pressed, exit
+    while((!(GetKeyState(VK_ESCAPE) & 0x8000)))
     {
         if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
         {
@@ -562,13 +564,9 @@ gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& 
                 _gameData = updatePosition(_gameData, 1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
         }
-        //Else if escape is pressed, exit
-        else if((GetKeyState(VK_ESCAPE) & 0x8000))
-        {
-            system("CLS"); //Wipe console
-            return _gameData;
-        }
     }
+    system("CLS"); //Wipe console
+    return _gameData;
 }
 
 //This function is for placing base using a coordinate system
@@ -722,20 +720,23 @@ bool getConfirmation()
 }
 
 //This function is in charge of spawning all unscanned planes
-void spawnUFO(UFO _ufosData[], int _ufoCount, string _origin[], string _type[], char _symbol[])
+gameInfo spawnUFO(UFO _ufosData[], int _ufoCount, string _origin[], string _type[], char _symbol[], gameInfo _gameData)
 {
     for(int i = 0; i < _ufoCount; i++) //Spawn all planes
     {
-        _ufosData[i] = setUFO(_ufosData[i], _origin, _type, _symbol); //Call function to make a new plane
+        _ufosData[i] = setUFO(_ufosData[i], _origin, _type, _symbol, _gameData.gameMap); //Call function to make a new plane
     }
-    return;
+    return _gameData;
 }
 
 //This function is in charge of setting the information on the plane
-UFO setUFO(UFO _ufoData, string _origin[], string _type[], char _symbol[])
+UFO setUFO(UFO _ufoData, string _origin[], string _type[], char _symbol[], char _gameMap[199][55])
 {
     int randValue; //This represents a random value
     randValue = rand() % 10; //Determine random number to find out what allegiance is the plane
+
+    //Get rid of the previous ufo and reset it to (reuse it) for a new ufo
+    setSpot(_gameMap[_ufoData.xPos][_ufoData.yPos], _ufoData.savedChar);
 
     _ufoData.identity = rand() % 9999; //Generate random identity
 
@@ -770,7 +771,21 @@ UFO setUFO(UFO _ufoData, string _origin[], string _type[], char _symbol[])
     }
     _ufoData.xPos = rand()%198; //Get the random x position
     _ufoData.yPos = rand()%47 + 3; //Get the random y position
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! char savedChar; //This represents the char of the original spot of the object
+    setSpot(_ufoData.savedChar, _gameMap[_ufoData.xPos][_ufoData.yPos]); //Save the character on the map of the UFO before updating map
+
+    //Now that ufo data is saved, update map data
+    setSpot(_gameMap[_ufoData.xPos][_ufoData.yPos], '?');
 
     return _ufoData;
+}
+
+//This resets the position of the ufo's
+void resetUFOs(UFO _objects[])
+{
+    for(int i = 0; i < 20; i++)
+    {
+        _objects[i].xPos = 0;
+        _objects[i].yPos = 0;
+    }
+    return;
 }
