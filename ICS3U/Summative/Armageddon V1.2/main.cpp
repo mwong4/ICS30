@@ -14,13 +14,10 @@
 
 >- Random Aircraft Spawn
 
->- Scan aircraft
-    >- Tag them different colors
-
->- Commenting
-
-
     ////////////////////////////// Goal for tmrw
+
+    >- Scan aircraft
+    >- Tag them different colors
 
     >- Advance Events
 
@@ -28,6 +25,8 @@
         >-Fill map?
         >- Russia
         >- Ocean
+
+    >- Commenting
 
 >- !!!!!!!!! Check with Mr. M on while(true)
 */
@@ -50,6 +49,7 @@ using namespace std;
 //Delcaring used structures
 struct gameInfo //This struct holds the core game data
 {
+    int ufoCount;
     float baseCost; //This is the price of the buildings
     int currentYear; //Year counter
     float defcon;
@@ -62,6 +62,18 @@ struct playerData //This struct holds the data for each player
     float currentGDP; //The US GDP
     float currentIncome; //The % funding for the department
     float currentBalance; //The military budget, how much funding in dollars
+};
+
+struct UFO //This struct holds the core data for each UFO spawned in the game
+{
+    int identity; //This is just for decor, a random 4 digit number
+    string tag; //This r  epresents if it is friendly or enemy
+    string origin; //This represents where if came from (country)
+    string type; //This represents what the ship is
+    char symbol; //This is the symbol representing it on the map
+    char savedChar; //This represents the char of the original spot of the object
+    int xPos; //This represents the x position of the object
+    int yPos; //This represents the y position of the object
 };
 
 //Delcaring function prototypes
@@ -92,6 +104,9 @@ void anyInput(); //This is an integrated version of getch(); and a message
 string getName(); //This function is used to get the player's name, disguised as the start menu
 bool getConfirmation(); //This function is to get a boolean response from the player
 
+void spawnUFO(UFO[], int, string[], string[], char[]); //This function is in charge of spawning all unscanned planes
+UFO setUFO(UFO, string[], string[], char[]); //This function is in charge of setting the information on the plane
+
 int main()
 {
     srand (time(NULL)); //Randomize seed according to time
@@ -112,6 +127,11 @@ int main()
     string defconOptions[5]= {"CRITICAL|| Nuclear War Imminent","SEVERE|| Armed Forces Ready to Deploy in 6 hours","SUBSTANTIAL|| Air Force Mobilizes in 15 Minutes","MODERATE|| Increase Security Readiness","LOW|| Normal Peacetime Readiness"};
     //World events that may or may not change your income/funding
     string worldEvents[10] = {"Funding is re-directed to Boost the Economy","New Governemnt Against-Military","Anti-War Protests are Widespread","Sovites Become More Agresive","New US Government is Pro-Military","Public Opinion Swings Pro-Military","NATO Military Exercise Occurs in Western Europe","Warsaw Pact Meet For Annual Military Sumit","Refugees Continue to Flee Eastern Europe","Civil War Occurs in South America"};
+
+    //String arrays for UFO's
+    string origin[13] = {"Soviet","Chinese","South Korea","Sweden","Switzerland","Egypt","Saudi Arabie","Austria", "West Germany", "United States of America", "Canada", "France", "United Kingdom"}; //The origins of enemy and neutral planes
+    string type[4] = {"Military","Nuclear","Cargo","Passenger"}; //These represent the possible plane types in the game
+    char symbols[2] = {'^', '!'}; //Symbols of possible enemy planes
 
     int menuInput = 1; //This int represents the input taken from user
 
@@ -179,6 +199,10 @@ void display(char _mapSpot)
     {
         displayColorText("&", false, 10); //Light green
     }
+    else if(_mapSpot == '^')
+    {
+        displayColorText("^", false, 10); //Blue
+    }
     else
     {
         cout << _mapSpot;
@@ -240,6 +264,7 @@ gameInfo resetGame(gameInfo _data)
     _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
     _data.defcon = 5;
     _data = getMap(_data, true); //Initialize the value of the map array
+    _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
     return _data;
 }
 
@@ -694,4 +719,58 @@ bool getConfirmation()
         return true;
     }
     return false; //Otherwise, return false
+}
+
+//This function is in charge of spawning all unscanned planes
+void spawnUFO(UFO _ufosData[], int _ufoCount, string _origin[], string _type[], char _symbol[])
+{
+    for(int i = 0; i < _ufoCount; i++) //Spawn all planes
+    {
+        _ufosData[i] = setUFO(_ufosData[i], _origin, _type, _symbol); //Call function to make a new plane
+    }
+    return;
+}
+
+//This function is in charge of setting the information on the plane
+UFO setUFO(UFO _ufoData, string _origin[], string _type[], char _symbol[])
+{
+    int randValue; //This represents a random value
+    randValue = rand() % 10; //Determine random number to find out what allegiance is the plane
+
+    _ufoData.identity = rand() % 9999; //Generate random identity
+
+    if(randValue - 7 > 0)
+    {
+        _ufoData.tag = "Neutral"; //GIve tag as neutral
+        _ufoData.origin = _origin[rand() % 11 + 2]; //Generate the random neutral origin country
+        _ufoData.type = _type[rand()%2 + 2]; //Generate type -> neutral
+        _ufoData.symbol = '^'; //Set symbol as neutral
+    }
+    else if(randValue - 3 > 0)
+    {
+        _ufoData.tag = "Friendly"; //Give tag as friendly
+        _ufoData.origin = "NATO Ally"; //All friendly belong to NATO
+        _ufoData.type = _type[rand()%2]; //Generate type -> Agressive
+        _ufoData.symbol = '&'; //Set symbol as ally
+    }
+    else
+    {
+        _ufoData.tag = "Enemy"; //Give tag as enemy
+        _ufoData.origin = _origin[(rand() % 3) % 2]; //Generate the random enemy origin country
+        randValue = (rand()%7 + 2) % 4; //Generate the type of plane -> Neutral or Enemy?
+        _ufoData.type = _type[randValue]; //Take integer and set the type of the plane
+        if(randValue == 1 || randValue == 2) //Give custom symbol depending of if plane is neutral enemy or agressive enemy
+        {
+            _ufoData.symbol = '!'; //Agressive
+        }
+        else
+        {
+            _ufoData.symbol = '^'; //Neutral
+        }
+    }
+    _ufoData.xPos = rand()%198; //Get the random x position
+    _ufoData.yPos = rand()%47 + 3; //Get the random y position
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! char savedChar; //This represents the char of the original spot of the object
+
+    return _ufoData;
 }
