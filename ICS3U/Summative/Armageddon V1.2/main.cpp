@@ -5,17 +5,18 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.3.8]
+>- [version 1.3.9]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
 
-    >- Caps
+    >- Scan aircraft [In progress]
 
-    >- Scan aircraft
-    >- Tag them different colors
+    >- Commenting
+
+    ////////////////////////////// Goal for tmrw
 
     >- Advance Events
 
@@ -23,10 +24,6 @@
         >-Fill map?
         >- Russia
         >- Ocean
-
-    >- Commenting
-
-    ////////////////////////////// Goal for tmrw
 
     >- UFO array can't be in struct bug
 */
@@ -167,7 +164,10 @@ int main()
                 gameData.currentYear ++;//Update year
                 usa = endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents); //Calls function to update income
 
-                gameData.ufoCount ++;
+                if(gameData.currentYear % 2 == 0 && gameData.ufoCount < 20)
+                { //Caps ufos at 20 and makes sure that fo count is increased every 2 turns
+                    gameData.ufoCount ++;
+                }
                 gameData = spawnUFO(ufosOnMap, gameData.ufoCount, origin, type, symbols, gameData); //Call function to spawn all the UFO's
             }
         }
