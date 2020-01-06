@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.3.7]
+>- [version 1.3.8]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -47,7 +47,7 @@
 using namespace std;
 
 //Delcaring used structures
-struct playerData //This struct holds the data for each player
+struct PlayerData //This struct holds the data for each player
 {
     string playerName;
     float currentGDP; //The US GDP
@@ -67,7 +67,7 @@ struct UFO //This struct holds the core data for each UFO spawned in the game
     int yPos; //This represents the y position of the object
 };
 
-struct gameInfo //This struct holds the core game data
+struct GameInfo //This struct holds the core game data
 {
     int ufoCount;
     float baseCost; //This is the price of the buildings
@@ -80,31 +80,31 @@ struct gameInfo //This struct holds the core game data
 
 void display(char); //This function is for displaying a single character
 void setSpot(char&, char); //This function is to set a specific spot in the map
-gameInfo goThroughMap(gameInfo, char, bool); //This function is to go through every spot in the map. It can use other functions to set it all or display it
-gameInfo getMap(gameInfo, bool); //This function is used to find each line in the map txt file
-gameInfo saveMap(std::string, gameInfo, int); //This function is used to extract each character in a map file line
+GameInfo goThroughMap(GameInfo, char, bool); //This function is to go through every spot in the map. It can use other functions to set it all or display it
+GameInfo getMap(GameInfo, bool); //This function is used to find each line in the map txt file
+GameInfo saveMap(std::string, GameInfo, int); //This function is used to extract each character in a map file line
 
-playerData endTurn(playerData, float, float&, float&, string[], string[]); //This function is in charge of updating the player data for the next turn
+PlayerData endTurn(PlayerData, float, float&, float&, string[], string[]); //This function is in charge of updating the player data for the next turn
 void defconCounter(string[], float); //This function is to display the defcon state
 void worldEvent(float&, string[]); //This function is to display the world events
-bool gameOverScreen(gameInfo); //This function is for ending the game
-gameInfo resetGame(gameInfo); //This function is for resting game info
-playerData resetPlayer(playerData); //This function is for reseting a player
+bool gameOverScreen(GameInfo); //This function is for ending the game
+GameInfo resetGame(GameInfo); //This function is for resting game info
+PlayerData resetPlayer(PlayerData); //This function is for reseting a player
 
-gameInfo chooseBuilding(gameInfo, playerData, string[], string[], float&); //This function is for player to choose their building
-gameInfo buildingMode(gameInfo, playerData, string[], char, float&); //This function is for the general mode of building
-gameInfo keyboardMode(gameInfo, int&, int&, char&, char); //This function is for placing base using keyboard
-gameInfo coordinateMode(gameInfo, int&, int&, char&, char); //This function is for placing base using a coordinate system
-gameInfo updatePosition(gameInfo, int, int, bool, int&, int&, char&, char); //This function is for updating the position of the base
+GameInfo chooseBuilding(GameInfo, PlayerData, string[], string[], float&); //This function is for player to choose their building
+GameInfo buildingMode(GameInfo, PlayerData, string[], char, float&); //This function is for the general mode of building
+GameInfo keyboardMode(GameInfo, int&, int&, char&, char); //This function is for placing base using keyboard
+GameInfo coordinateMode(GameInfo, int&, int&, char&, char); //This function is for placing base using a coordinate system
+GameInfo updatePosition(GameInfo, int, int, bool, int&, int&, char&, char); //This function is for updating the position of the base
 
 int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
-void displayMenu(string[], int, playerData, int, bool); //Function to show the menu: All positions are options except last which is reserved for quit number
+void displayMenu(string[], int, PlayerData, int, bool); //Function to show the menu: All positions are options except last which is reserved for quit number
 void displayColorText(string, bool, int); //This function is used to display Color text
 void anyInput(); //This is an integrated version of getch(); and a message
 string getName(); //This function is used to get the player's name, disguised as the start menu
 bool getConfirmation(); //This function is to get a boolean response from the player
 
-gameInfo spawnUFO(UFO[], int, string[], string[], char[], gameInfo); //This function is in charge of spawning all unscanned planes
+GameInfo spawnUFO(UFO[], int, string[], string[], char[], GameInfo); //This function is in charge of spawning all unscanned planes
 UFO setUFO(UFO, string[], string[], char[], char[199][55]); //This function is in charge of setting the information on the plane
 void resetUFOs(UFO[]); //This resets the position of the ufo's
 
@@ -114,8 +114,8 @@ int main()
     //Declaring all variables
 
     //Declare and initialize game data and playerData
-    gameInfo gameData; //This struct represents the important information for the whole game
-    playerData usa; //This struct represents the important information for player usa
+    GameInfo gameData; //This struct represents the important information for the whole game
+    PlayerData usa; //This struct represents the important information for player usa
     UFO ufosOnMap[20]; //This is an array containing the information on every ufo on the map
 
     //Calling function to reset all (Game and Player) data
@@ -166,6 +166,8 @@ int main()
             {
                 gameData.currentYear ++;//Update year
                 usa = endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents); //Calls function to update income
+
+                gameData.ufoCount ++;
                 gameData = spawnUFO(ufosOnMap, gameData.ufoCount, origin, type, symbols, gameData); //Call function to spawn all the UFO's
             }
         }
@@ -221,7 +223,7 @@ void setSpot(char& _spot, char _newValue)
 }
 
 //This function is to set completely clean off the map at the start of the game
-gameInfo goThroughMap(gameInfo _gameData, char _clearValue, bool _setMap)
+GameInfo goThroughMap(GameInfo _gameData, char _clearValue, bool _setMap)
 {
     for(int i = 0; i < 55; i++)
     {
@@ -245,7 +247,7 @@ gameInfo goThroughMap(gameInfo _gameData, char _clearValue, bool _setMap)
 }
 
 //This function is for ending the game
-bool gameOverScreen(gameInfo _data)
+bool gameOverScreen(GameInfo _data)
 {
     system("CLS"); //Wipe consol
     _data = getMap(_data, false); //Print game over screen
@@ -261,18 +263,18 @@ bool gameOverScreen(gameInfo _data)
 }
 
 //This function is for resting game info
-gameInfo resetGame(gameInfo _data)
+GameInfo resetGame(GameInfo _data)
 {
     _data.currentYear = 1945; //Set the starting year to 1945
     _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
     _data.defcon = 5;
     _data = getMap(_data, true); //Initialize the value of the map array //error
-    _data.ufoCount = 10; //Set amount of ufo's in the sky to 0
+    _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
     return _data;
 }
 
 //This function is for reseting a player
-playerData resetPlayer(playerData _data)
+PlayerData resetPlayer(PlayerData _data)
 {
     _data.currentGDP = 2000; //The stating US GDP is 2 trillion
     _data.currentIncome = 0.01; //The starting military funding is 0.01%
@@ -282,7 +284,7 @@ playerData resetPlayer(playerData _data)
 }
 
 //This function is used to find each line in the map txt file
-gameInfo getMap(gameInfo _gameData, bool _saveFile)
+GameInfo getMap(GameInfo _gameData, bool _saveFile)
 {
     std::string line;
     ifstream mapFile_("MapFile.txt");
@@ -311,7 +313,7 @@ gameInfo getMap(gameInfo _gameData, bool _saveFile)
 }
 
 //This function is used to extract each character in a map file line
-gameInfo saveMap(std::string _line, gameInfo _gameData, int _currentRow)
+GameInfo saveMap(std::string _line, GameInfo _gameData, int _currentRow)
 {
     for(std::string::size_type i = 0; i < _line.size(); ++i) //Running through every character
     {
@@ -321,7 +323,7 @@ gameInfo saveMap(std::string _line, gameInfo _gameData, int _currentRow)
 }
 
 //This function is in charge of updating the player data for the next turn
-playerData endTurn(playerData _data, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[], string _worldEvents[])
+PlayerData endTurn(PlayerData _data, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[], string _worldEvents[])
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
@@ -444,7 +446,7 @@ void worldEvent(float& _budgetPercent, string _worldEvents[])
 }
 
 //This function is for player to choose their building
-gameInfo chooseBuilding(gameInfo _gameData, playerData _playerInfo, string _buildingOptions[], string _buildModeOptions[], float& _budget)
+GameInfo chooseBuilding(GameInfo _gameData, PlayerData _playerInfo, string _buildingOptions[], string _buildModeOptions[], float& _budget)
 {
     int inputValue; //This is used to get the input of the player
 
@@ -476,7 +478,7 @@ gameInfo chooseBuilding(gameInfo _gameData, playerData _playerInfo, string _buil
 }
 
 //This function is for the general mode of building
-gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo, string _menuOptions[], char _building, float& _budget)
+GameInfo buildingMode(GameInfo _gameData, PlayerData _playerInfo, string _menuOptions[], char _building, float& _budget)
 {
     int menuInput = 1; //Integer used to get input from player
 
@@ -529,7 +531,7 @@ gameInfo buildingMode(gameInfo _gameData, playerData _playerInfo, string _menuOp
 }
 
 //This function is for placing base using keyboard
-gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
+GameInfo keyboardMode(GameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
 { //If escape is pressed, exit
     while((!(GetKeyState(VK_ESCAPE) & 0x8000)))
     {
@@ -570,7 +572,7 @@ gameInfo keyboardMode(gameInfo _gameData, int& _currentX, int& _currentY, char& 
 }
 
 //This function is for placing base using a coordinate system
-gameInfo coordinateMode(gameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
+GameInfo coordinateMode(GameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
 {
     int tempX; //x position input chosen by player
     int tempY; //y position input chosen by player
@@ -586,7 +588,7 @@ gameInfo coordinateMode(gameInfo _gameData, int& _currentX, int& _currentY, char
 }
 
 //This function is for updating the position of the base
-gameInfo updatePosition(gameInfo _gameData, int _xChange, int _yChange, bool _usingKeyboard, int& _currentX, int& _currentY, char& _savedChar, char _building)
+GameInfo updatePosition(GameInfo _gameData, int _xChange, int _yChange, bool _usingKeyboard, int& _currentX, int& _currentY, char& _savedChar, char _building)
 {
     _gameData.gameMap[_currentX][_currentY] = _savedChar; //Replace current position with the saved character
     _savedChar = _gameData.gameMap[_currentX + _xChange][_currentY + _yChange]; //Save the character of the future value
@@ -634,7 +636,7 @@ int getAnswer (int _maxLimit, int _minLimit)
 }
 
 //Displays the menu
-void displayMenu(string _options[], int _arraySize, playerData _data, int _year, bool showInfo)
+void displayMenu(string _options[], int _arraySize, PlayerData _data, int _year, bool showInfo)
 {
     //Display UI
     cout << "    >- Please enter a direct command. Below are the primary listed commands.                                                  ";
@@ -720,7 +722,7 @@ bool getConfirmation()
 }
 
 //This function is in charge of spawning all unscanned planes
-gameInfo spawnUFO(UFO _ufosData[], int _ufoCount, string _origin[], string _type[], char _symbol[], gameInfo _gameData)
+GameInfo spawnUFO(UFO _ufosData[], int _ufoCount, string _origin[], string _type[], char _symbol[], GameInfo _gameData)
 {
     for(int i = 0; i < _ufoCount; i++) //Spawn all planes
     {
