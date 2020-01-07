@@ -13,13 +13,18 @@
     ////////////////////////////// Goals for today
 
     >- Scan aircraft [In progress]
-        >- w/ Special UI
+        >- Radar struct that stores coordinates
+        >- Each plane is able to scan for surrounding radars
+        >- Reveal plane on map if radar around
+        >- If plane is revealed, can be pulled up to give more info
 
-    >- Advance Events
+    >- Make menu array more versitile to apply to ufo menu
 
     >- Commenting
 
-    ////////////////////////////// Goal for tmrw
+    ////////////////////////////// Goal for tomorrow
+
+    >- Advance Events
 
     >- Restricted placement system
         >-Fill map?
@@ -27,7 +32,6 @@
         >- Ocean
 
     >- UFO array can't be in struct bug
-    >- Make menu array more versitile to apply to ufo menu
 */
 
 //Declaring all used libraries
