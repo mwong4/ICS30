@@ -104,6 +104,7 @@ bool getConfirmation(); //This function is to get a boolean response from the pl
 GameInfo spawnUFO(UFO[], int, string[], string[], char[], GameInfo); //This function is in charge of spawning all unscanned planes
 UFO setUFO(UFO, string[], string[], char[], char[199][55]); //This function is in charge of setting the information on the plane
 void resetUFOs(UFO[]); //This resets the position of the ufo's
+GameInfo scanMode(UFO[], GameInfo, PlayerData); //This function is used for all interactions between player and UFO's including a special UI place
 
 int main()
 {
@@ -120,7 +121,7 @@ int main()
     usa = resetPlayer(usa);
     resetUFOs(ufosOnMap);
 
-    string primaryOptions[3] = {"Enter building mode","|| Finish Turn >>", "Quit"}; //This array represents the optiosn available in the main menu
+    string primaryOptions[4] = {"Enter building mode","|| Finish Turn >>", "Scan all available UFOs", "Quit"}; //This array represents the optiosn available in the main menu
     string buildingOptions[3] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex", "Quit"}; //This represents the available options for buildings
     string buildModeOptions[4] = {"Place using keyboard", "Place using coordinate", "Confirm place", "Cancel/Exit build mode"}; //These are the menu options for build mode
     //These are the five states of DEFCON advance warning
@@ -134,11 +135,11 @@ int main()
     char symbols[2] = {'^', '!'}; //Symbols of possible enemy planes
 
     int menuInput = 1; //This int represents the input taken from user
-    while(menuInput != 3)//While player does not choose to quit
+    while(menuInput != 4)//While player does not choose to quit
     {
         gameData = goThroughMap(gameData, ' ', false); //Display map
-        displayMenu(primaryOptions, 3, usa, gameData.currentYear, true); //Display all menu options
-        menuInput = getAnswer(3,1); //Get player input
+        displayMenu(primaryOptions, 4, usa, gameData.currentYear, true); //Display all menu options
+        menuInput = getAnswer(4,1); //Get player input
 
         if(menuInput == 1)
         {
@@ -171,10 +172,14 @@ int main()
                 gameData = spawnUFO(ufosOnMap, gameData.ufoCount, origin, type, symbols, gameData); //Call function to spawn all the UFO's
             }
         }
+        else if(menuInput == 3)
+        { //Scan all ufo's
+            gameData = scanMode(ufosOnMap, gameData, usa);
+        }
         else
         { //Quit game
-            cout << "    >- Quitting..." << endl << ">- [Please press any key to continue]" << endl;
-            anyInput();//Get any input before continuing
+            cout << "    >- Quitting..." << endl;
+            anyInput();
         }
         system("CLS"); //Cleans console
     }
@@ -790,4 +795,34 @@ void resetUFOs(UFO _objects[])
         _objects[i].yPos = 0;
     }
     return;
+}
+
+//This function is used for all interactions between player and UFO's including a special UI place
+GameInfo scanMode(UFO _objects[], GameInfo _gameData, PlayerData _playerData)
+{
+    int inputValue = 0;
+
+    system("CLS"); //wipe consol
+
+    for(int i = 0; i < _gameData.ufoCount; i++)
+    { //For every UFO, find the tag and save it to the array
+        if(_objects[i].tag == "Enemy")
+        {
+            cout << "    >- [" << i << "] ";
+            displayColorText(_objects[i].tag, true, 12);
+        }
+        else
+        {
+            cout << "    >- [" << i << "] " << _objects[i].tag << endl;
+        }
+    }
+
+    if(_gameData.ufoCount == 0)
+    { //If there are no UFO's, notify player
+        cout << "    >- Sorry, no UFO's detected" << endl;
+    }
+
+    inputValue = getAnswer(_gameData.ufoCount, 0);
+
+    return _gameData;
 }
