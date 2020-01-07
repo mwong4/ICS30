@@ -1,11 +1,11 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 5, 2020
+>- Updated: Jan 7, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.3.9]
+>- [version 1.4.1]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -13,12 +13,13 @@
     ////////////////////////////// Goals for today
 
     >- Scan aircraft [In progress]
+        >- w/ Special UI
+
+    >- Advance Events
 
     >- Commenting
 
     ////////////////////////////// Goal for tmrw
-
-    >- Advance Events
 
     >- Restricted placement system
         >-Fill map?
@@ -26,6 +27,7 @@
         >- Ocean
 
     >- UFO array can't be in struct bug
+    >- Make menu array more versitile to apply to ufo menu
 */
 
 //Declaring all used libraries
@@ -105,6 +107,7 @@ GameInfo spawnUFO(UFO[], int, string[], string[], char[], GameInfo); //This func
 UFO setUFO(UFO, string[], string[], char[], char[199][55]); //This function is in charge of setting the information on the plane
 void resetUFOs(UFO[]); //This resets the position of the ufo's
 GameInfo scanMode(UFO[], GameInfo, PlayerData); //This function is used for all interactions between player and UFO's including a special UI place
+void ufoScanMenu(UFO[], int); //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
 
 int main()
 {
@@ -178,11 +181,15 @@ int main()
         }
         else
         { //Quit game
-            cout << "    >- Quitting..." << endl;
-            anyInput();
+            cout << "    >- Are you sure you want to quit?" << endl;
+            if(!getConfirmation())
+            { //Make sure they want to quit
+                menuInput = 0;
+            }
         }
         system("CLS"); //Cleans console
     }
+    cout << "    >- Quitting..." << endl;
     return 0;
 }
 
@@ -211,7 +218,7 @@ void display(char _mapSpot)
     }
     else if(_mapSpot == '^')
     {
-        displayColorText("^", false, 10); //Blue
+        displayColorText("^", false, 9); //Blue
     }
     else
     {
@@ -804,25 +811,46 @@ GameInfo scanMode(UFO _objects[], GameInfo _gameData, PlayerData _playerData)
 
     system("CLS"); //wipe consol
 
-    for(int i = 0; i < _gameData.ufoCount; i++)
+    while(inputValue <= _gameData.ufoCount)
+    {
+        ufoScanMenu(_objects, _gameData.ufoCount); //Call function to display menu
+        inputValue = getAnswer(_gameData.ufoCount+1, 1); //Get player's input
+
+        if(inputValue <= _gameData.ufoCount)
+        {
+
+        }
+    }
+    system("CLS");
+    return _gameData;
+}
+
+//This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
+void ufoScanMenu(UFO _objects[], int _limit)
+{
+    for(int i = 0; i < _limit; i++)
     { //For every UFO, find the tag and save it to the array
         if(_objects[i].tag == "Enemy")
         {
-            cout << "    >- [" << i << "] ";
+            cout << "    >- [" << i+1 << "] ";
             displayColorText(_objects[i].tag, true, 12);
+        }
+        else if(_objects[i].tag == "Friendly")
+        {
+            cout << "    >- [" << i+1 << "] ";
+            displayColorText(_objects[i].tag, true, 10);
         }
         else
         {
-            cout << "    >- [" << i << "] " << _objects[i].tag << endl;
+            cout << "    >- [" << i+1 << "] ";
+            displayColorText(_objects[i].tag, true, 9);
         }
     }
+    cout << "    >- [" << _limit + 1 << "] To Exit Scan Mode" << endl;
 
-    if(_gameData.ufoCount == 0)
+    if(_limit == 0)
     { //If there are no UFO's, notify player
         cout << "    >- Sorry, no UFO's detected" << endl;
     }
-
-    inputValue = getAnswer(_gameData.ufoCount, 0);
-
-    return _gameData;
+    return;
 }
