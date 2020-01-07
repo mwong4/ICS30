@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.4.1]
+>- [version 1.4.3]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -13,7 +13,6 @@
     ////////////////////////////// Goals for today
 
     >- Scan aircraft [In progress]
-        >- Radar struct that stores coordinates
         >- Each plane is able to scan for surrounding radars
         >- Reveal plane on map if radar around
         >- If plane is revealed, can be pulled up to give more info
@@ -50,12 +49,20 @@
 using namespace std;
 
 //Delcaring used structures
+struct Radar
+{
+    int xPos; //Represents the y position of the radar
+    int yPos; //Represents the x position of the radar
+};
+
 struct PlayerData //This struct holds the data for each player
 {
     string playerName;
     float currentGDP; //The US GDP
     float currentIncome; //The % funding for the department
     float currentBalance; //The military budget, how much funding in dollars
+    int radarCount; //This keeps track of how many radar's there is
+    Radar radarData[100]; //This represents the data of each radar
 };
 
 struct UFO //This struct holds the core data for each UFO spawned in the game
@@ -94,8 +101,8 @@ bool gameOverScreen(GameInfo); //This function is for ending the game
 GameInfo resetGame(GameInfo); //This function is for resting game info
 PlayerData resetPlayer(PlayerData); //This function is for reseting a player
 
-GameInfo chooseBuilding(GameInfo, PlayerData, string[], string[], float&); //This function is for player to choose their building
-GameInfo buildingMode(GameInfo, PlayerData, string[], char, float&); //This function is for the general mode of building
+GameInfo chooseBuilding(GameInfo, PlayerData&, string[], string[]); //This function is for player to choose their building
+GameInfo buildingMode(GameInfo, PlayerData&, string[], char); //This function is for the general mode of building
 GameInfo keyboardMode(GameInfo, int&, int&, char&, char); //This function is for placing base using keyboard
 GameInfo coordinateMode(GameInfo, int&, int&, char&, char); //This function is for placing base using a coordinate system
 GameInfo updatePosition(GameInfo, int, int, bool, int&, int&, char&, char); //This function is for updating the position of the base
@@ -150,7 +157,7 @@ int main()
 
         if(menuInput == 1)
         {
-            gameData = chooseBuilding(gameData, usa, buildingOptions, buildModeOptions, usa.currentBalance);
+            gameData = chooseBuilding(gameData, usa, buildingOptions, buildModeOptions);
         }
         else if(menuInput == 2)
         { //Go to end turn function
@@ -296,6 +303,7 @@ PlayerData resetPlayer(PlayerData _data)
     _data.currentIncome = 0.01; //The starting military funding is 0.01%
     _data.currentBalance = 0.5; //The current military balance is 500 million dollars
     _data.playerName = getName(); //Initialize name by using the loading screen
+    _data.radarCount = 0;
     return _data;
 }
 
@@ -462,7 +470,7 @@ void worldEvent(float& _budgetPercent, string _worldEvents[])
 }
 
 //This function is for player to choose their building
-GameInfo chooseBuilding(GameInfo _gameData, PlayerData _playerInfo, string _buildingOptions[], string _buildModeOptions[], float& _budget)
+GameInfo chooseBuilding(GameInfo _gameData, PlayerData& _playerInfo, string _buildingOptions[], string _buildModeOptions[])
 {
     int inputValue; //This is used to get the input of the player
 
@@ -471,30 +479,30 @@ GameInfo chooseBuilding(GameInfo _gameData, PlayerData _playerInfo, string _buil
     displayMenu(_buildingOptions, 3, _playerInfo, _gameData.currentYear, false); //Display all buidling options
     cout << "    >- Each building cost: [" << _gameData.baseCost << "] billion dollars" << endl;
 
-    if(_budget < _gameData.baseCost)
+    if(_playerInfo.currentBalance < _gameData.baseCost)
     { //If you do not have enough money, tell player
         displayColorText( "    >- You do not have the funds to build anything| Returning to menu now", true, 4);
     }
 
     inputValue = getAnswer(3,1); //Get player's input
 
-    if(inputValue != 3 && _budget > _gameData.baseCost)
+    if(inputValue != 3 && _playerInfo.currentBalance > _gameData.baseCost)
     {
         system("CLS"); //Wipe console
         if(inputValue == 1)
         { //Call build mode function
-            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '@', _budget);
+            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '@');
         }
         else
         { //Call build mode function
-            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '#', _budget);
+            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '#');
         }
     }
     return _gameData; //Otherwise, return to main
 }
 
 //This function is for the general mode of building
-GameInfo buildingMode(GameInfo _gameData, PlayerData _playerInfo, string _menuOptions[], char _building, float& _budget)
+GameInfo buildingMode(GameInfo _gameData, PlayerData& _playerInfo, string _menuOptions[], char _building)
 {
     int menuInput = 1; //Integer used to get input from player
 
@@ -526,10 +534,16 @@ GameInfo buildingMode(GameInfo _gameData, PlayerData _playerInfo, string _menuOp
             if(getConfirmation()) //If player confirms yes to placement, save and exit function
             {
                 menuInput = 4; //Trigger quit option
-                _budget -= _gameData.baseCost; //Use up money
+                _playerInfo.currentIncome -= _gameData.baseCost; //Use up money
                 if(_building == '@')
                 { //If building built is missile silo
                     _gameData.defcon -= 0.1; //Decrease Defcon (increase level)
+                }
+                else if(_building == '#')
+                {
+                    _playerInfo.radarData[_playerInfo.radarCount].xPos = currentX; //Save the position of the radar - x
+                    _playerInfo.radarData[_playerInfo.radarCount].yPos = currentY; //Save the position fo the radar - y
+                    _playerInfo.radarCount ++; //Update the fact that +1 radar has been added
                 }
             }
         }
