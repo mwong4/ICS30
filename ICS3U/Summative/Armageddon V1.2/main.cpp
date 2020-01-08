@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.4.3]
+>- [version 1.4.4]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -13,8 +13,7 @@
     ////////////////////////////// Goals for today
 
     >- Scan aircraft [In progress]
-        >- Each plane is able to scan for surrounding radars
-        >- Reveal plane on map if radar around
+        >- Generate number beside ufo
         >- If plane is revealed, can be pulled up to give more info
 
     >- Make menu array more versitile to apply to ufo menu
@@ -117,8 +116,10 @@ bool getConfirmation(); //This function is to get a boolean response from the pl
 GameInfo spawnUFO(UFO[], int, string[], string[], char[], GameInfo); //This function is in charge of spawning all unscanned planes
 UFO setUFO(UFO, string[], string[], char[], char[199][55]); //This function is in charge of setting the information on the plane
 void resetUFOs(UFO[]); //This resets the position of the ufo's
-GameInfo scanMode(UFO[], GameInfo, PlayerData); //This function is used for all interactions between player and UFO's including a special UI place
-void ufoScanMenu(UFO[], int); //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
+GameInfo scanMode(UFO[], GameInfo, PlayerData&); //This function is used for all interactions between player and UFO's including a special UI place
+void ufoMenu(UFO[], int); //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
+void ufoScanAll(UFO[], int, PlayerData&, GameInfo&); //This function is for actually getting each and everyplane to scan it's surroundings
+void ufoScanInd(UFO, PlayerData&, GameInfo&); //This function is for scanning -> each individual ufo
 
 int main()
 {
@@ -823,7 +824,7 @@ void resetUFOs(UFO _objects[])
 }
 
 //This function is used for all interactions between player and UFO's including a special UI place
-GameInfo scanMode(UFO _objects[], GameInfo _gameData, PlayerData _playerData)
+GameInfo scanMode(UFO _objects[], GameInfo _gameData, PlayerData& _playerData)
 {
     int inputValue = 0;
 
@@ -831,7 +832,8 @@ GameInfo scanMode(UFO _objects[], GameInfo _gameData, PlayerData _playerData)
 
     while(inputValue <= _gameData.ufoCount)
     {
-        ufoScanMenu(_objects, _gameData.ufoCount); //Call function to display menu
+        ufoMenu(_objects, _gameData.ufoCount); //Call function to display menu
+        ufoScanAll(_objects, _gameData.ufoCount, _playerData, _gameData); //Scan all the possible ufo's
         inputValue = getAnswer(_gameData.ufoCount+1, 1); //Get player's input
 
         if(inputValue <= _gameData.ufoCount)
@@ -844,7 +846,7 @@ GameInfo scanMode(UFO _objects[], GameInfo _gameData, PlayerData _playerData)
 }
 
 //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
-void ufoScanMenu(UFO _objects[], int _limit)
+void ufoMenu(UFO _objects[], int _limit)
 {
     for(int i = 0; i < _limit; i++)
     { //For every UFO, find the tag and save it to the array
@@ -869,6 +871,29 @@ void ufoScanMenu(UFO _objects[], int _limit)
     if(_limit == 0)
     { //If there are no UFO's, notify player
         cout << "    >- Sorry, no UFO's detected" << endl;
+    }
+    return;
+}
+
+//This function is for actually getting each plane to scan it's surroundings
+void ufoScanAll(UFO _objects[], int _limit, PlayerData& _playerData, GameInfo& _gameData)
+{
+    for(int i = 0; i < _limit; i++)
+    { //For every UFO, scan for surrounding radar stations
+        ufoScanInd( _objects[i], _playerData, _gameData);
+    }
+    return;
+}
+
+//This function is for scanning -> each individual ufo
+void ufoScanInd(UFO _object, PlayerData& _playerData, GameInfo& _gameData)
+{
+    for(int i = 0; i < _playerData.radarCount; i++)
+    {
+        if(_object.xPos - _playerData.radarData[i].xPos < 5 && _object.xPos - _playerData.radarData[i].xPos > -5 && _object.yPos - _playerData.radarData[i].yPos < 5 && _object.yPos - _playerData.radarData[i].yPos > -5)
+        {
+            setSpot(_gameData.gameMap[_object.xPos][_object.yPos], _object.symbol);
+        }
     }
     return;
 }
