@@ -1,11 +1,11 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 7, 2020
+>- Updated: Jan 8, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.4.4]
+>- [version 1.4.5]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -13,7 +13,6 @@
     ////////////////////////////// Goals for today
 
     >- Scan aircraft [In progress]
-        >- Generate number beside ufo
         >- If plane is revealed, can be pulled up to give more info
 
     >- Make menu array more versitile to apply to ufo menu
@@ -52,16 +51,8 @@ struct Radar
 {
     int xPos; //Represents the y position of the radar
     int yPos; //Represents the x position of the radar
-};
-
-struct PlayerData //This struct holds the data for each player
-{
-    string playerName;
-    float currentGDP; //The US GDP
-    float currentIncome; //The % funding for the department
-    float currentBalance; //The military budget, how much funding in dollars
-    int radarCount; //This keeps track of how many radar's there is
-    Radar radarData[100]; //This represents the data of each radar
+    char savedCharOne; //represents the saved char at the origin of the label
+    char savedCharTwo; //represents the saved char beside the first one
 };
 
 struct UFO //This struct holds the core data for each UFO spawned in the game
@@ -74,6 +65,17 @@ struct UFO //This struct holds the core data for each UFO spawned in the game
     char savedChar; //This represents the char of the original spot of the object
     int xPos; //This represents the x position of the object
     int yPos; //This represents the y position of the object
+};
+
+struct PlayerData //This struct holds the data for each player
+{
+    string playerName;
+    float currentGDP; //The US GDP
+    float currentIncome; //The % funding for the department
+    float currentBalance; //The military budget, how much funding in dollars
+    int radarCount; //This keeps track of how many radar's there is
+    Radar radarData[100]; //This represents the data of each radar
+    Radar tempLabel[20]; //These are temporary labels in the scan mode just to know what target it which
 };
 
 struct GameInfo //This struct holds the core game data
@@ -118,8 +120,10 @@ UFO setUFO(UFO, string[], string[], char[], char[199][55]); //This function is i
 void resetUFOs(UFO[]); //This resets the position of the ufo's
 GameInfo scanMode(UFO[], GameInfo, PlayerData&); //This function is used for all interactions between player and UFO's including a special UI place
 void ufoMenu(UFO[], int); //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
-void ufoScanAll(UFO[], int, PlayerData&, GameInfo&); //This function is for actually getting each and everyplane to scan it's surroundings
-void ufoScanInd(UFO, PlayerData&, GameInfo&); //This function is for scanning -> each individual ufo
+void ufoScanAll(UFO[], int, PlayerData&, GameInfo&, int); //This function is for actually getting each and everyplane to scan it's surroundings
+void ufoScanInd(UFO, PlayerData&, GameInfo&, int); //This function is for scanning -> each individual ufo
+void placeLabel(PlayerData&, GameInfo&, UFO, int); //This is for placing a label beside a ufo tag
+void clearLabel(PlayerData&, GameInfo&); //This is for clearing all labels after exiting scan mode
 
 int main()
 {
@@ -161,9 +165,11 @@ int main()
             gameData = chooseBuilding(gameData, usa, buildingOptions, buildModeOptions);
         }
         else if(menuInput == 2)
-        { //Go to end turn function
+        {
+            //Go to end turn function
             if(gameData.defcon - 0.05 <= 1)
-            { //If gameover trigger is detected
+            {
+                //If gameover trigger is detected
                 if(gameOverScreen(gameData))
                 {
                     return 0;
@@ -181,21 +187,25 @@ int main()
                 usa = endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents); //Calls function to update income
 
                 if(gameData.currentYear % 2 == 0 && gameData.ufoCount < 20)
-                { //Caps ufos at 20 and makes sure that fo count is increased every 2 turns
+                {
+                    //Caps ufos at 20 and makes sure that fo count is increased every 2 turns
                     gameData.ufoCount ++;
                 }
                 gameData = spawnUFO(ufosOnMap, gameData.ufoCount, origin, type, symbols, gameData); //Call function to spawn all the UFO's
             }
         }
         else if(menuInput == 3)
-        { //Scan all ufo's
+        {
+            //Scan all ufo's
             gameData = scanMode(ufosOnMap, gameData, usa);
         }
         else
-        { //Quit game
+        {
+            //Quit game
             cout << "    >- Are you sure you want to quit?" << endl;
             if(!getConfirmation())
-            { //Make sure they want to quit
+            {
+                //Make sure they want to quit
                 menuInput = 0;
             }
         }
@@ -208,6 +218,7 @@ int main()
 //This function is for displaying a single character
 void display(char _mapSpot)
 {
+    string tempString; //This string is here temporarily and simply to convert char to string
     if(_mapSpot == '@')
     {
         displayColorText("@", false, 14); //yellow
@@ -231,6 +242,12 @@ void display(char _mapSpot)
     else if(_mapSpot == '^')
     {
         displayColorText("^", false, 9); //Blue
+    }
+    else if(_mapSpot == '1' || _mapSpot == '2' || _mapSpot == '3' || _mapSpot == '4' || _mapSpot == '5' || _mapSpot == '6' || _mapSpot == '7' || _mapSpot == '8' || _mapSpot == '9' || _mapSpot == '0')
+    {
+        //Else if character is a number, highlight
+        tempString = _mapSpot;
+        displayColorText(tempString, false, 6); //Blue highlight
     }
     else
     {
@@ -293,7 +310,7 @@ GameInfo resetGame(GameInfo _data)
     _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
     _data.defcon = 5;
     _data = getMap(_data, true); //Initialize the value of the map array //error
-    _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
+    _data.ufoCount = 15; //Set amount of ufo's in the sky to 0
     return _data;
 }
 
@@ -481,7 +498,8 @@ GameInfo chooseBuilding(GameInfo _gameData, PlayerData& _playerInfo, string _bui
     cout << "    >- Each building cost: [" << _gameData.baseCost << "] billion dollars" << endl;
 
     if(_playerInfo.currentBalance < _gameData.baseCost)
-    { //If you do not have enough money, tell player
+    {
+        //If you do not have enough money, tell player
         displayColorText( "    >- You do not have the funds to build anything| Returning to menu now", true, 4);
     }
 
@@ -491,11 +509,13 @@ GameInfo chooseBuilding(GameInfo _gameData, PlayerData& _playerInfo, string _bui
     {
         system("CLS"); //Wipe console
         if(inputValue == 1)
-        { //Call build mode function
+        {
+            //Call build mode function
             _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '@');
         }
         else
-        { //Call build mode function
+        {
+            //Call build mode function
             _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '#');
         }
     }
@@ -537,7 +557,8 @@ GameInfo buildingMode(GameInfo _gameData, PlayerData& _playerInfo, string _menuO
                 menuInput = 4; //Trigger quit option
                 _playerInfo.currentIncome -= _gameData.baseCost; //Use up money
                 if(_building == '@')
-                { //If building built is missile silo
+                {
+                    //If building built is missile silo
                     _gameData.defcon -= 0.1; //Decrease Defcon (increase level)
                 }
                 else if(_building == '#')
@@ -563,7 +584,8 @@ GameInfo buildingMode(GameInfo _gameData, PlayerData& _playerInfo, string _menuO
 
 //This function is for placing base using keyboard
 GameInfo keyboardMode(GameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
-{ //If escape is pressed, exit
+{
+    //If escape is pressed, exit
     while((!(GetKeyState(VK_ESCAPE) & 0x8000)))
     {
         if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
@@ -662,7 +684,8 @@ int getAnswer (int _maxLimit, int _minLimit)
             displayColorText("  ==================================================", true, 4);
             findingInput = true; //If the input is invalid, then the loop will loop
         }
-    }while(findingInput);
+    }
+    while(findingInput);
     return playerInput;//Otherwise input is good, return input
 }
 
@@ -813,18 +836,18 @@ UFO setUFO(UFO _ufoData, string _origin[], string _type[], char _symbol[], char 
 }
 
 //This resets the position of the ufo's
-void resetUFOs(UFO _objects[])
+void resetUFOs(UFO _ufos[])
 {
     for(int i = 0; i < 20; i++)
     {
-        _objects[i].xPos = 0;
-        _objects[i].yPos = 0;
+        _ufos[i].xPos = 0;
+        _ufos[i].yPos = 0;
     }
     return;
 }
 
 //This function is used for all interactions between player and UFO's including a special UI place
-GameInfo scanMode(UFO _objects[], GameInfo _gameData, PlayerData& _playerData)
+GameInfo scanMode(UFO _ufos[], GameInfo _gameData, PlayerData& _playerData)
 {
     int inputValue = 0;
 
@@ -832,8 +855,9 @@ GameInfo scanMode(UFO _objects[], GameInfo _gameData, PlayerData& _playerData)
 
     while(inputValue <= _gameData.ufoCount)
     {
-        ufoMenu(_objects, _gameData.ufoCount); //Call function to display menu
-        ufoScanAll(_objects, _gameData.ufoCount, _playerData, _gameData); //Scan all the possible ufo's
+        ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 5); //Scan all the possible ufo's
+        _gameData = goThroughMap(_gameData, ' ', false); //Display map
+        ufoMenu(_ufos, _gameData.ufoCount); //Call function to display menu
         inputValue = getAnswer(_gameData.ufoCount+1, 1); //Get player's input
 
         if(inputValue <= _gameData.ufoCount)
@@ -841,59 +865,115 @@ GameInfo scanMode(UFO _objects[], GameInfo _gameData, PlayerData& _playerData)
 
         }
     }
+    clearLabel(_playerData, _gameData);
     system("CLS");
     return _gameData;
 }
 
 //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
-void ufoMenu(UFO _objects[], int _limit)
+void ufoMenu(UFO _ufos[], int _limit)
 {
     for(int i = 0; i < _limit; i++)
-    { //For every UFO, find the tag and save it to the array
-        if(_objects[i].tag == "Enemy")
+    {
+        //For every UFO, find the tag and save it to the array
+        if(_ufos[i].tag == "Enemy")
         {
             cout << "    >- [" << i+1 << "] ";
-            displayColorText(_objects[i].tag, true, 12);
+            displayColorText(_ufos[i].tag, true, 12);
         }
-        else if(_objects[i].tag == "Friendly")
+        else if(_ufos[i].tag == "Friendly")
         {
             cout << "    >- [" << i+1 << "] ";
-            displayColorText(_objects[i].tag, true, 10);
+            displayColorText(_ufos[i].tag, true, 10);
         }
         else
         {
             cout << "    >- [" << i+1 << "] ";
-            displayColorText(_objects[i].tag, true, 9);
+            displayColorText(_ufos[i].tag, true, 9);
         }
     }
     cout << "    >- [" << _limit + 1 << "] To Exit Scan Mode" << endl;
 
     if(_limit == 0)
-    { //If there are no UFO's, notify player
+    {
+        //If there are no UFO's, notify player
         cout << "    >- Sorry, no UFO's detected" << endl;
     }
     return;
 }
 
 //This function is for actually getting each plane to scan it's surroundings
-void ufoScanAll(UFO _objects[], int _limit, PlayerData& _playerData, GameInfo& _gameData)
+void ufoScanAll(UFO _ufos[], int _limit, PlayerData& _playerData, GameInfo& _gameData, int _radius)
 {
     for(int i = 0; i < _limit; i++)
-    { //For every UFO, scan for surrounding radar stations
-        ufoScanInd( _objects[i], _playerData, _gameData);
+    {
+        //For every UFO, scan for surrounding radar stations
+        ufoScanInd( _ufos[i], _playerData, _gameData, _radius);
+        placeLabel(_playerData, _gameData, _ufos[i], i);
     }
     return;
 }
 
 //This function is for scanning -> each individual ufo
-void ufoScanInd(UFO _object, PlayerData& _playerData, GameInfo& _gameData)
+void ufoScanInd(UFO _ufo, PlayerData& _playerData, GameInfo& _gameData, int _radius)
 {
     for(int i = 0; i < _playerData.radarCount; i++)
     {
-        if(_object.xPos - _playerData.radarData[i].xPos < 5 && _object.xPos - _playerData.radarData[i].xPos > -5 && _object.yPos - _playerData.radarData[i].yPos < 5 && _object.yPos - _playerData.radarData[i].yPos > -5)
+        if(_ufo.xPos - _playerData.radarData[i].xPos < _radius && _ufo.xPos - _playerData.radarData[i].xPos > -_radius && _ufo.yPos - _playerData.radarData[i].yPos < _radius && _ufo.yPos - _playerData.radarData[i].yPos > -_radius)
         {
-            setSpot(_gameData.gameMap[_object.xPos][_object.yPos], _object.symbol);
+            setSpot(_gameData.gameMap[_ufo.xPos][_ufo.yPos], _ufo.symbol);
         }
+    }
+    return;
+}
+
+//This is for placing a label beside a ufo tag
+void placeLabel(PlayerData& _playerData, GameInfo& _gameData, UFO _ufo, int _ufoNumber)
+{
+    char tempChar; //This is a temporary character to be used to convert the _ufoNumber to char
+    if(_ufo.xPos - 2 >= 0 && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '?' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '?')
+    {
+        //Check to make sure the label won't be out of the map or that the label will cover something 1 point to the left of it
+        _playerData.tempLabel[_ufoNumber].xPos = _ufo.xPos - 2; //Save the label's new x position
+        _playerData.tempLabel[_ufoNumber].yPos = _ufo.yPos; //Save the label's new y position
+    }
+    else if(_ufo.xPos + 2 <= 198 && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '!' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '@' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '#' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '^' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '&' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '?' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '?')
+    {
+        //Check to make sure the label won't be out of the map or that the label will cover something 1 point to the right of it
+        _playerData.tempLabel[_ufoNumber].xPos = _ufo.xPos + 1; //Save the label's new x position
+        _playerData.tempLabel[_ufoNumber].yPos = _ufo.yPos; //Save the label's new y position
+    }
+    else
+    {
+        //In the small likelyhood of reaching this point:
+        _playerData.tempLabel[_ufoNumber].xPos = _ufo.xPos; //Save the label's new x position
+        _playerData.tempLabel[_ufoNumber].yPos = _ufo.yPos + 1; //Save the label's new y position
+    }
+    //Save the char on the map 'behind' the label and adjacent to the origins of the label position
+    _playerData.tempLabel[_ufoNumber].savedCharOne = _gameData.gameMap[_playerData.tempLabel[_ufoNumber].xPos][_playerData.tempLabel[_ufoNumber].yPos];
+    _playerData.tempLabel[_ufoNumber].savedCharTwo = _gameData.gameMap[_playerData.tempLabel[_ufoNumber].xPos + 1][_playerData.tempLabel[_ufoNumber].yPos];
+
+
+    //Save the first digit
+    tempChar = '0' + ((_ufoNumber + 1) % 10); //Convert int to char
+    //Save the first digit of the _ufoNumber to the map
+    setSpot(_gameData.gameMap[_playerData.tempLabel[_ufoNumber].xPos + 1][_playerData.tempLabel[_ufoNumber].yPos], tempChar);
+
+    //Save the second digit
+    tempChar = '0' + ((_ufoNumber + 1 - ((_ufoNumber + 1) % 10))/10); //Convert int to char
+    //Save the second digit of the _ufoNumber to the map
+    setSpot(_gameData.gameMap[_playerData.tempLabel[_ufoNumber].xPos][_playerData.tempLabel[_ufoNumber].yPos], tempChar);
+
+    return;
+}
+
+//This is for clearing all labels after exiting scan mode
+void clearLabel(PlayerData& _playerData, GameInfo& _gameData)
+{
+    for(int i = 0; i < _gameData.ufoCount; i++)
+    { //Go through every possible ufo labels and replace them with their saved char's
+        setSpot(_gameData.gameMap[_playerData.tempLabel[i].xPos][_playerData.tempLabel[i].yPos], _playerData.tempLabel[i].savedCharOne);
+        setSpot(_gameData.gameMap[_playerData.tempLabel[i].xPos - 1][_playerData.tempLabel[i].yPos], _playerData.tempLabel[i].savedCharTwo);
     }
     return;
 }
