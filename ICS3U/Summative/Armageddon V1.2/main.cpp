@@ -119,7 +119,7 @@ GameInfo spawnUFO(UFO[], int, string[], string[], char[], GameInfo); //This func
 UFO setUFO(UFO, string[], string[], char[], char[199][55]); //This function is in charge of setting the information on the plane
 void resetUFOs(UFO[]); //This resets the position of the ufo's
 GameInfo scanMode(UFO[], GameInfo, PlayerData&); //This function is used for all interactions between player and UFO's including a special UI place
-void ufoMenu(UFO[], int); //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
+void ufoMenu(UFO[], int, GameInfo); //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
 void ufoScanAll(UFO[], int, PlayerData&, GameInfo&, int); //This function is for actually getting each and everyplane to scan it's surroundings
 void ufoScanInd(UFO, PlayerData&, GameInfo&, int); //This function is for scanning -> each individual ufo
 void placeLabel(PlayerData&, GameInfo&, UFO, int); //This is for placing a label beside a ufo tag
@@ -857,7 +857,7 @@ GameInfo scanMode(UFO _ufos[], GameInfo _gameData, PlayerData& _playerData)
     {
         ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 5); //Scan all the possible ufo's
         _gameData = goThroughMap(_gameData, ' ', false); //Display map
-        ufoMenu(_ufos, _gameData.ufoCount); //Call function to display menu
+        ufoMenu(_ufos, _gameData.ufoCount, _gameData); //Call function to display menu
         inputValue = getAnswer(_gameData.ufoCount+1, 1); //Get player's input
 
         if(inputValue <= _gameData.ufoCount)
@@ -871,25 +871,30 @@ GameInfo scanMode(UFO _ufos[], GameInfo _gameData, PlayerData& _playerData)
 }
 
 //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
-void ufoMenu(UFO _ufos[], int _limit)
+void ufoMenu(UFO _ufos[], int _limit, GameInfo _gameData)
 {
     for(int i = 0; i < _limit; i++)
     {
         //For every UFO, find the tag and save it to the array
-        if(_ufos[i].tag == "Enemy")
+        if(_ufos[i].tag == "Enemy" && _gameData.gameMap[_ufos[i].xPos][_ufos[i].yPos] != '?')
         {
             cout << "    >- [" << i+1 << "] ";
             displayColorText(_ufos[i].tag, true, 12);
         }
-        else if(_ufos[i].tag == "Friendly")
+        else if(_ufos[i].tag == "Friendly" && _gameData.gameMap[_ufos[i].xPos][_ufos[i].yPos] != '?')
         {
             cout << "    >- [" << i+1 << "] ";
             displayColorText(_ufos[i].tag, true, 10);
         }
-        else
+        else if(_gameData.gameMap[_ufos[i].xPos][_ufos[i].yPos] != '?')
         {
             cout << "    >- [" << i+1 << "] ";
             displayColorText(_ufos[i].tag, true, 9);
+        }
+        else
+        {
+            cout << "    >- [" << i+1 << "] ";
+            displayColorText("Unknown", true, 9);
         }
     }
     cout << "    >- [" << _limit + 1 << "] To Exit Scan Mode" << endl;
@@ -973,7 +978,7 @@ void clearLabel(PlayerData& _playerData, GameInfo& _gameData)
     for(int i = 0; i < _gameData.ufoCount; i++)
     { //Go through every possible ufo labels and replace them with their saved char's
         setSpot(_gameData.gameMap[_playerData.tempLabel[i].xPos][_playerData.tempLabel[i].yPos], _playerData.tempLabel[i].savedCharOne);
-        setSpot(_gameData.gameMap[_playerData.tempLabel[i].xPos - 1][_playerData.tempLabel[i].yPos], _playerData.tempLabel[i].savedCharTwo);
+        setSpot(_gameData.gameMap[_playerData.tempLabel[i].xPos + 1][_playerData.tempLabel[i].yPos], _playerData.tempLabel[i].savedCharTwo);
     }
     return;
 }
