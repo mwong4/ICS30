@@ -5,16 +5,14 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.4.7]
+>- [version 1.4.8]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
 
-    >- Fix all functions to use references [In progress]
-
-    >- Make menu array more versitile to apply to ufo menu
+    >- Make menu array more versitile to apply to ufo menu [In progress]
 
     >- Advance Events
 
@@ -24,10 +22,17 @@
     >- Advance reactions in scan mode
         >- Attack Mode?
         >- New building, SAM defences?
+
     >- Restricted placement system
         >-Fill map?
         >- Russia
         >- Ocean
+
+    >- National Security Bar
+        >- Make other things affect this bar
+        >- More nuclear silos increase it
+        >- Sam sites, radar stations increase it
+        >- enemy planes in north west hemisphere that are not dealt with will increase it
 
     >- UFO array can't be in struct bug
 */
@@ -89,25 +94,24 @@ struct GameInfo //This struct holds the core game data
 };
 
 //Delcaring function prototypes
-
 void display(char); //This function is for displaying a single character
 void setSpot(char&, char); //This function is to set a specific spot in the map
-GameInfo goThroughMap(GameInfo, char, bool); //This function is to go through every spot in the map. It can use other functions to set it all or display it
-GameInfo getMap(GameInfo, bool); //This function is used to find each line in the map txt file
-GameInfo saveMap(std::string, GameInfo, int); //This function is used to extract each character in a map file line
+void goThroughMap(GameInfo&, char, bool); //This function is to go through every spot in the map. It can use other functions to set it all or display it
+void getMap(GameInfo&, bool); //This function is used to find each line in the map txt file
+void saveMap(std::string, GameInfo&, int); //This function is used to extract each character in a map file line
 
-PlayerData endTurn(PlayerData, float, float&, float&, string[], string[]); //This function is in charge of updating the player data for the next turn
+void endTurn(PlayerData&, float, float&, float&, string[], string[]); //This function is in charge of updating the player data for the next turn
 void defconCounter(string[], float); //This function is to display the defcon state
 void worldEvent(float&, string[]); //This function is to display the world events
 bool gameOverScreen(GameInfo); //This function is for ending the game
-GameInfo resetGame(GameInfo); //This function is for resting game info
-PlayerData resetPlayer(PlayerData); //This function is for reseting a player
+void resetGame(GameInfo&); //This function is for resting game info
+void resetPlayer(PlayerData&); //This function is for reseting a player
 
-GameInfo chooseBuilding(GameInfo, PlayerData&, string[], string[]); //This function is for player to choose their building
-GameInfo buildingMode(GameInfo, PlayerData&, string[], char); //This function is for the general mode of building
-GameInfo keyboardMode(GameInfo, int&, int&, char&, char); //This function is for placing base using keyboard
-GameInfo coordinateMode(GameInfo, int&, int&, char&, char); //This function is for placing base using a coordinate system
-GameInfo updatePosition(GameInfo, int, int, bool, int&, int&, char&, char); //This function is for updating the position of the base
+void chooseBuilding(GameInfo&, PlayerData&, string[], string[]); //This function is for player to choose their building
+void buildingMode(GameInfo&, PlayerData&, string[], char); //This function is for the general mode of building
+void keyboardMode(GameInfo&, int&, int&, char&, char); //This function is for placing base using keyboard
+void coordinateMode(GameInfo&, int&, int&, char&, char); //This function is for placing base using a coordinate system
+void updatePosition(GameInfo&, int, int, bool, int&, int&, char&, char); //This function is for updating the position of the base
 
 int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
 void displayMenu(string[], int, PlayerData, int, bool); //Function to show the menu: All positions are options except last which is reserved for quit number
@@ -116,10 +120,10 @@ void anyInput(); //This is an integrated version of getch(); and a message
 string getName(); //This function is used to get the player's name, disguised as the start menu
 bool getConfirmation(); //This function is to get a boolean response from the player
 
-GameInfo spawnUFO(UFO[], int, string[], string[], char[], GameInfo); //This function is in charge of spawning all unscanned planes
-UFO setUFO(UFO, string[], string[], char[], char[199][55]); //This function is in charge of setting the information on the plane
+void spawnUFO(UFO[], int, string[], string[], char[], GameInfo&); //This function is in charge of spawning all unscanned planes
+void setUFO(UFO&, string[], string[], char[], char[199][55]); //This function is in charge of setting the information on the plane
 void resetUFOs(UFO[]); //This resets the position of the ufo's
-GameInfo scanMode(UFO[], GameInfo, PlayerData&); //This function is used for all interactions between player and UFO's including a special UI place
+void scanMode(UFO[], GameInfo&, PlayerData&); //This function is used for all interactions between player and UFO's including a special UI place
 void ufoMenu(UFO[], int, GameInfo); //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
 void ufoScanAll(UFO[], int, PlayerData&, GameInfo&, int); //This function is for actually getting each and everyplane to scan it's surroundings
 void ufoScanInd(UFO, PlayerData&, GameInfo&, int); //This function is for scanning -> each individual ufo
@@ -137,8 +141,8 @@ int main()
     UFO ufosOnMap[20]; //This is an array containing the information on every ufo on the map
 
     //Calling function to reset all (Game and Player) data and UFO data
-    gameData = resetGame(gameData);
-    usa = resetPlayer(usa);
+    resetGame(gameData);
+    resetPlayer(usa);
     resetUFOs(ufosOnMap);
 
     string primaryOptions[4] = {"Enter building mode","|| Finish Turn >>", "Scan all available UFOs", "Quit"}; //This array represents the optiosn available in the main menu
@@ -157,13 +161,13 @@ int main()
     int menuInput = 1; //This int represents the input taken from user
     while(menuInput != 4)//While player does not choose to quit
     {
-        gameData = goThroughMap(gameData, ' ', false); //Display map
+        goThroughMap(gameData, ' ', false); //Display map
         displayMenu(primaryOptions, 4, usa, gameData.currentYear, true); //Display all menu options
         menuInput = getAnswer(4,1); //Get player input
 
         if(menuInput == 1)
         { //If player one enters 1, enter function to choose building and buidl mode
-            gameData = chooseBuilding(gameData, usa, buildingOptions, buildModeOptions);
+            chooseBuilding(gameData, usa, buildingOptions, buildModeOptions);
         }
         else if(menuInput == 2)
         {
@@ -178,28 +182,28 @@ int main()
                 else
                 {
                     //Calling function to reset all (Game and Player) data and UFO data
-                    gameData = resetGame(gameData);
-                    usa = resetPlayer(usa);
+                    resetGame(gameData);
+                    resetPlayer(usa);
                     resetUFOs(ufosOnMap);
                 }
             }
             else
             {
                 gameData.currentYear ++;//Update year
-                usa = endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents); //Calls function to update income
+                endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents); //Calls function to update income
 
                 if(gameData.currentYear % 2 == 0 && gameData.ufoCount < 20)
                 {
                     //Caps ufos at 20 and makes sure that fo count is increased every 2 turns
                     gameData.ufoCount ++;
                 }
-                gameData = spawnUFO(ufosOnMap, gameData.ufoCount, origin, type, symbols, gameData); //Call function to spawn all the UFO's
+                spawnUFO(ufosOnMap, gameData.ufoCount, origin, type, symbols, gameData); //Call function to spawn all the UFO's
             }
         }
         else if(menuInput == 3)
         {
             //Scan all ufo's
-            gameData = scanMode(ufosOnMap, gameData, usa);
+            scanMode(ufosOnMap, gameData, usa);
         }
         else
         {
@@ -266,7 +270,7 @@ void setSpot(char& _spot, char _newValue)
 }
 
 //This function is to set completely clean off the map at the start of the game
-GameInfo goThroughMap(GameInfo _gameData, char _clearValue, bool _setMap)
+void goThroughMap(GameInfo& _gameData, char _clearValue, bool _setMap)
 {
     for(int i = 0; i < 55; i++) //Using double for loop, go through entire double array
     {
@@ -286,49 +290,11 @@ GameInfo goThroughMap(GameInfo _gameData, char _clearValue, bool _setMap)
             cout << endl;
         }
     }
-    return _gameData;
-}
-
-//This function is for ending the game
-bool gameOverScreen(GameInfo _data)
-{
-    system("CLS"); //Wipe consol
-    _data = getMap(_data, false); //Print game over screen
-    cout << endl << endl << "            =========================================================================================================================" << endl;
-    cout << "            >- GAMEOVER: The world has ended by nuclear war. At your hands, billions have died. There really is no winning is there?" << endl;
-    cout << "            >- Maybe you can be the savior that this world needs, and change it for the better. Stay DETERMINED" << endl;
-    cout << "               >- Would you like to play again?" << endl << "            ";
-    if(getConfirmation()) //If they want to play again: return false
-    {
-        return false;
-    }
-    return true; //Else, return true
-}
-
-//This function is for resting game info
-GameInfo resetGame(GameInfo _data)
-{
-    _data.currentYear = 1945; //Set the starting year to 1945
-    _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
-    _data.defcon = 5; //Set defcon by default to 5
-    _data = getMap(_data, true); //Initialize the value of the map array //error
-    _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
-    return _data;
-}
-
-//This function is for reseting a player
-PlayerData resetPlayer(PlayerData _data)
-{
-    _data.currentGDP = 2000; //The stating US GDP is 2 trillion
-    _data.currentIncome = 0.01; //The starting military funding is 0.01%
-    _data.currentBalance = 0.5; //The current military balance is 500 million dollars
-    _data.playerName = getName(); //Initialize name by using the loading screen
-    _data.radarCount = 0; //By default, set radar count to 0
-    return _data;
+    return;
 }
 
 //This function is used to find each line in the map txt file
-GameInfo getMap(GameInfo _gameData, bool _saveFile)
+void getMap(GameInfo& _gameData, bool _saveFile)
 {
     std::string line; //String line used to seperate the text file into lines
     ifstream mapFile_("MapFile.txt"); //This is the map file
@@ -340,7 +306,7 @@ GameInfo getMap(GameInfo _gameData, bool _saveFile)
     {
         while(getline(mapFile_,line)) //This function uses the builtin function: getline
         {
-            _gameData = saveMap(line, _gameData, currentRow); //It then references the saveMapFile function in order to save it into a doubel array.
+            saveMap(line, _gameData, currentRow); //It then references the saveMapFile function in order to save it into a doubel array.
             currentRow += 1;
         }
         mapFile_.close(); //Close file
@@ -353,21 +319,21 @@ GameInfo getMap(GameInfo _gameData, bool _saveFile)
         }
         endFile_.close(); //Close file
     }
-    return _gameData;
+    return;
 }
 
 //This function is used to extract each character in a map file line
-GameInfo saveMap(std::string _line, GameInfo _gameData, int _currentRow)
+void saveMap(std::string _line, GameInfo& _gameData, int _currentRow)
 {
     for(std::string::size_type i = 0; i < _line.size(); ++i) //Running through every character
     {
         setSpot(_gameData.gameMap[i][_currentRow], _line[i]); //Save spot in double array with specific corresponding char and spot
     }
-    return _gameData;
+    return;
 }
 
 //This function is in charge of updating the player data for the next turn
-PlayerData endTurn(PlayerData _data, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[], string _worldEvents[])
+void endTurn(PlayerData& _data, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[], string _worldEvents[])
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
@@ -406,7 +372,7 @@ PlayerData endTurn(PlayerData _data, float _budgetChange, float& _baseCost, floa
     _baseCost += _baseCost*randomValue; //Increase price of buildings
 
     anyInput();//Get any input before continuing
-    return _data;
+    return;
 }
 
 //This function is to display the defcon state
@@ -485,8 +451,46 @@ void worldEvent(float& _budgetPercent, string _worldEvents[])
     return;
 }
 
+//This function is for ending the game
+bool gameOverScreen(GameInfo _data)
+{
+    system("CLS"); //Wipe consol
+    getMap(_data, false); //Print game over screen
+    cout << endl << endl << "            =========================================================================================================================" << endl;
+    cout << "            >- GAMEOVER: The world has ended by nuclear war. At your hands, billions have died. There really is no winning is there?" << endl;
+    cout << "            >- Maybe you can be the savior that this world needs, and change it for the better. Stay DETERMINED" << endl;
+    cout << "               >- Would you like to play again?" << endl << "            ";
+    if(getConfirmation()) //If they want to play again: return false
+    {
+        return false;
+    }
+    return true; //Else, return true
+}
+
+//This function is for resting game info
+void resetGame(GameInfo& _data)
+{
+    _data.currentYear = 1945; //Set the starting year to 1945
+    _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
+    _data.defcon = 5; //Set defcon by default to 5
+    getMap(_data, true); //Initialize the value of the map array //error
+    _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
+    return;
+}
+
+//This function is for reseting a player
+void resetPlayer(PlayerData& _data)
+{
+    _data.currentGDP = 2000; //The stating US GDP is 2 trillion
+    _data.currentIncome = 0.01; //The starting military funding is 0.01%
+    _data.currentBalance = 0.5; //The current military balance is 500 million dollars
+    _data.playerName = getName(); //Initialize name by using the loading screen
+    _data.radarCount = 0; //By default, set radar count to 0
+    return;
+}
+
 //This function is for player to choose their building
-GameInfo chooseBuilding(GameInfo _gameData, PlayerData& _playerInfo, string _buildingOptions[], string _buildModeOptions[])
+void chooseBuilding(GameInfo& _gameData, PlayerData& _playerInfo, string _buildingOptions[], string _buildModeOptions[])
 {
     int inputValue; //This is used to get the input of the player
 
@@ -509,19 +513,19 @@ GameInfo chooseBuilding(GameInfo _gameData, PlayerData& _playerInfo, string _bui
         if(inputValue == 1)
         {
             //Call build mode function
-            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '@');
+            buildingMode(_gameData, _playerInfo, _buildModeOptions, '@');
         }
         else
         {
             //Call build mode function
-            _gameData = buildingMode(_gameData, _playerInfo, _buildModeOptions, '#');
+            buildingMode(_gameData, _playerInfo, _buildModeOptions, '#');
         }
     }
-    return _gameData; //Otherwise, return to main
+    return; //Otherwise, return to main
 }
 
 //This function is for the general mode of building
-GameInfo buildingMode(GameInfo _gameData, PlayerData& _playerInfo, string _menuOptions[], char _building)
+void buildingMode(GameInfo& _gameData, PlayerData& _playerInfo, string _menuOptions[], char _building)
 {
     int menuInput = 1; //Integer used to get input from player
 
@@ -533,18 +537,18 @@ GameInfo buildingMode(GameInfo _gameData, PlayerData& _playerInfo, string _menuO
 
     while(menuInput != 4) //Kepp loop running unless quit option is chosen
     {
-        _gameData = goThroughMap(_gameData, ' ', false); //Display map
+        goThroughMap(_gameData, ' ', false); //Display map
         displayMenu(_menuOptions, 4, _playerInfo, _gameData.currentYear, true); //Display options
         menuInput = getAnswer(4,1); //Get player input
 
         if(menuInput == 1)
         {
             displayColorText("    >- Use WASD  or Arrow keys to move", true, 4); //Display instructions
-            _gameData = keyboardMode(_gameData, currentX, currentY, savedChar, _building); //Call function to place using keyboard
+            keyboardMode(_gameData, currentX, currentY, savedChar, _building); //Call function to place using keyboard
         }
         else if(menuInput == 2)
         {
-            _gameData = coordinateMode(_gameData, currentX, currentY, savedChar, _building);  //Call function to place using coordinates
+            coordinateMode(_gameData, currentX, currentY, savedChar, _building);  //Call function to place using coordinates
         }
         else if(menuInput == 3)
         {
@@ -577,11 +581,11 @@ GameInfo buildingMode(GameInfo _gameData, PlayerData& _playerInfo, string _menuO
         }
         system("CLS");
     }
-    return _gameData;
+    return;
 }
 
 //This function is for placing base using keyboard
-GameInfo keyboardMode(GameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
+void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
 {
     //If escape is pressed, exit
     while((!(GetKeyState(VK_ESCAPE) & 0x8000)))
@@ -590,7 +594,7 @@ GameInfo keyboardMode(GameInfo _gameData, int& _currentX, int& _currentY, char& 
         {
             if((_currentY - 1) >= 5) //Check to see if new position is legal
             {
-                _gameData = updatePosition(_gameData, 0, -1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+                updatePosition(_gameData, 0, -1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
         }
         //Else if specific key is pressed:
@@ -598,7 +602,7 @@ GameInfo keyboardMode(GameInfo _gameData, int& _currentX, int& _currentY, char& 
         {
             if((_currentY + 1) <= 45) //Check to see if new position is legal
             {
-                _gameData = updatePosition(_gameData, 0, 1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+                updatePosition(_gameData, 0, 1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
         }
         //Else if specific key is pressed:
@@ -606,7 +610,7 @@ GameInfo keyboardMode(GameInfo _gameData, int& _currentX, int& _currentY, char& 
         {
             if((_currentX - 1) >= 0) //Check to see if new position is legal
             {
-                _gameData = updatePosition(_gameData, -1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+                updatePosition(_gameData, -1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
         }
         //Else if specific key is pressed:
@@ -614,16 +618,16 @@ GameInfo keyboardMode(GameInfo _gameData, int& _currentX, int& _currentY, char& 
         {
             if((_currentX + 1) <= 199) //Check to see if new position is legal
             {
-                _gameData = updatePosition(_gameData, 1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+                updatePosition(_gameData, 1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
         }
     }
     system("CLS"); //Wipe console
-    return _gameData;
+    return;
 }
 
 //This function is for placing base using a coordinate system
-GameInfo coordinateMode(GameInfo _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
+void coordinateMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
 {
     int tempX; //x position input chosen by player
     int tempY; //y position input chosen by player
@@ -634,12 +638,12 @@ GameInfo coordinateMode(GameInfo _gameData, int& _currentX, int& _currentY, char
     cout << "    >- Please input your y-position between 3 - 43 " << endl;
     tempY = getAnswer(43, 3); //Show range in y axis. Get input
 
-    _gameData = updatePosition(_gameData, -_currentX + tempX, -_currentY + tempY, false, _currentX, _currentY, _savedChar, _building); //Set new position of the building
-    return _gameData;
+    updatePosition(_gameData, -_currentX + tempX, -_currentY + tempY, false, _currentX, _currentY, _savedChar, _building); //Set new position of the building
+    return;
 }
 
 //This function is for updating the position of the base
-GameInfo updatePosition(GameInfo _gameData, int _xChange, int _yChange, bool _usingKeyboard, int& _currentX, int& _currentY, char& _savedChar, char _building)
+void updatePosition(GameInfo& _gameData, int _xChange, int _yChange, bool _usingKeyboard, int& _currentX, int& _currentY, char& _savedChar, char _building)
 {
     _gameData.gameMap[_currentX][_currentY] = _savedChar; //Replace current position with the saved character
     _savedChar = _gameData.gameMap[_currentX + _xChange][_currentY + _yChange]; //Save the character of the future value
@@ -650,10 +654,10 @@ GameInfo updatePosition(GameInfo _gameData, int _xChange, int _yChange, bool _us
     if(_usingKeyboard)
     {
         system("CLS"); //Wipe console
-        _gameData = goThroughMap(_gameData, ' ', false); //Display map
+        goThroughMap(_gameData, ' ', false); //Display map
         displayColorText("    >- Press escape to exit keyboard mode", true, 4); //Output warning/directions on how to exit
     }
-    return _gameData; //return
+    return; //return
 }
 
 //Error trapping funcion that only accepts integers
@@ -774,17 +778,17 @@ bool getConfirmation()
 }
 
 //This function is in charge of spawning all unscanned planes
-GameInfo spawnUFO(UFO _ufosData[], int _ufoCount, string _origin[], string _type[], char _symbol[], GameInfo _gameData)
+void spawnUFO(UFO _ufosData[], int _ufoCount, string _origin[], string _type[], char _symbol[], GameInfo& _gameData)
 {
     for(int i = 0; i < _ufoCount; i++) //Spawn all planes
     {
-        _ufosData[i] = setUFO(_ufosData[i], _origin, _type, _symbol, _gameData.gameMap); //Call function to make a new plane
+        setUFO(_ufosData[i], _origin, _type, _symbol, _gameData.gameMap); //Call function to make a new plane
     }
-    return _gameData;
+    return;
 }
 
 //This function is in charge of setting the information on the plane
-UFO setUFO(UFO _ufoData, string _origin[], string _type[], char _symbol[], char _gameMap[199][55])
+void setUFO(UFO& _ufoData, string _origin[], string _type[], char _symbol[], char _gameMap[199][55])
 {
     int randValue; //This represents a random value
     randValue = rand() % 10; //Determine random number to find out what allegiance is the plane
@@ -830,7 +834,7 @@ UFO setUFO(UFO _ufoData, string _origin[], string _type[], char _symbol[], char 
     //Now that ufo data is saved, update map data
     setSpot(_gameMap[_ufoData.xPos][_ufoData.yPos], '?');
 
-    return _ufoData;
+    return;
 }
 
 //This resets the position of the ufo's
@@ -845,27 +849,31 @@ void resetUFOs(UFO _ufos[])
 }
 
 //This function is used for all interactions between player and UFO's including a special UI place
-GameInfo scanMode(UFO _ufos[], GameInfo _gameData, PlayerData& _playerData)
+void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData)
 {
     int inputValue = 0;
+    ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 5); //Scan all the possible ufo's
 
     while(inputValue <= _gameData.ufoCount)
     {
         system("CLS"); //wipe consol
-        ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 5); //Scan all the possible ufo's
-        _gameData = goThroughMap(_gameData, ' ', false); //Display map
+        goThroughMap(_gameData, ' ', false); //Display map
         ufoMenu(_ufos, _gameData.ufoCount, _gameData); //Call function to display menu
         inputValue = getAnswer(_gameData.ufoCount+1, 1); //Get player's input
         cout << endl; //Skip a space
 
-        if(_gameData.gameMap[_ufos[inputValue - 1].xPos][_ufos[inputValue - 1].yPos] == '?')
+        if(inputValue == _gameData.ufoCount + 1)
+        {
+            clearLabel(_playerData, _gameData);
+        }
+        else if(_gameData.gameMap[_ufos[inputValue - 1].xPos][_ufos[inputValue - 1].yPos] == '?')
         { //If the spot of the ufo selected is still undetected, show unscan version of information
             cout << ">- |IDENTITY| -- unknown" << endl; //Show that everything (all info) is unknown until scanned
             cout << ">- |TAG| ------- unknown" << endl;
             cout << ">- |ORIGINS| --- unknown.country" << endl;
             cout << ">- |SYMBOL| ---- ?" << endl;
         }
-        else if(inputValue != _gameData.ufoCount + 1)
+        else
         { //Otherwise, the ufo has been scanned, show available information
             cout << ">- |IDENTITY| -- " << _ufos[inputValue - 1].type << "." << _ufos[inputValue - 1].identity << endl;
             cout << ">- |TAG| ------- " << _ufos[inputValue - 1].tag << endl;
@@ -874,9 +882,8 @@ GameInfo scanMode(UFO _ufos[], GameInfo _gameData, PlayerData& _playerData)
         }
         anyInput(); //Get any getch before continuing
     }
-    clearLabel(_playerData, _gameData);
     system("CLS");
-    return _gameData;
+    return;
 }
 
 //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
