@@ -5,23 +5,20 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.4.5]
+>- [version 1.4.6]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
 
-    >- Scan aircraft [In progress]
-        >- If plane is revealed, can be pulled up to give more info
-
-    >- Make menu array more versitile to apply to ufo menu
-
-    >- Commenting
+    >- Commenting [In progress]
 
     ////////////////////////////// Goal for tomorrow
 
     >- Advance Events
+
+    >- Fix all functions to use references
 
     >- Restricted placement system
         >-Fill map?
@@ -29,6 +26,8 @@
         >- Ocean
 
     >- UFO array can't be in struct bug
+
+    >- Make menu array more versitile to apply to ufo menu
 */
 
 //Declaring all used libraries
@@ -851,19 +850,30 @@ GameInfo scanMode(UFO _ufos[], GameInfo _gameData, PlayerData& _playerData)
 {
     int inputValue = 0;
 
-    system("CLS"); //wipe consol
-
     while(inputValue <= _gameData.ufoCount)
     {
+        system("CLS"); //wipe consol
         ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 5); //Scan all the possible ufo's
         _gameData = goThroughMap(_gameData, ' ', false); //Display map
         ufoMenu(_ufos, _gameData.ufoCount, _gameData); //Call function to display menu
         inputValue = getAnswer(_gameData.ufoCount+1, 1); //Get player's input
+        cout << endl; //Skip a space
 
-        if(inputValue <= _gameData.ufoCount)
-        {
-
+        if(_gameData.gameMap[_ufos[inputValue - 1].xPos][_ufos[inputValue - 1].yPos] == '?')
+        { //If the spot of the ufo selected is still undetected, show unscan version of information
+            cout << ">- |IDENTITY| -- unknown" << endl;
+            cout << ">- |TAG| ------- unknown" << endl;
+            cout << ">- |ORIGINS| --- unknown.country" << endl;
+            cout << ">- |SYMBOL| ---- ?" << endl;
         }
+        else if(inputValue != _gameData.ufoCount + 1)
+        { //Otherwise, the ufo has been scanned, show available information
+            cout << ">- |IDENTITY| -- " << _ufos[inputValue - 1].type << "." << _ufos[inputValue - 1].identity << endl;
+            cout << ">- |TAG| ------- " << _ufos[inputValue - 1].tag << endl;
+            cout << ">- |ORIGINS| --- " << _ufos[inputValue - 1].origin << ".country" << endl;
+            cout << ">- |SYMBOL| ---- " << _ufos[inputValue - 1].symbol << endl;
+        }
+        anyInput(); //Get any getch before continuing
     }
     clearLabel(_playerData, _gameData);
     system("CLS");
@@ -875,26 +885,31 @@ void ufoMenu(UFO _ufos[], int _limit, GameInfo _gameData)
 {
     for(int i = 0; i < _limit; i++)
     {
+        cout << "    >- [" << i+1 << "] ";
+
+        if(i < 9)
+        { //If the number is 1 digit
+            cout << " "; //Add an extra space
+        }
+
         //For every UFO, find the tag and save it to the array
         if(_ufos[i].tag == "Enemy" && _gameData.gameMap[_ufos[i].xPos][_ufos[i].yPos] != '?')
         {
-            cout << "    >- [" << i+1 << "] ";
             displayColorText(_ufos[i].tag, true, 12);
         }
         else if(_ufos[i].tag == "Friendly" && _gameData.gameMap[_ufos[i].xPos][_ufos[i].yPos] != '?')
         {
-            cout << "    >- [" << i+1 << "] ";
             displayColorText(_ufos[i].tag, true, 10);
         }
         else if(_gameData.gameMap[_ufos[i].xPos][_ufos[i].yPos] != '?')
         {
-            cout << "    >- [" << i+1 << "] ";
-            displayColorText(_ufos[i].tag, true, 9);
+            cout << _ufos[i].tag << endl;
+            //displayColorText(_ufos[i].tag, true, 9);
         }
         else
         {
-            cout << "    >- [" << i+1 << "] ";
-            displayColorText("Unknown", true, 9);
+            cout << " Unknown" << endl;
+            //displayColorText("Unknown", true, 9);
         }
     }
     cout << "    >- [" << _limit + 1 << "] To Exit Scan Mode" << endl;
