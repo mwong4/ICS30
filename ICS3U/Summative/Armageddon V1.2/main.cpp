@@ -5,29 +5,31 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.4.6]
+>- [version 1.4.7]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
 
-    >- Commenting [In progress]
+    >- Fix all functions to use references [In progress]
 
-    ////////////////////////////// Goal for tomorrow
+    >- Make menu array more versitile to apply to ufo menu
 
     >- Advance Events
 
-    >- Fix all functions to use references
+    ////////////////////////////// Goal for tomorrow
 
+
+    >- Advance reactions in scan mode
+        >- Attack Mode?
+        >- New building, SAM defences?
     >- Restricted placement system
         >-Fill map?
         >- Russia
         >- Ocean
 
     >- UFO array can't be in struct bug
-
-    >- Make menu array more versitile to apply to ufo menu
 */
 
 //Declaring all used libraries
@@ -134,7 +136,7 @@ int main()
     PlayerData usa; //This struct represents the important information for player usa
     UFO ufosOnMap[20]; //This is an array containing the information on every ufo on the map
 
-    //Calling function to reset all (Game and Player) data
+    //Calling function to reset all (Game and Player) data and UFO data
     gameData = resetGame(gameData);
     usa = resetPlayer(usa);
     resetUFOs(ufosOnMap);
@@ -160,7 +162,7 @@ int main()
         menuInput = getAnswer(4,1); //Get player input
 
         if(menuInput == 1)
-        {
+        { //If player one enters 1, enter function to choose building and buidl mode
             gameData = chooseBuilding(gameData, usa, buildingOptions, buildModeOptions);
         }
         else if(menuInput == 2)
@@ -175,9 +177,10 @@ int main()
                 }
                 else
                 {
-                    //Calling function to reset all (Game and Player) data
+                    //Calling function to reset all (Game and Player) data and UFO data
                     gameData = resetGame(gameData);
                     usa = resetPlayer(usa);
+                    resetUFOs(ufosOnMap);
                 }
             }
             else
@@ -218,31 +221,31 @@ int main()
 void display(char _mapSpot)
 {
     string tempString; //This string is here temporarily and simply to convert char to string
-    if(_mapSpot == '@')
+    if(_mapSpot == '@') //If place is missile silo
     {
-        displayColorText("@", false, 14); //yellow
+        displayColorText("@", false, 14); //yellow color
     }
-    else if(_mapSpot == '#')
+    else if(_mapSpot == '#') //If place is radar station
     {
-        displayColorText("#", false, 2); //Dark green
+        displayColorText("#", false, 2); //Dark green color
     }
-    else if(_mapSpot == '!')
+    else if(_mapSpot == '!') //If place is enemy
     {
-        displayColorText("!", false, 4); //Red
+        displayColorText("!", false, 4); //Red color
     }
-    else if(_mapSpot == '?')
+    else if(_mapSpot == '?') //If place is unknown
     {
-        displayColorText("?", false, 9); //Blue
+        displayColorText("?", false, 9); //Blue color
     }
-    else if(_mapSpot == '&')
+    else if(_mapSpot == '&') //If place is ally
     {
-        displayColorText("&", false, 10); //Light green
+        displayColorText("&", false, 10); //Light green color
     }
-    else if(_mapSpot == '^')
+    else if(_mapSpot == '^') //If place is neutral
     {
-        displayColorText("^", false, 9); //Blue
+        displayColorText("^", false, 9); //Blue color
     }
-    else if(_mapSpot == '1' || _mapSpot == '2' || _mapSpot == '3' || _mapSpot == '4' || _mapSpot == '5' || _mapSpot == '6' || _mapSpot == '7' || _mapSpot == '8' || _mapSpot == '9' || _mapSpot == '0')
+    else if(_mapSpot == '1' || _mapSpot == '2' || _mapSpot == '3' || _mapSpot == '4' || _mapSpot == '5' || _mapSpot == '6' || _mapSpot == '7' || _mapSpot == '8' || _mapSpot == '9' || _mapSpot == '0') //If place is label
     {
         //Else if character is a number, highlight
         tempString = _mapSpot;
@@ -258,28 +261,28 @@ void display(char _mapSpot)
 //This function is to set a specific spot in the map
 void setSpot(char& _spot, char _newValue)
 {
-    _spot = _newValue;
+    _spot = _newValue; //Set referenced spot to input variable
     return;
 }
 
 //This function is to set completely clean off the map at the start of the game
 GameInfo goThroughMap(GameInfo _gameData, char _clearValue, bool _setMap)
 {
-    for(int i = 0; i < 55; i++)
+    for(int i = 0; i < 55; i++) //Using double for loop, go through entire double array
     {
         for(int j = 0; j < 199; j++)
         {
             if(_setMap)
-            {
+            { //If _setMap is true, set spot to sent char
                 setSpot(_gameData.gameMap[j][i], _clearValue);
             }
             else
-            {
+            { //Otherwise, output char
                 display(_gameData.gameMap[j][i]);
             }
         }
         if(!_setMap)
-        {
+        { //Skip a line when the line is finished
             cout << endl;
         }
     }
@@ -307,9 +310,9 @@ GameInfo resetGame(GameInfo _data)
 {
     _data.currentYear = 1945; //Set the starting year to 1945
     _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
-    _data.defcon = 5;
+    _data.defcon = 5; //Set defcon by default to 5
     _data = getMap(_data, true); //Initialize the value of the map array //error
-    _data.ufoCount = 15; //Set amount of ufo's in the sky to 0
+    _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
     return _data;
 }
 
@@ -320,18 +323,18 @@ PlayerData resetPlayer(PlayerData _data)
     _data.currentIncome = 0.01; //The starting military funding is 0.01%
     _data.currentBalance = 0.5; //The current military balance is 500 million dollars
     _data.playerName = getName(); //Initialize name by using the loading screen
-    _data.radarCount = 0;
+    _data.radarCount = 0; //By default, set radar count to 0
     return _data;
 }
 
 //This function is used to find each line in the map txt file
 GameInfo getMap(GameInfo _gameData, bool _saveFile)
 {
-    std::string line;
-    ifstream mapFile_("MapFile.txt");
-    ifstream endFile_("NuclearEnding.txt");
+    std::string line; //String line used to seperate the text file into lines
+    ifstream mapFile_("MapFile.txt"); //This is the map file
+    ifstream endFile_("NuclearEnding.txt"); //This is the game over file
 
-    int currentRow = 0;
+    int currentRow = 0; //This integer keeps count of the row number for the saving in array
 
     if(mapFile_.is_open() && _saveFile) //If instricted to save the file
     {
@@ -340,7 +343,7 @@ GameInfo getMap(GameInfo _gameData, bool _saveFile)
             _gameData = saveMap(line, _gameData, currentRow); //It then references the saveMapFile function in order to save it into a doubel array.
             currentRow += 1;
         }
-        mapFile_.close();
+        mapFile_.close(); //Close file
     }
     else if(endFile_.is_open() && !_saveFile) //Otherwise, if instructed to read out file
     {
@@ -348,7 +351,7 @@ GameInfo getMap(GameInfo _gameData, bool _saveFile)
         {
             cout << line << endl; //Find each line and print it out
         }
-        endFile_.close();
+        endFile_.close(); //Close file
     }
     return _gameData;
 }
@@ -358,7 +361,7 @@ GameInfo saveMap(std::string _line, GameInfo _gameData, int _currentRow)
 {
     for(std::string::size_type i = 0; i < _line.size(); ++i) //Running through every character
     {
-        setSpot(_gameData.gameMap[i][_currentRow], _line[i]);
+        setSpot(_gameData.gameMap[i][_currentRow], _line[i]); //Save spot in double array with specific corresponding char and spot
     }
     return _gameData;
 }
@@ -410,36 +413,32 @@ PlayerData endTurn(PlayerData _data, float _budgetChange, float& _baseCost, floa
 void defconCounter(string _defconOptions[], float _defcon)
 {
     int defconLevel; //This integer represents the rounded defcon level
-    defconLevel = round(_defcon);
+    defconLevel = round(_defcon); //Round defcon level into the int
 
     cout << "    >- DEFCON: [";
     if(defconLevel == 1)
     {
-        displayColorText("1", false, 4);
+        displayColorText("1", false, 4); //If rounded to 1, print in deep red
     }
     else if(defconLevel == 2)
     {
-        displayColorText("2", false, 12);
+        displayColorText("2", false, 12); //If rounded to 2, print in deep orange
     }
     else if(defconLevel == 3)
     {
-        displayColorText("3", false, 14);
+        displayColorText("3", false, 14); //If rounded to 3, print in deep yellow
     }
     else if(defconLevel == 4)
     {
-        displayColorText("4", false, 9);
+        displayColorText("4", false, 9); //If rounded to 4, print in deep blue
     }
     else if(defconLevel == 5)
     {
-        displayColorText("5", false, 10);
-    }
-    else
-    {
-        //Trigger end game screen
+        displayColorText("5", false, 10); //If rounded to 5, print in deep greem
     }
     cout << "]" << endl;
 
-    cout << "    >- " << _defconOptions[defconLevel-1] << endl << endl;
+    cout << "    >- " << _defconOptions[defconLevel-1] << endl << endl; //cout the specefic defcon message for the rounded level
     return;
 }
 
@@ -452,16 +451,16 @@ void worldEvent(float& _budgetPercent, string _worldEvents[])
 
     cout << endl << endl << "    ===========================================" << endl << "    >- Major International Events Summary (M.I.E.S) -< " << endl;
 
-    if(randomInt - 37 > 0)
+    if(randomInt - 37 > 0) //If event numbergenerated is greater than 37
     {
         cout << "        + no major events" << endl;
     }
-    else if(randomInt - 29 > 0)
+    else if(randomInt - 29 > 0) //If event numbergenerated is greater than 29
     {
         cout << "        + ";
         cout << _worldEvents[(randomInt - 28) % 4 + 6] << endl; //Show world event
     }
-    else if(randomInt - 8 > 0)
+    else if(randomInt - 8 > 0) //If event numbergenerated is greater than 8
     {
         cout << "        + ";
         cout << _worldEvents[(randomInt - 7) % 3 + 3] << endl; //Show world event
@@ -470,7 +469,7 @@ void worldEvent(float& _budgetPercent, string _worldEvents[])
         cout << randomFloat*100 << "%" << endl; //Display change
         _budgetPercent += randomFloat; //Increase funding
     }
-    else
+    else //Otherwise
     {
         cout << "        + ";
         cout << _worldEvents[(randomInt + 1) % 3] << endl; //Show world event
@@ -630,12 +629,12 @@ GameInfo coordinateMode(GameInfo _gameData, int& _currentX, int& _currentY, char
     int tempY; //y position input chosen by player
 
     cout << endl << "    >- Please input your x-position between 3 - 198 " << endl;
-    tempX = getAnswer(198, 3);
+    tempX = getAnswer(198, 3); //Show range on x-axis. Get input
 
     cout << "    >- Please input your y-position between 3 - 43 " << endl;
-    tempY = getAnswer(43, 3);
+    tempY = getAnswer(43, 3); //Show range in y axis. Get input
 
-    _gameData = updatePosition(_gameData, -_currentX + tempX, -_currentY + tempY, false, _currentX, _currentY, _savedChar, _building);
+    _gameData = updatePosition(_gameData, -_currentX + tempX, -_currentY + tempY, false, _currentX, _currentY, _savedChar, _building); //Set new position of the building
     return _gameData;
 }
 
@@ -699,7 +698,7 @@ void displayMenu(string _options[], int _arraySize, PlayerData _data, int _year,
     }
     cout << endl;
     //Display instructions
-    for(int i = 0; i < _arraySize; i++)
+    for(int i = 0; i < _arraySize; i++) //For every option, display with number indicator
     {
         cout << "    >- [" << i+1 << "] " << _options[i] << endl;
     }
@@ -716,7 +715,7 @@ void displayColorText(string _inputOne, bool _returnTrue, int color)
     cout << _inputOne;
     SetConsoleTextAttribute(hConsole, 15); //Set color to white again
     if(_returnTrue)
-    {
+    { //If instructed, skip a line
         cout << endl;
     }
 }
@@ -725,7 +724,7 @@ void displayColorText(string _inputOne, bool _returnTrue, int color)
 void anyInput()
 {
     cout << "    >- [Press Any Key To Continue]" << endl;
-    getch();
+    getch(); //Get any input before continuing and returning
     return;
 }
 
@@ -755,7 +754,7 @@ string getName()
         cout << '*';
         ch = _getch();
     }
-    cout << endl << "    >- \Acess Granted." << endl << "    >- Welcome " << userID << endl;
+    cout << endl << "    >- \Acess Granted." << endl << "    >- Welcome " << userID << endl; //Show user information before continuing
     anyInput();
 
     return userID;
@@ -837,10 +836,10 @@ UFO setUFO(UFO _ufoData, string _origin[], string _type[], char _symbol[], char 
 //This resets the position of the ufo's
 void resetUFOs(UFO _ufos[])
 {
-    for(int i = 0; i < 20; i++)
+    for(int i = 0; i < 20; i++) //For every ufo
     {
-        _ufos[i].xPos = 0;
-        _ufos[i].yPos = 0;
+        _ufos[i].xPos = 0; //Reset x position to 0
+        _ufos[i].yPos = 0; //Reset y position to 0
     }
     return;
 }
@@ -861,7 +860,7 @@ GameInfo scanMode(UFO _ufos[], GameInfo _gameData, PlayerData& _playerData)
 
         if(_gameData.gameMap[_ufos[inputValue - 1].xPos][_ufos[inputValue - 1].yPos] == '?')
         { //If the spot of the ufo selected is still undetected, show unscan version of information
-            cout << ">- |IDENTITY| -- unknown" << endl;
+            cout << ">- |IDENTITY| -- unknown" << endl; //Show that everything (all info) is unknown until scanned
             cout << ">- |TAG| ------- unknown" << endl;
             cout << ">- |ORIGINS| --- unknown.country" << endl;
             cout << ">- |SYMBOL| ---- ?" << endl;
@@ -894,25 +893,25 @@ void ufoMenu(UFO _ufos[], int _limit, GameInfo _gameData)
 
         //For every UFO, find the tag and save it to the array
         if(_ufos[i].tag == "Enemy" && _gameData.gameMap[_ufos[i].xPos][_ufos[i].yPos] != '?')
-        {
-            displayColorText(_ufos[i].tag, true, 12);
+        { //If tag found is enemy
+            displayColorText(_ufos[i].tag, true, 12); //Color tag as red
         }
         else if(_ufos[i].tag == "Friendly" && _gameData.gameMap[_ufos[i].xPos][_ufos[i].yPos] != '?')
-        {
-            displayColorText(_ufos[i].tag, true, 10);
+        { //If tag found is green
+            displayColorText(_ufos[i].tag, true, 10); //
         }
         else if(_gameData.gameMap[_ufos[i].xPos][_ufos[i].yPos] != '?')
-        {
+        { //otherwise, just show tag if neutral
             cout << _ufos[i].tag << endl;
             //displayColorText(_ufos[i].tag, true, 9);
         }
         else
-        {
+        { //If unknown, say that tag is unknown
             cout << " Unknown" << endl;
             //displayColorText("Unknown", true, 9);
         }
     }
-    cout << "    >- [" << _limit + 1 << "] To Exit Scan Mode" << endl;
+    cout << "    >- [" << _limit + 1 << "] To Exit Scan Mode" << endl; //Show option to exit scan mode
 
     if(_limit == 0)
     {
@@ -937,11 +936,11 @@ void ufoScanAll(UFO _ufos[], int _limit, PlayerData& _playerData, GameInfo& _gam
 //This function is for scanning -> each individual ufo
 void ufoScanInd(UFO _ufo, PlayerData& _playerData, GameInfo& _gameData, int _radius)
 {
-    for(int i = 0; i < _playerData.radarCount; i++)
+    for(int i = 0; i < _playerData.radarCount; i++) //For every radar station
     {
         if(_ufo.xPos - _playerData.radarData[i].xPos < _radius && _ufo.xPos - _playerData.radarData[i].xPos > -_radius && _ufo.yPos - _playerData.radarData[i].yPos < _radius && _ufo.yPos - _playerData.radarData[i].yPos > -_radius)
-        {
-            setSpot(_gameData.gameMap[_ufo.xPos][_ufo.yPos], _ufo.symbol);
+        { //Have plane check to see if a radar station is in range. If yes:
+            setSpot(_gameData.gameMap[_ufo.xPos][_ufo.yPos], _ufo.symbol); //Set spot on map to symbol (reveal information)
         }
     }
     return;
