@@ -12,6 +12,11 @@
 
     ////////////////////////////// Goals for today
 
+    >- Fix Bugs
+        >- Overlap bug
+        >- Negative income bug
+        >- SAM radius not working bug
+
     >- Advance reactions in scan mode [In progress]
         >- Setting up new sam sites
         >- Make attack options
@@ -137,7 +142,7 @@ void placeLabel(PlayerData&, GameInfo&, UFO, int); //This is for placing a label
 void clearLabel(PlayerData&, GameInfo&); //This is for clearing all labels after exiting scan mode
 bool scanRadius(UFO, Building, int); //This function is purely for returning true or false depending on if an object is within the radius
 
-void actionMenu(string[], UFO, Building, PlayerData); //This function is used to display the possible actions against ufo's
+void actionMenu(string[], UFO, Building[], PlayerData); //This function is used to display the possible actions against ufo's
 
 int main()
 {
@@ -983,7 +988,7 @@ void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string 
                 cout << "    >- |SYMBOL| ---- " << _ufos[inputValue - 1].symbol << endl;
             }
             cout << endl; //Skip a space
-
+            actionMenu(_actionOptions, _ufos[inputValue], _playerData.samData, _playerData);
         }
         anyInput(); //Get any getch before continuing
     }
@@ -1120,14 +1125,25 @@ bool scanRadius(UFO _ufo, Building _buildObject, int _radius)
 }
 
 //This function is used to display the possible actions against ufo's
-void actionMenu(string _actionOption[], UFO _ufo, Building _buildObject, PlayerData _playerData)
+void actionMenu(string _actionOption[], UFO _ufo, Building _buildObject[], PlayerData _playerData)
 {
     int userInput; //this is an integer used to get player input
+    bool tempBool = false; //Temporary boolean that is true when sam site is in range
 
     displayMenu(_actionOption, 4, _playerData, 1945, false);
-    if(scanRadius(_ufo, _buildObject, 10))
+    for(int i = 0;  i < _playerData.samCount; i++)
     {
-        cout << "";
+        cout << "ran" << endl;
+        if(scanRadius(_ufo, _buildObject[i], 10))
+        {
+            cout << "detected" << endl;
+            system("PAUSE");
+            tempBool = true; //Found a sam site, set to true
+        }
+    }
+    if(tempBool)
+    {
+        cout << "    >- [5] local SAM site in range. Launch intercepter missile.";
     }
 
     userInput = getAnswer(5, 1);
