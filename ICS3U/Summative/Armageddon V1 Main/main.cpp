@@ -17,35 +17,24 @@
 //Game features to be finished
     //Spending money to build nuclear bases (a balance of power thing)
     //Build radar stations to detect ships or planes
-    //! Be able to search ships and planes and figure out if they are soviet
+    // Be able to search ships and planes and figure out if they are soviet
     //! Events that affect income or gameplay
         //! Soviets invade afghenistan
         //! Cuban missile crisis
         //! Berlin wall
-    //! Always a nuclear ending, no winning
+    // Always a nuclear ending, no winning
     //! Research tech
     //! Communiquges with the other military department
     //Defcon indicator
 
-//Events that could affect income:
-    //Soviets become more agressive, US Government becomes more worried and increases military spending (+)
-    //New government is pro-military and increases military spending(+)
-    //Military demonstration impresses the public(+)
-    //World is goingt through a recession, funding is decreased(-)
-    //New government is against military and decreases military spending(-)
-    //Military demonstration goes badly, public is less supportive(-)
-    //NATO performs a military excercise
-    //Warsaw Pact performs military exercise
-    //More refugees escape East Germany
-    //Civial war in south america supports an anti-soviet regime
 
 //Specific events
     //ww2 ends (September 2, 1945)
     //Korean war starts (June 25, 1950)
     //Space Race begins (1955)
     //Large uprising in hungary begins (October 23, 1956)
-    //Civil actions against the government for Vietnam are started (1960s)
     //U-2 shot down (May 1, 1960)
+    //Civil actions against the government for Vietnam are started (1965)
     //Cuban missile crisis begins (October 16, 1962)
     //Soviets invade afghanistan (December 25, 1979)
     //Soviet submarine acceident happens (K-219) (March 8, 1986)

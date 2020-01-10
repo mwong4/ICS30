@@ -1,20 +1,18 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 8, 2020
+>- Updated: Jan 9, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.4.8]
+>- [version 1.4.9]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
 
-    >- Make menu array more versitile to apply to ufo menu [In progress]
-
-    >- Advance Events
+    >- Advance Events [In progress]
 
     ////////////////////////////// Goal for tomorrow
 
@@ -53,6 +51,13 @@
 using namespace std;
 
 //Delcaring used structures
+struct Event
+{
+    int year; //The year at which the event occurs
+    string note; //The message that will be displayed
+    float effect; //This int represents the impact of the event on your income
+};
+
 struct Radar
 {
     int xPos; //Represents the y position of the radar
@@ -91,6 +96,7 @@ struct GameInfo //This struct holds the core game data
     int currentYear; //Year counter
     float defcon; //This is the world tension counter. If it reaches 1, everyone dies
     char gameMap [199][55];//This is the double array that houses the whole map
+    Event advanceEvents[11]; //These are the big 11 events that happen throughout the 20th century
 };
 
 //Delcaring function prototypes
@@ -100,12 +106,14 @@ void goThroughMap(GameInfo&, char, bool); //This function is to go through every
 void getMap(GameInfo&, bool); //This function is used to find each line in the map txt file
 void saveMap(std::string, GameInfo&, int); //This function is used to extract each character in a map file line
 
-void endTurn(PlayerData&, float, float&, float&, string[], string[]); //This function is in charge of updating the player data for the next turn
+void endTurn(PlayerData&, float, float&, float&, string[], string[], GameInfo); //This function is in charge of updating the player data for the next turn
 void defconCounter(string[], float); //This function is to display the defcon state
-void worldEvent(float&, string[]); //This function is to display the world events
+void worldEvent(float&, string[], GameInfo); //This function is to display the world events
 bool gameOverScreen(GameInfo); //This function is for ending the game
 void resetGame(GameInfo&); //This function is for resting game info
 void resetPlayer(PlayerData&); //This function is for reseting a player
+void setBigEvents(GameInfo&); //This function is in charge of initializing the large advance events
+void checkBigEvents(GameInfo); //This function is called to check for matching advance events to output
 
 void chooseBuilding(GameInfo&, PlayerData&, string[], string[]); //This function is for player to choose their building
 void buildingMode(GameInfo&, PlayerData&, string[], char); //This function is for the general mode of building
@@ -190,7 +198,7 @@ int main()
             else
             {
                 gameData.currentYear ++;//Update year
-                endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents); //Calls function to update income
+                endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents, gameData); //Calls function to update income
 
                 if(gameData.currentYear % 2 == 0 && gameData.ufoCount < 20)
                 {
@@ -333,7 +341,7 @@ void saveMap(std::string _line, GameInfo& _gameData, int _currentRow)
 }
 
 //This function is in charge of updating the player data for the next turn
-void endTurn(PlayerData& _data, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[], string _worldEvents[])
+void endTurn(PlayerData& _playerData, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[], string _worldEvents[], GameInfo _gameData)
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
@@ -341,7 +349,7 @@ void endTurn(PlayerData& _data, float _budgetChange, float& _baseCost, float& _d
     _defcon -= 0.05; //Increase defcon naturally
     defconCounter(_defconOptions, _defcon); //Call function to display defcon information
 
-    worldEvent(_data.currentIncome, _worldEvents); //Call function to display current world issues
+    worldEvent(_playerData.currentIncome, _worldEvents, _gameData); //Call function to display current world issues
 
 
     randomValue = (rand()%5+1)/100.0; //Get the random increase or decrease of the GDP
@@ -349,23 +357,23 @@ void endTurn(PlayerData& _data, float _budgetChange, float& _baseCost, float& _d
     {
         //In decrease (less likely), display percent and update GDP
         cout << "    >- Economy decreased by -> " << randomValue*100 << "%" << endl;
-        _data.currentGDP -= _data.currentGDP*randomValue;
+        _playerData.currentGDP -= _playerData.currentGDP*randomValue;
     }
     else
     {
         //In increase (more likely), display percent and update GDP
         cout << "    >- Economy increased by -> " << randomValue*100 << "%" << endl;
-        _data.currentGDP += _data.currentGDP*randomValue;
+        _playerData.currentGDP += _playerData.currentGDP*randomValue;
     }
     //Show new GDP
-    cout << "    >- GDP is Now: " << _data.currentGDP << " billion dollars" << endl;
+    cout << "    >- GDP is Now: " << _playerData.currentGDP << " billion dollars" << endl;
 
     //Change income percent if government changes it
-    _data.currentIncome += _budgetChange;
+    _playerData.currentIncome += _budgetChange;
 
     //Update the income of the department
-    _data.currentBalance += (_data.currentGDP*_data.currentIncome)/100.0;
-    cout << "    >- Current Department Anual Budget: " << _data.currentBalance << " billion dollars" << endl;
+    _playerData.currentBalance += (_playerData.currentGDP*_playerData.currentIncome)/100.0;
+    cout << "    >- Current Department Anual Budget: " << _playerData.currentBalance << " billion dollars" << endl;
 
 
     randomValue = (rand()%3+7)/100.0; //Get the random increase in inflation
@@ -409,7 +417,7 @@ void defconCounter(string _defconOptions[], float _defcon)
 }
 
 //This function is to display the world events
-void worldEvent(float& _budgetPercent, string _worldEvents[])
+void worldEvent(float& _budgetPercent, string _worldEvents[], GameInfo _data)
 {
     int randomInt; //This represents a random value generated by the program
     float randomFloat; //This represents a random value henerated for change in income budget
@@ -447,6 +455,8 @@ void worldEvent(float& _budgetPercent, string _worldEvents[])
             _budgetPercent -= randomFloat; //Decrease funding
         }
     }
+
+    checkBigEvents(_data);
     cout << endl << endl << "    ===========================================" << endl;
     return;
 }
@@ -486,6 +496,63 @@ void resetPlayer(PlayerData& _data)
     _data.currentBalance = 0.5; //The current military balance is 500 million dollars
     _data.playerName = getName(); //Initialize name by using the loading screen
     _data.radarCount = 0; //By default, set radar count to 0
+    return;
+}
+
+//This function is in charge of initializing the large advance events
+void setBigEvents(GameInfo& _data)
+{
+    string tempString; //This is a temporary string to try resolving the save string -> crash bug
+    //Set event for 1946
+    tempString = "The year is 1946. Only one year ago, the worlds largest war ended. Only one year ago, the Atmoic age was born";
+    _data.advanceEvents[0].year = 1946;
+    _data.advanceEvents[0].note = tempString;
+    //Set event for 1950
+    tempString = "1950: War ignites on the Korean peninsula as the North Korean army crosses the 38th parallel.";
+    _data.advanceEvents[1].year = 1950;
+    _data.advanceEvents[1].note = tempString;
+    //Set event for 1955
+    tempString = "1955: President Kenedy announces the end goal for the US space program, the moon.";
+    _data.advanceEvents[2].year = 1955;
+    _data.advanceEvents[2].note = tempString;
+    //Set event for 1956
+    tempString = "1956: Widespread fighting spreads across Budapest and the surrounding cities as Hungarian revolutionaries fight a Soviet national army.";
+    _data.advanceEvents[3].year = 1956;
+    _data.advanceEvents[3].note = tempString;
+    //Set event for 1960
+    tempString = "1960: An american U-2 recon plane is shot down over soviet airspace.";
+    _data.advanceEvents[4].year = 1960;
+    _data.advanceEvents[4].note = tempString;
+    //Set event for 1962
+    tempString = "1962: Nuclear missile silo's are discovered in soviet backed Cuba. US navy start a blockade.";
+    _data.advanceEvents[5].year = 1962;
+    _data.advanceEvents[5].note = tempString;
+    //Set event for 1965
+    tempString = "1965: The SDC organizes a large scale march on washington DC against intervention in Vietnam.";
+    _data.advanceEvents[6].year = 1965;
+    _data.advanceEvents[6].note = tempString;
+    //Set event for 1979
+    tempString = "1979: The Soviet Union military begins a military operation to support the communist government in Afghanistan.";
+    _data.advanceEvents[7].year = 1979;
+    _data.advanceEvents[7].note = tempString;
+    //Set event for 1986
+    tempString = "1986: Soviet submarine K-219 is sunk with it's full crew during a training exercise accident.";
+    _data.advanceEvents[8].year = 1986;
+    _data.advanceEvents[8].note = tempString;
+    //Set event for 1986
+    tempString = "1986: The Chernobyl nuclear power plant near the city of Pripyat has a nuclear meltdown.";
+    _data.advanceEvents[9].year = 1986;
+    _data.advanceEvents[9].note = tempString;
+    //Set event for 1991
+    tempString = "1991: The Berlin wall has fallen. After 40 years, the curtain between the west and the east has finally opened.";
+    _data.advanceEvents[10].year = 1991;
+    _data.advanceEvents[10].note = tempString;
+    return;
+}
+
+//This function is called to check for matching advance events to output
+void checkBigEvents(GameInfo)
+{
     return;
 }
 
