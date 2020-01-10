@@ -15,7 +15,6 @@
     >- Fix Bugs
         >- Overlap bug
         >- Negative income bug
-        >- SAM radius not working bug
 
     >- Advance reactions in scan mode [In progress]
         >- Setting up new sam sites
@@ -988,7 +987,7 @@ void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string 
                 cout << "    >- |SYMBOL| ---- " << _ufos[inputValue - 1].symbol << endl;
             }
             cout << endl; //Skip a space
-            actionMenu(_actionOptions, _ufos[inputValue], _playerData.samData, _playerData);
+            actionMenu(_actionOptions, _ufos[inputValue-1], _playerData.samData, _playerData);
         }
         anyInput(); //Get any getch before continuing
     }
@@ -1133,17 +1132,14 @@ void actionMenu(string _actionOption[], UFO _ufo, Building _buildObject[], Playe
     displayMenu(_actionOption, 4, _playerData, 1945, false);
     for(int i = 0;  i < _playerData.samCount; i++)
     {
-        cout << "ran" << endl;
         if(scanRadius(_ufo, _buildObject[i], 10))
         {
-            cout << "detected" << endl;
-            system("PAUSE");
             tempBool = true; //Found a sam site, set to true
         }
     }
     if(tempBool)
     {
-        cout << "    >- [5] local SAM site in range. Launch intercepter missile.";
+        cout << "    >- [5] local SAM site in range. Launch intercepter missile." << endl;
     }
 
     userInput = getAnswer(5, 1);
