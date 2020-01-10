@@ -1,23 +1,22 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 9, 2020
+>- Updated: Jan 10, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.5.0]
+>- [version 1.5.1]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
 
-    ////////////////////////////// Goal for tomorrow
-
-
     >- Advance reactions in scan mode [In progress]
-        >- Attack Mode?
-        >- New building, SAM defences?
+        >- Setting up new sam sites
+        >- Make attack options
+
+    ////////////////////////////// Goal for tomorrow
 
     >- Restricted placement system
         >-Fill map?
@@ -56,10 +55,10 @@ struct Event
     float effect; //This int represents the impact of the event on your income
 };
 
-struct Radar
+struct Building
 {
-    int xPos; //Represents the y position of the radar
-    int yPos; //Represents the x position of the radar
+    int xPos; //Represents the y position of the building
+    int yPos; //Represents the x position of the building
     char savedCharOne; //represents the saved char at the origin of the label
     char savedCharTwo; //represents the saved char beside the first one
 };
@@ -83,8 +82,10 @@ struct PlayerData //This struct holds the data for each player
     float currentIncome; //The % funding for the department
     float currentBalance; //The military budget, how much funding in dollars
     int radarCount; //This keeps track of how many radar's there is
-    Radar radarData[100]; //This represents the data of each radar
-    Radar tempLabel[20]; //These are temporary labels in the scan mode just to know what target it which
+    Building radarData[100]; //This represents the data of each radar
+    Building tempLabel[20]; //These are temporary labels in the scan mode just to know what target it which
+    int samCount; //This keeps track of how many SAM sites there is
+    Building samData[100]; //This represents the data of each SAM site
 };
 
 struct GameInfo //This struct holds the core game data
@@ -154,7 +155,7 @@ int main()
     setBigEvents(advanceEvents);
 
     string primaryOptions[4] = {"Enter building mode","|| Finish Turn >>", "Scan all available UFOs", "Quit"}; //This array represents the optiosn available in the main menu
-    string buildingOptions[3] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex", "Quit"}; //This represents the available options for buildings
+    string buildingOptions[4] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex [Range: 7]", "Surface to Air Missile Defense Station [Range 10]", "Quit"}; //This represents the available options for buildings
     string buildModeOptions[4] = {"Place using keyboard", "Place using coordinate", "Confirm place", "Cancel/Exit build mode"}; //These are the menu options for build mode
     //These are the five states of DEFCON advance warning
     string defconOptions[5]= {"CRITICAL|| Nuclear War Imminent","SEVERE|| Armed Forces Ready to Deploy in 6 hours","SUBSTANTIAL|| Air Force Mobilizes in 15 Minutes","MODERATE|| Increase Security Readiness","LOW|| Normal Peacetime Readiness"};
@@ -235,7 +236,11 @@ void display(char _mapSpot)
     string tempString; //This string is here temporarily and simply to convert char to string
     if(_mapSpot == '@') //If place is missile silo
     {
-        displayColorText("@", false, 14); //yellow color
+        displayColorText("@", false, 6); //yellow color -14, 6
+    }
+    else if(_mapSpot == '$') //If place is missile silo
+    {
+        displayColorText("$", false, 6); //yellow color - 14, 6
     }
     else if(_mapSpot == '#') //If place is radar station
     {
@@ -345,10 +350,17 @@ void endTurn(PlayerData& _playerData, float _budgetChange, float& _baseCost, flo
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
+    Sleep(400); //Delay by 0.4 seconds
 
     _defcon -= 0.05; //Increase defcon naturally
     defconCounter(_defconOptions, _defcon); //Call function to display defcon information
+
+    Sleep(400); //Delay by 0.4 second
+
     worldEvent(_playerData.currentIncome, _worldEvents, _events, _year); //Call function to display current world issues
+
+    Sleep(400); //Delay by 0.4 second
+    cout << endl << endl << "    ===========================================" << endl;
 
     randomValue = (rand()%5+1)/100.0; //Get the random increase or decrease of the GDP
     if(rand() % 5 == 0 && randomValue < 3 )
@@ -387,7 +399,7 @@ void defconCounter(string _defconOptions[], float _defcon)
     int defconLevel; //This integer represents the rounded defcon level
     defconLevel = round(_defcon); //Round defcon level into the int
 
-    cout << "    >- DEFCON: [";
+    cout << endl << endl << "    >- DEFCON: [";
     if(defconLevel == 1)
     {
         displayColorText("1", false, 4); //If rounded to 1, print in deep red
@@ -455,7 +467,6 @@ void worldEvent(float& _budgetPercent, string _worldEvents[], Event _events[], i
     }
 
     checkBigEvents(_events, _year);//Check for any big events to display
-    cout << endl << endl << "    ===========================================" << endl;
     return;
 }
 
@@ -494,6 +505,7 @@ void resetPlayer(PlayerData& _data)
     _data.currentBalance = 0.5; //The current military balance is 500 million dollars
     _data.playerName = getName(); //Initialize name by using the loading screen
     _data.radarCount = 0; //By default, set radar count to 0
+    _data.samCount = 0; //By default, set radar count to 0
     return;
 }
 
@@ -568,7 +580,7 @@ void chooseBuilding(GameInfo& _gameData, PlayerData& _playerInfo, string _buildi
 
     //Output message
     cout << endl << endl << "    ===================================" << endl << "    >- What would you like to build?" << endl;
-    displayMenu(_buildingOptions, 3, _playerInfo, _gameData.currentYear, false); //Display all buidling options
+    displayMenu(_buildingOptions, 4, _playerInfo, _gameData.currentYear, false); //Display all buidling options
     cout << "    >- Each building cost: [" << _gameData.baseCost << "] billion dollars" << endl;
 
     if(_playerInfo.currentBalance < _gameData.baseCost)
@@ -577,20 +589,25 @@ void chooseBuilding(GameInfo& _gameData, PlayerData& _playerInfo, string _buildi
         displayColorText( "    >- You do not have the funds to build anything| Returning to menu now", true, 4);
     }
 
-    inputValue = getAnswer(3,1); //Get player's input
+    inputValue = getAnswer(4,1); //Get player's input
 
-    if(inputValue != 3 && _playerInfo.currentBalance > _gameData.baseCost)
+    if(inputValue != 4 && _playerInfo.currentBalance > _gameData.baseCost)
     {
         system("CLS"); //Wipe console
         if(inputValue == 1)
         {
-            //Call build mode function
+            //Call build mode function for silo
             buildingMode(_gameData, _playerInfo, _buildModeOptions, '@');
         }
-        else
+        else if(inputValue == 2)
         {
-            //Call build mode function
+            //Call build mode function radar
             buildingMode(_gameData, _playerInfo, _buildModeOptions, '#');
+        }
+        else if(inputValue == 3)
+        {
+            //Call build mode function SAM site
+            buildingMode(_gameData, _playerInfo, _buildModeOptions, '$');
         }
     }
     return; //Otherwise, return to main
@@ -636,10 +653,17 @@ void buildingMode(GameInfo& _gameData, PlayerData& _playerInfo, string _menuOpti
                     _gameData.defcon -= 0.1; //Decrease Defcon (increase level)
                 }
                 else if(_building == '#')
-                {
+                { //if player chose to build a radar station
                     _playerInfo.radarData[_playerInfo.radarCount].xPos = currentX; //Save the position of the radar - x
                     _playerInfo.radarData[_playerInfo.radarCount].yPos = currentY; //Save the position fo the radar - y
                     _playerInfo.radarCount ++; //Update the fact that +1 radar has been added
+                }
+                else if(_building == '$')
+                { //If player chose to build a sam site
+                    _playerInfo.samData[_playerInfo.samCount].xPos = currentX; //Save the position of the sam - x
+                    _playerInfo.samData[_playerInfo.samCount].yPos = currentY; //Save the position fo the sam - y
+                    _playerInfo.samCount ++; //Update the fact that +1 sam has been added
+                    _gameData.defcon -= 0.05; //Decrease Defcon (increase level)
                 }
             }
         }
@@ -924,7 +948,8 @@ void resetUFOs(UFO _ufos[])
 void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData)
 {
     int inputValue = 0;
-    ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 5); //Scan all the possible ufo's
+    ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 7); //Scan all the possible ufo's
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TBD
 
     while(inputValue <= _gameData.ufoCount)
     {
@@ -1029,13 +1054,13 @@ void ufoScanInd(UFO _ufo, PlayerData& _playerData, GameInfo& _gameData, int _rad
 void placeLabel(PlayerData& _playerData, GameInfo& _gameData, UFO _ufo, int _ufoNumber)
 {
     char tempChar; //This is a temporary character to be used to convert the _ufoNumber to char
-    if(_ufo.xPos - 2 >= 0 && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '?' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '?')
+    if(_ufo.xPos - 2 >= 0 && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '?' || _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '$' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '?' || _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '$')
     {
         //Check to make sure the label won't be out of the map or that the label will cover something 1 point to the left of it
         _playerData.tempLabel[_ufoNumber].xPos = _ufo.xPos - 2; //Save the label's new x position
         _playerData.tempLabel[_ufoNumber].yPos = _ufo.yPos; //Save the label's new y position
     }
-    else if(_ufo.xPos + 2 <= 198 && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '!' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '@' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '#' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '^' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '&' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '?' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '?')
+    else if(_ufo.xPos + 2 <= 198 && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '!' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '@' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '#' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '^' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '&' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '?' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '$' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '?' || _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '$')
     {
         //Check to make sure the label won't be out of the map or that the label will cover something 1 point to the right of it
         _playerData.tempLabel[_ufoNumber].xPos = _ufo.xPos + 1; //Save the label's new x position

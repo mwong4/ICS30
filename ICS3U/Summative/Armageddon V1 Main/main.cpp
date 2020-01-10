@@ -18,10 +18,10 @@
     //Spending money to build nuclear bases (a balance of power thing)
     //Build radar stations to detect ships or planes
     // Be able to search ships and planes and figure out if they are soviet
-    //! Events that affect income or gameplay
-        //! Soviets invade afghenistan
-        //! Cuban missile crisis
-        //! Berlin wall
+    // Events that affect income or gameplay
+        // Soviets invade afghenistan
+        // Cuban missile crisis
+        // Berlin wall
     // Always a nuclear ending, no winning
     //! Research tech
     //! Communiquges with the other military department
