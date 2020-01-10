@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.5.1]
+>- [version 1.5.2]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -129,12 +129,15 @@ bool getConfirmation(); //This function is to get a boolean response from the pl
 void spawnUFO(UFO[], int, string[], string[], char[], GameInfo&); //This function is in charge of spawning all unscanned planes
 void setUFO(UFO&, string[], string[], char[], char[199][55]); //This function is in charge of setting the information on the plane
 void resetUFOs(UFO[]); //This resets the position of the ufo's
-void scanMode(UFO[], GameInfo&, PlayerData&); //This function is used for all interactions between player and UFO's including a special UI place
+void scanMode(UFO[], GameInfo&, PlayerData&, string[]); //This function is used for all interactions between player and UFO's including a special UI place
 void ufoMenu(UFO[], int, GameInfo); //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
 void ufoScanAll(UFO[], int, PlayerData&, GameInfo&, int); //This function is for actually getting each and everyplane to scan it's surroundings
-void ufoScanInd(UFO, PlayerData&, GameInfo&, int); //This function is for scanning -> each individual ufo
+void ufoScanInd(UFO, int, Building[], GameInfo&, int); //This function is for scanning -> each individual ufo
 void placeLabel(PlayerData&, GameInfo&, UFO, int); //This is for placing a label beside a ufo tag
 void clearLabel(PlayerData&, GameInfo&); //This is for clearing all labels after exiting scan mode
+bool scanRadius(UFO, Building, int); //This function is purely for returning true or false depending on if an object is within the radius
+
+void actionMenu(string[], UFO, Building, PlayerData); //This function is used to display the possible actions against ufo's
 
 int main()
 {
@@ -165,6 +168,7 @@ int main()
     //String arrays for UFO's
     string origin[13] = {"Soviet","Chinese","South Korea","Sweden","Switzerland","Egypt","Saudi Arabie","Austria", "West Germany", "United States of America", "Canada", "France", "United Kingdom"}; //The origins of enemy and neutral planes
     string type[4] = {"Military","Nuclear","Cargo","Passenger"}; //These represent the possible plane types in the game
+    string actionOptions[4] = {"Deploy the airforce, force the aircraft to land", "Radio ufo and order it to land", "Leave the ufo alone", "Set DEFCON to [1], launch all nuclear missiles in a first strike"}; //All options in interaction with ufo's and the world
     char symbols[2] = {'^', '!'}; //Symbols of possible enemy planes
 
     int menuInput = 1; //This int represents the input taken from user
@@ -212,7 +216,7 @@ int main()
         else if(menuInput == 3)
         {
             //Scan all ufo's
-            scanMode(ufosOnMap, gameData, usa);
+            scanMode(ufosOnMap, gameData, usa, actionOptions);
         }
         else
         {
@@ -945,11 +949,10 @@ void resetUFOs(UFO _ufos[])
 }
 
 //This function is used for all interactions between player and UFO's including a special UI place
-void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData)
+void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string _actionOptions[])
 {
     int inputValue = 0;
     ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 7); //Scan all the possible ufo's
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TBD
 
     while(inputValue <= _gameData.ufoCount)
     {
@@ -963,19 +966,24 @@ void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData)
         {
             clearLabel(_playerData, _gameData);
         }
-        else if(_gameData.gameMap[_ufos[inputValue - 1].xPos][_ufos[inputValue - 1].yPos] == '?')
-        { //If the spot of the ufo selected is still undetected, show unscan version of information
-            cout << ">- |IDENTITY| -- unknown" << endl; //Show that everything (all info) is unknown until scanned
-            cout << ">- |TAG| ------- unknown" << endl;
-            cout << ">- |ORIGINS| --- unknown.country" << endl;
-            cout << ">- |SYMBOL| ---- ?" << endl;
-        }
-        else
-        { //Otherwise, the ufo has been scanned, show available information
-            cout << ">- |IDENTITY| -- " << _ufos[inputValue - 1].type << "." << _ufos[inputValue - 1].identity << endl;
-            cout << ">- |TAG| ------- " << _ufos[inputValue - 1].tag << endl;
-            cout << ">- |ORIGINS| --- " << _ufos[inputValue - 1].origin << ".country" << endl;
-            cout << ">- |SYMBOL| ---- " << _ufos[inputValue - 1].symbol << endl;
+        else //If the input si valid
+        {
+            if(_gameData.gameMap[_ufos[inputValue - 1].xPos][_ufos[inputValue - 1].yPos] == '?')
+            { //If the spot of the ufo selected is still undetected, show unscan version of information
+                cout << "    >- |IDENTITY| -- unknown" << endl; //Show that everything (all info) is unknown until scanned
+                cout << "    >- |TAG| ------- unknown" << endl;
+                cout << "    >- |ORIGINS| --- unknown.country" << endl;
+                cout << "    >- |SYMBOL| ---- ?" << endl;
+            }
+            else
+            { //Otherwise, the ufo has been scanned, show available information
+                cout << "    >- |IDENTITY| -- " << _ufos[inputValue - 1].type << "." << _ufos[inputValue - 1].identity << endl;
+                cout << "    >- |TAG| ------- " << _ufos[inputValue - 1].tag << endl;
+                cout << "    >- |ORIGINS| --- " << _ufos[inputValue - 1].origin << ".country" << endl;
+                cout << "    >- |SYMBOL| ---- " << _ufos[inputValue - 1].symbol << endl;
+            }
+            cout << endl; //Skip a space
+
         }
         anyInput(); //Get any getch before continuing
     }
@@ -1011,11 +1019,11 @@ void ufoMenu(UFO _ufos[], int _limit, GameInfo _gameData)
         }
         else
         { //If unknown, say that tag is unknown
-            cout << " Unknown" << endl;
+            cout << "Unknown" << endl;
             //displayColorText("Unknown", true, 9);
         }
     }
-    cout << "    >- [" << _limit + 1 << "] To Exit Scan Mode" << endl; //Show option to exit scan mode
+    cout << "    >- [" << _limit + 1 << "]  To Exit Scan Mode" << endl; //Show option to exit scan mode
 
     if(_limit == 0)
     {
@@ -1031,18 +1039,18 @@ void ufoScanAll(UFO _ufos[], int _limit, PlayerData& _playerData, GameInfo& _gam
     for(int i = 0; i < _limit; i++)
     {
         //For every UFO, scan for surrounding radar stations
-        ufoScanInd( _ufos[i], _playerData, _gameData, _radius);
+        ufoScanInd( _ufos[i], _playerData.radarCount, _playerData.radarData, _gameData, _radius);
         placeLabel(_playerData, _gameData, _ufos[i], i);
     }
     return;
 }
 
 //This function is for scanning -> each individual ufo
-void ufoScanInd(UFO _ufo, PlayerData& _playerData, GameInfo& _gameData, int _radius)
+void ufoScanInd(UFO _ufo, int _buildingCount, Building _buildObject[], GameInfo& _gameData, int _radius)
 {
-    for(int i = 0; i < _playerData.radarCount; i++) //For every radar station
+    for(int i = 0; i < _buildingCount; i++) //For every radar station
     {
-        if(_ufo.xPos - _playerData.radarData[i].xPos < _radius && _ufo.xPos - _playerData.radarData[i].xPos > -_radius && _ufo.yPos - _playerData.radarData[i].yPos < _radius && _ufo.yPos - _playerData.radarData[i].yPos > -_radius)
+        if(scanRadius(_ufo, _buildObject[i], _radius))
         { //Have plane check to see if a radar station is in range. If yes:
             setSpot(_gameData.gameMap[_ufo.xPos][_ufo.yPos], _ufo.symbol); //Set spot on map to symbol (reveal information)
         }
@@ -1098,5 +1106,36 @@ void clearLabel(PlayerData& _playerData, GameInfo& _gameData)
         setSpot(_gameData.gameMap[_playerData.tempLabel[i].xPos][_playerData.tempLabel[i].yPos], _playerData.tempLabel[i].savedCharOne);
         setSpot(_gameData.gameMap[_playerData.tempLabel[i].xPos + 1][_playerData.tempLabel[i].yPos], _playerData.tempLabel[i].savedCharTwo);
     }
+    return;
+}
+
+//This function is purely for returning true or false depending on if an object is within the radius
+bool scanRadius(UFO _ufo, Building _buildObject, int _radius)
+{
+    if(_ufo.xPos - _buildObject.xPos < _radius && _ufo.xPos - _buildObject.xPos > -_radius && _ufo.yPos - _buildObject.yPos < _radius && _ufo.yPos - _buildObject.yPos > -_radius)
+    { //Have plane check to see if a radar station is in range. If yes:
+        return true;
+    }
+    return false;
+}
+
+//This function is used to display the possible actions against ufo's
+void actionMenu(string _actionOption[], UFO _ufo, Building _buildObject, PlayerData _playerData)
+{
+    int userInput; //this is an integer used to get player input
+
+    displayMenu(_actionOption, 4, _playerData, 1945, false);
+    if(scanRadius(_ufo, _buildObject, 10))
+    {
+        cout << "";
+    }
+
+    userInput = getAnswer(5, 1);
+
+    if(userInput == 1)
+    {
+
+    }
+
     return;
 }
