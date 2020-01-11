@@ -12,9 +12,12 @@
 
     ////////////////////////////// Goals for today
 
-    >- Advance reactions in scan mode [In progress]
-        >- Setting up new sam sites
+    >- Combat system [In progress]
         >- Make attack options
+        >- Shoot down with SAM
+        >- Deploy air force - force landing
+        >- Radio and order to land
+        >- Fire all nuclear weapons
 
     ////////////////////////////// Goal for tomorrow
 
@@ -95,6 +98,7 @@ struct GameInfo //This struct holds the core game data
     int currentYear; //Year counter
     float defcon; //This is the world tension counter. If it reaches 1, everyone dies
     char gameMap [199][55];//This is the double array that houses the whole map
+    bool endGame; //This bool determines if we should close the game or not
 };
 
 //Delcaring function prototypes
@@ -137,7 +141,8 @@ void placeLabel(PlayerData&, GameInfo&, UFO, int); //This is for placing a label
 void clearLabel(PlayerData&, GameInfo&); //This is for clearing all labels after exiting scan mode
 bool scanRadius(UFO, Building, int); //This function is purely for returning true or false depending on if an object is within the radius
 
-void actionMenu(string[], UFO, Building[], PlayerData); //This function is used to display the possible actions against ufo's
+void actionMenu(string[], UFO, Building[], PlayerData, GameInfo&); //This function is used to display the possible actions against ufo's
+void launchNukes(GameInfo&); //This is one of the game's endings, if you choose to launch all nukes
 
 int main()
 {
@@ -174,9 +179,16 @@ int main()
     int menuInput = 1; //This int represents the input taken from user
     while(menuInput != 4)//While player does not choose to quit
     {
-        goThroughMap(gameData, ' ', false); //Display map
-        displayMenu(primaryOptions, 4, usa, gameData.currentYear, true); //Display all menu options
-        menuInput = getAnswer(4,1); //Get player input
+        if(!gameData.endGame) //If game has not ended yet
+        {
+            goThroughMap(gameData, ' ', false); //Display map
+            displayMenu(primaryOptions, 4, usa, gameData.currentYear, true); //Display all menu options
+            menuInput = getAnswer(4,1); //Get player input
+        }
+        else //Otherwise, initiate ending/game over
+        {
+            menuInput = 2;
+        }
 
         if(menuInput == 1)
         { //If player one enters 1, enter function to choose building and buidl mode
@@ -386,7 +398,6 @@ void endTurn(PlayerData& _playerData, float _budgetChange, float& _baseCost, flo
     _playerData.currentIncome += _budgetChange;
 
     //Update the income of the department
-    cout <<_playerData.currentIncome << endl;
     _playerData.currentBalance += (_playerData.currentGDP*_playerData.currentIncome)/100.0;
     cout << "    >- Current Department Anual Budget: " << _playerData.currentBalance << " billion dollars" << endl;
 
@@ -499,6 +510,7 @@ void resetGame(GameInfo& _data)
     _data.defcon = 5; //Set defcon by default to 5
     getMap(_data, true); //Initialize the value of the map array //error
     _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
+    _data.endGame = false; //Make sure to set the end of the game to false
     return;
 }
 
@@ -955,7 +967,7 @@ void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string 
     int inputValue = 0;
     ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 7); //Scan all the possible ufo's
 
-    while(inputValue <= _gameData.ufoCount)
+    while(inputValue <= _gameData.ufoCount && !_gameData.endGame)
     {
         system("CLS"); //wipe consol
         goThroughMap(_gameData, ' ', false); //Display map
@@ -984,7 +996,7 @@ void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string 
                 cout << "    >- |SYMBOL| ---- " << _ufos[inputValue - 1].symbol << endl;
             }
             cout << endl; //Skip a space
-            actionMenu(_actionOptions, _ufos[inputValue-1], _playerData.samData, _playerData);
+            actionMenu(_actionOptions, _ufos[inputValue-1], _playerData.samData, _playerData, _gameData);
         }
         anyInput(); //Get any getch before continuing
     }
@@ -1121,7 +1133,7 @@ bool scanRadius(UFO _ufo, Building _buildObject, int _radius)
 }
 
 //This function is used to display the possible actions against ufo's
-void actionMenu(string _actionOption[], UFO _ufo, Building _buildObject[], PlayerData _playerData)
+void actionMenu(string _actionOption[], UFO _ufo, Building _buildObject[], PlayerData _playerData, GameInfo& _gameData)
 {
     int userInput; //this is an integer used to get player input
     bool tempBool = false; //Temporary boolean that is true when sam site is in range
@@ -1134,17 +1146,60 @@ void actionMenu(string _actionOption[], UFO _ufo, Building _buildObject[], Playe
             tempBool = true; //Found a sam site, set to true
         }
     }
+
     if(tempBool)
-    {
+    { //If same site is in range
         cout << "    >- [5] local SAM site in range. Launch intercepter missile." << endl;
+        userInput = getAnswer(5, 1);
+    }
+    else
+    {
+        userInput = getAnswer(4, 1);
     }
 
-    userInput = getAnswer(5, 1);
 
     if(userInput == 1)
     {
 
     }
+    else if(userInput == 2)
+    {
 
+    }
+    else if(userInput == 4)
+    {
+        launchNukes(_gameData); //Launch all nuclear weapons
+    }
+    else if(userInput == 5)
+    {
+
+    }
+
+    return;
+}
+
+//This is one of the game's endings, if you choose to launch all nukes
+void launchNukes(GameInfo& _gameData)
+{
+    cout << endl << "    >- The president has authorized full use of all nuclear weapons on pre-determined targets. Please confirm order:" << endl;
+
+    if(getConfirmation())
+    {
+        cout << "    >- Processing" << endl;
+        _gameData.defcon = 1; //Set defcon to 1
+        _gameData.endGame = true; //End game set true now
+        for(int i = 0; i < 120; i++) //Spawn 100 different ! marks to symbolize nuclear missiles
+        {
+            setSpot(_gameData.gameMap[rand()%198][rand()%54], '!');
+        }
+        goThroughMap(_gameData, ' ', false); //Display map
+        cout << endl << "    >- Launch protocol status: |ACTIVE|" << endl;
+        cout << "    >- All personal seek emergency shelter, National Response Scenario Number One (NRSNO) is currently active." << endl;
+        cout << "    >- Approx --- ~40 min before first strike impact" << endl;
+    }
+    else
+    {
+        cout << "    >- Launch canceled" << endl;
+    }
     return;
 }
