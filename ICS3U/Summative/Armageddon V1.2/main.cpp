@@ -12,9 +12,6 @@
 
     ////////////////////////////// Goals for today
 
-    >- Fix Bugs
-        >- Negative income bug
-
     >- Advance reactions in scan mode [In progress]
         >- Setting up new sam sites
         >- Make attack options
@@ -389,6 +386,7 @@ void endTurn(PlayerData& _playerData, float _budgetChange, float& _baseCost, flo
     _playerData.currentIncome += _budgetChange;
 
     //Update the income of the department
+    cout <<_playerData.currentIncome << endl;
     _playerData.currentBalance += (_playerData.currentGDP*_playerData.currentIncome)/100.0;
     cout << "    >- Current Department Anual Budget: " << _playerData.currentBalance << " billion dollars" << endl;
 
