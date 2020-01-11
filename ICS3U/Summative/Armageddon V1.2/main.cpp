@@ -1,11 +1,11 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 10, 2020
+>- Updated: Jan 11, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.5.2]
+>- [version 1.5.3]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -13,7 +13,6 @@
     ////////////////////////////// Goals for today
 
     >- Fix Bugs
-        >- Overlap bug
         >- Negative income bug
 
     >- Advance reactions in scan mode [In progress]
@@ -1066,13 +1065,13 @@ void ufoScanInd(UFO _ufo, int _buildingCount, Building _buildObject[], GameInfo&
 void placeLabel(PlayerData& _playerData, GameInfo& _gameData, UFO _ufo, int _ufoNumber)
 {
     char tempChar; //This is a temporary character to be used to convert the _ufoNumber to char
-    if(_ufo.xPos - 2 >= 0 && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '?' || _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '$' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '?' || _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '$')
+    if(_ufo.xPos - 2 >= 0 && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '?' && _gameData.gameMap[_ufo.xPos - 1][_ufo.yPos] != '$' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '?' && _gameData.gameMap[_ufo.xPos - 2][_ufo.yPos] != '$')
     {
         //Check to make sure the label won't be out of the map or that the label will cover something 1 point to the left of it
         _playerData.tempLabel[_ufoNumber].xPos = _ufo.xPos - 2; //Save the label's new x position
         _playerData.tempLabel[_ufoNumber].yPos = _ufo.yPos; //Save the label's new y position
     }
-    else if(_ufo.xPos + 2 <= 198 && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '!' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '@' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '#' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '^' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '&' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '?' || _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '$' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '?' || _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '$')
+    else if(_ufo.xPos + 2 <= 198 && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '?' && _gameData.gameMap[_ufo.xPos + 1][_ufo.yPos] != '$' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '!' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '@' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '#' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '^' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '&' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '?' && _gameData.gameMap[_ufo.xPos + 2][_ufo.yPos] != '$')
     {
         //Check to make sure the label won't be out of the map or that the label will cover something 1 point to the right of it
         _playerData.tempLabel[_ufoNumber].xPos = _ufo.xPos + 1; //Save the label's new x position
