@@ -5,29 +5,28 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.5.5]
+>- [version 1.5.7]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
 
-    >- Combat system [In progress]
-        >- Shoot down with SAM
-            >- Change increase with how many in range
+    ////////////////////////////// Goal for tomorrow
+
+    >- Test SAM missile combat system
+
+    >- Increasing negatively bug
+        >- triggered by building?
+        >- after initial negative, increases negatively maybe in similar fashion
+        >- UI also not updating income
+
+    >- Combat system
         >- Deploy air force - force landing
             >- In quadrant and friendly or neutral
                 >-immidietly land
         >- Radio and order to land
             >- In quadrant and friendly or neutral
-                >-
-
-        >- National Security Bar [In progress]
-            >- Building anything increases it
-            >- Enemy planes around friendly airspace will decrease it
-            >- If reaches 0 -> Nuclear war
-
-    ////////////////////////////// Goal for tomorrow
 
     >- Restricted placement system
         >-Fill map?
@@ -111,7 +110,7 @@ void goThroughMap(GameInfo&, char, bool); //This function is to go through every
 void getMap(GameInfo&, bool); //This function is used to find each line in the map txt file
 void saveMap(std::string, GameInfo&, int); //This function is used to extract each character in a map file line
 
-void endTurn(PlayerData&, float, float&, float&, string[], string[], Event[], int, float); //This function is in charge of updating the player data for the next turn
+void endTurn(PlayerData&, float, string[], string[], Event[], GameInfo&, UFO[]); //This function is in charge of updating the player data for the next turn
 void defconCounter(string[], float); //This function is to display the defcon state
 void worldEvent(float&, string[], Event[], int); //This function is to display the world events
 bool gameOverScreen(GameInfo); //This function is for ending the game
@@ -148,6 +147,8 @@ bool scanRadius(UFO, Building, int); //This function is purely for returning tru
 void actionMenu(string[], UFO, Building[], PlayerData, GameInfo&); //This function is used to display the possible actions against ufo's
 void launchNukes(GameInfo&); //This is one of the game's endings, if you choose to launch all nukes
 void launchSAM(int, GameInfo&, UFO); //This will initiate the launch of a SAM against ufo's
+bool inArea(int, int, int, int, UFO); //This function is in charge of finding out if a ufo is in a certain map area
+void securityPenalty(GameInfo&, UFO[]); //This is for updating the penalty given to the player in secuirty every turn
 
 int main()
 {
@@ -202,8 +203,14 @@ int main()
         else if(menuInput == 2)
         {
             //Go to end turn function
-            if(gameData.defcon - 0.05 <= 1)
+            if(gameData.defcon - 0.05 <= 1 || gameData.nationalSecurity <= 0)
             {
+                system("CLS"); //Wipe consol
+                if(gameData.nationalSecurity <= 0) //If gameover was triggered by national security, let player know
+                {
+                    cout << "    >- By letting National Security drop too low, you have convinced the soviets to launch a first strike" << endl;
+                }
+
                 //If gameover trigger is detected
                 if(gameOverScreen(gameData))
                 {
@@ -220,7 +227,7 @@ int main()
             else
             {
                 gameData.currentYear ++;//Update year
-                endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents, advanceEvents, gameData.currentYear, gameData.nationalSecurity); //Calls function to update income
+                endTurn(usa, 0, defconOptions, worldEvents, advanceEvents, gameData, ufosOnMap); //Calls function to update income
 
                 if(gameData.currentYear % 2 == 0 && gameData.ufoCount < 20)
                 {
@@ -367,22 +374,23 @@ void saveMap(std::string _line, GameInfo& _gameData, int _currentRow)
 }
 
 //This function is in charge of updating the player data for the next turn
-void endTurn(PlayerData& _playerData, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[], string _worldEvents[], Event _events[], int _year, float _security)
+void endTurn(PlayerData& _playerData, float _budgetChange, string _defconOptions[], string _worldEvents[], Event _events[], GameInfo& _gameData, UFO _flyingObjects[])
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
     Sleep(400); //Delay by 0.4 seconds
 
-    _defcon -= 0.05; //Increase defcon naturally
-    defconCounter(_defconOptions, _defcon); //Call function to display defcon information
+    _gameData.defcon -= 0.05; //Increase defcon naturally
+    defconCounter(_defconOptions, _gameData.defcon); //Call function to display defcon information
 
     Sleep(400); //Delay by 0.4 second
 
-    displaySecurity(_security); //Call function to display national security
+    securityPenalty(_gameData, _flyingObjects); //Calculate and update security penalty
+    displaySecurity(_gameData.nationalSecurity); //Call function to display national security
 
     Sleep(400); //Delay by 0.4 second
 
-    worldEvent(_playerData.currentIncome, _worldEvents, _events, _year); //Call function to display current world issues
+    worldEvent(_playerData.currentIncome, _worldEvents, _events, _gameData.currentYear); //Call function to display current world issues
 
     Sleep(400); //Delay by 0.4 second
     cout << endl << endl << "    ===========================================" << endl;
@@ -412,7 +420,7 @@ void endTurn(PlayerData& _playerData, float _budgetChange, float& _baseCost, flo
 
 
     randomValue = (rand()%3+7)/100.0; //Get the random increase in inflation
-    _baseCost += _baseCost*randomValue; //Increase price of buildings
+    _gameData.baseCost += _gameData.baseCost*randomValue; //Increase price of buildings
 
     anyInput();//Get any input before continuing
     return;
@@ -498,7 +506,6 @@ void worldEvent(float& _budgetPercent, string _worldEvents[], Event _events[], i
 //This function is for ending the game
 bool gameOverScreen(GameInfo _data)
 {
-    system("CLS"); //Wipe consol
     getMap(_data, false); //Print game over screen
     cout << endl << endl << "            =========================================================================================================================" << endl;
     cout << "            >- GAMEOVER: The world has ended by nuclear war. At your hands, billions have died. There really is no winning is there?" << endl;
@@ -722,6 +729,11 @@ void buildingMode(GameInfo& _gameData, PlayerData& _playerInfo, string _menuOpti
                     _playerInfo.samData[_playerInfo.samCount].yPos = currentY; //Save the position fo the sam - y
                     _playerInfo.samCount ++; //Update the fact that +1 sam has been added
                     _gameData.defcon -= 0.05; //Decrease Defcon (increase level)
+                }
+
+                if(_gameData.nationalSecurity < 10)
+                { //If national security has not reaches max yet
+                    _gameData.nationalSecurity += 0.2; // add some more
                 }
             }
         }
@@ -1213,7 +1225,7 @@ void actionMenu(string _actionOption[], UFO _ufo, Building _buildObject[], Playe
     }
     else if(userInput == 5)
     {
-
+        launchSAM(samCounter, _gameData, _ufo);
     }
 
     return;
@@ -1246,7 +1258,7 @@ void launchNukes(GameInfo& _gameData)
 }
 
 //This will initiate the launch of a SAM against ufo's
-void launchSAM(int _samCount, GameInfo& _gameData, UFO _flyingObject)
+void launchSAM(int _samCount, GameInfo& _gameData, UFO _ufo)
 {
     int hitProbability = 0; //This int represents the change of a missile hitting
     hitProbability += _samCount*3; //For every sam site in range, add 30% hit porbability
@@ -1259,13 +1271,14 @@ void launchSAM(int _samCount, GameInfo& _gameData, UFO _flyingObject)
         if(_samCount >= 3 || hitProbability + rand()%11 >= 10) //If three or more SAM sites are in range, rig hit to 100%
         { //Otherwise generate number between 0 and 10. If added to the hit porbability is greater than 10%, you hit plane!
             cout << endl << "    >- UFO hit confirmed" << endl;
-            if(_flyingObject.tag == "Friendly" || _flyingObject.type == "Cargo" || _flyingObject.type == "Passenger")
+            if(_ufo.tag == "Friendly" || _ufo.type == "Cargo" || _ufo.type == "Passenger")
             {
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Updating defcon by 0.2
+                _gameData.defcon += 0.2; //Increase defcon by 0.2
             }
             else
             {
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Updating defcon by 0.1 and national secuirty by 1
+                _gameData.defcon += 0.1; //Increase defcon by 0.1
+                _gameData.nationalSecurity += 0.2;
             }
         }
         else
@@ -1276,6 +1289,29 @@ void launchSAM(int _samCount, GameInfo& _gameData, UFO _flyingObject)
     else
     {
         cout << "    >- Launch canceled" << endl;
+    }
+    return;
+}
+
+//This function is in charge of finding out if a ufo is in a certain map area
+bool inArea(int maxX, int minX, int maxY, int minY, UFO _object)
+{
+    if(_object.xPos < maxX && _object.xPos > minX && _object.yPos < maxY && _object.yPos > minY)
+    { //Check to see if coordinates is in the area. If yes to all conditions, return true
+        return true;
+    }
+    return false; //Else, return false
+}
+
+//This is for updating the penalty given to the player in secuirty every turn
+void securityPenalty(GameInfo& _data, UFO _objects[])
+{
+    for(int i = 0; i < _data.ufoCount; i++)
+    { //Run a for loop to use all UFO's
+        if(inArea(100, 1, 30, 1, _objects[i]) && _data.nationalSecurity < 10 && _objects[i].tag == "Enemy")
+        { //Check to see if they are in the specified area. If yes, penalize country
+            _data.nationalSecurity -= 0.2; //add penalty to national security
+        }
     }
     return;
 }
