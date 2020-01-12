@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.5.4]
+>- [version 1.5.5]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -22,14 +22,10 @@
             >- In quadrant and friendly or neutral
                 >-
 
-
-        >- National Security Bar
-            >-
-
-            >- Make other things affect this bar
-            >- More nuclear silos increase it
-            >- Sam sites, radar stations increase it
-            >- enemy planes in north west hemisphere that are not dealt with will increase it
+        >- National Security Bar [In progress]
+            >- Building anything increases it
+            >- Enemy planes around friendly airspace will decrease it
+            >- If reaches 0 -> Nuclear war
 
     ////////////////////////////// Goal for tomorrow
 
@@ -105,6 +101,7 @@ struct GameInfo //This struct holds the core game data
     float defcon; //This is the world tension counter. If it reaches 1, everyone dies
     char gameMap [199][55];//This is the double array that houses the whole map
     bool endGame; //This bool determines if we should close the game or not
+    float nationalSecurity; //This float represents the security of the nation. If it reaches 0, game ends
 };
 
 //Delcaring function prototypes
@@ -114,7 +111,7 @@ void goThroughMap(GameInfo&, char, bool); //This function is to go through every
 void getMap(GameInfo&, bool); //This function is used to find each line in the map txt file
 void saveMap(std::string, GameInfo&, int); //This function is used to extract each character in a map file line
 
-void endTurn(PlayerData&, float, float&, float&, string[], string[], Event[], int); //This function is in charge of updating the player data for the next turn
+void endTurn(PlayerData&, float, float&, float&, string[], string[], Event[], int, float); //This function is in charge of updating the player data for the next turn
 void defconCounter(string[], float); //This function is to display the defcon state
 void worldEvent(float&, string[], Event[], int); //This function is to display the world events
 bool gameOverScreen(GameInfo); //This function is for ending the game
@@ -122,6 +119,7 @@ void resetGame(GameInfo&); //This function is for resting game info
 void resetPlayer(PlayerData&); //This function is for reseting a player
 void setBigEvents(Event[]); //This function is in charge of initializing the large advance events
 void checkBigEvents(Event[], int); //This function is called to check for matching advance events to output
+void displaySecurity(float); //This function displays the national security of the nation
 
 void chooseBuilding(GameInfo&, PlayerData&, string[], string[]); //This function is for player to choose their building
 void buildingMode(GameInfo&, PlayerData&, string[], char); //This function is for the general mode of building
@@ -222,7 +220,7 @@ int main()
             else
             {
                 gameData.currentYear ++;//Update year
-                endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents, advanceEvents, gameData.currentYear); //Calls function to update income
+                endTurn(usa, 0, gameData.baseCost, gameData.defcon, defconOptions, worldEvents, advanceEvents, gameData.currentYear, gameData.nationalSecurity); //Calls function to update income
 
                 if(gameData.currentYear % 2 == 0 && gameData.ufoCount < 20)
                 {
@@ -369,7 +367,7 @@ void saveMap(std::string _line, GameInfo& _gameData, int _currentRow)
 }
 
 //This function is in charge of updating the player data for the next turn
-void endTurn(PlayerData& _playerData, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[], string _worldEvents[], Event _events[], int _year)
+void endTurn(PlayerData& _playerData, float _budgetChange, float& _baseCost, float& _defcon, string _defconOptions[], string _worldEvents[], Event _events[], int _year, float _security)
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
@@ -377,6 +375,10 @@ void endTurn(PlayerData& _playerData, float _budgetChange, float& _baseCost, flo
 
     _defcon -= 0.05; //Increase defcon naturally
     defconCounter(_defconOptions, _defcon); //Call function to display defcon information
+
+    Sleep(400); //Delay by 0.4 second
+
+    displaySecurity(_security); //Call function to display national security
 
     Sleep(400); //Delay by 0.4 second
 
@@ -518,6 +520,7 @@ void resetGame(GameInfo& _data)
     getMap(_data, true); //Initialize the value of the map array //error
     _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
     _data.endGame = false; //Make sure to set the end of the game to false
+    _data.nationalSecurity = 5;
     return;
 }
 
@@ -594,6 +597,37 @@ void checkBigEvents(Event _events[], int _year)
             cout <<"        + " << _events[i].note << endl;
         }
     }
+    return;
+}
+
+//This function displays the national security of the nation
+void displaySecurity(float _security)
+{
+    int colorCode = 0; //This int represents the color of the UI to represent the situation
+
+    if(_security < 2)
+    { //If situation is critical, set color to red
+        colorCode = 4;
+    }
+    else
+    { //Otherwise, set color to blue
+        colorCode = 9;
+    }
+
+    cout << endl << endl << "    ===========================================" << endl;
+    cout << "    >- "; //Display national security
+    displayColorText("National Security", false, colorCode); //Display status with color clue indicators
+    cout << ": ||";
+
+    for(int i = 0; i < round(_security); i++)
+    {
+        displayColorText("#", false, colorCode); //# of # represents the secuirity value
+    }
+    for(int i = 0; i < round(10 - _security); i++)
+    {
+        cout << "-"; //# of - represents missing security value to optain maximum
+    }
+    cout << "|| [" << round(_security) << "]" << endl;
     return;
 }
 
