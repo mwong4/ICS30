@@ -1,11 +1,11 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 11, 2020
+>- Updated: Jan 12, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.5.3]
+>- [version 1.5.4]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -13,11 +13,23 @@
     ////////////////////////////// Goals for today
 
     >- Combat system [In progress]
-        >- Make attack options
         >- Shoot down with SAM
+            >- Change increase with how many in range
         >- Deploy air force - force landing
+            >- In quadrant and friendly or neutral
+                >-immidietly land
         >- Radio and order to land
-        >- Fire all nuclear weapons
+            >- In quadrant and friendly or neutral
+                >-
+
+
+        >- National Security Bar
+            >-
+
+            >- Make other things affect this bar
+            >- More nuclear silos increase it
+            >- Sam sites, radar stations increase it
+            >- enemy planes in north west hemisphere that are not dealt with will increase it
 
     ////////////////////////////// Goal for tomorrow
 
@@ -25,12 +37,6 @@
         >-Fill map?
         >- Russia
         >- Ocean
-
-    >- National Security Bar
-        >- Make other things affect this bar
-        >- More nuclear silos increase it
-        >- Sam sites, radar stations increase it
-        >- enemy planes in north west hemisphere that are not dealt with will increase it
 
     >- UFO array can't be in struct bug
 */
@@ -69,7 +75,7 @@ struct Building
 struct UFO //This struct holds the core data for each UFO spawned in the game
 {
     int identity; //This is just for decor, a random 4 digit number
-    string tag; //This r  epresents if it is friendly or enemy
+    string tag; //This represents if it is friendly or enemy
     string origin; //This represents where if came from (country)
     string type; //This represents what the ship is
     char symbol; //This is the symbol representing it on the map
@@ -143,6 +149,7 @@ bool scanRadius(UFO, Building, int); //This function is purely for returning tru
 
 void actionMenu(string[], UFO, Building[], PlayerData, GameInfo&); //This function is used to display the possible actions against ufo's
 void launchNukes(GameInfo&); //This is one of the game's endings, if you choose to launch all nukes
+void launchSAM(int, GameInfo&, UFO); //This will initiate the launch of a SAM against ufo's
 
 int main()
 {
@@ -163,7 +170,7 @@ int main()
     setBigEvents(advanceEvents);
 
     string primaryOptions[4] = {"Enter building mode","|| Finish Turn >>", "Scan all available UFOs", "Quit"}; //This array represents the optiosn available in the main menu
-    string buildingOptions[4] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex [Range: 7]", "Surface to Air Missile Defense Station [Range 10]", "Quit"}; //This represents the available options for buildings
+    string buildingOptions[4] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex [Range: 10]", "Surface to Air Missile Defense Station [Range 15]", "Quit"}; //This represents the available options for buildings
     string buildModeOptions[4] = {"Place using keyboard", "Place using coordinate", "Confirm place", "Cancel/Exit build mode"}; //These are the menu options for build mode
     //These are the five states of DEFCON advance warning
     string defconOptions[5]= {"CRITICAL|| Nuclear War Imminent","SEVERE|| Armed Forces Ready to Deploy in 6 hours","SUBSTANTIAL|| Air Force Mobilizes in 15 Minutes","MODERATE|| Increase Security Readiness","LOW|| Normal Peacetime Readiness"};
@@ -965,7 +972,7 @@ void resetUFOs(UFO _ufos[])
 void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string _actionOptions[])
 {
     int inputValue = 0;
-    ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 7); //Scan all the possible ufo's
+    ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 10); //Scan all the possible ufo's
 
     while(inputValue <= _gameData.ufoCount && !_gameData.endGame)
     {
@@ -1136,25 +1143,25 @@ bool scanRadius(UFO _ufo, Building _buildObject, int _radius)
 void actionMenu(string _actionOption[], UFO _ufo, Building _buildObject[], PlayerData _playerData, GameInfo& _gameData)
 {
     int userInput; //this is an integer used to get player input
-    bool tempBool = false; //Temporary boolean that is true when sam site is in range
+    int samCounter = 0; //Temporary integer that keeps track of how many sam sites are in range
 
     displayMenu(_actionOption, 4, _playerData, 1945, false);
     for(int i = 0;  i < _playerData.samCount; i++)
     {
-        if(scanRadius(_ufo, _buildObject[i], 10))
+        if(scanRadius(_ufo, _buildObject[i], 15))
         {
-            tempBool = true; //Found a sam site, set to true
+            samCounter++; //Found a sam site, add 1 to the storing veriable
         }
     }
 
-    if(tempBool)
+    if(samCounter > 0)
     { //If same site is in range
-        cout << "    >- [5] local SAM site in range. Launch intercepter missile." << endl;
-        userInput = getAnswer(5, 1);
+        cout << "    >- [5] local SAM site in range. Launch intercepter missile." << endl; //display option
+        userInput = getAnswer(5, 1); //allow option to be picked
     }
     else
     {
-        userInput = getAnswer(4, 1);
+        userInput = getAnswer(4, 1); //Otherwise, remove option 5
     }
 
 
@@ -1196,6 +1203,41 @@ void launchNukes(GameInfo& _gameData)
         cout << endl << "    >- Launch protocol status: |ACTIVE|" << endl;
         cout << "    >- All personal seek emergency shelter, National Response Scenario Number One (NRSNO) is currently active." << endl;
         cout << "    >- Approx --- ~40 min before first strike impact" << endl;
+    }
+    else
+    {
+        cout << "    >- Launch canceled" << endl;
+    }
+    return;
+}
+
+//This will initiate the launch of a SAM against ufo's
+void launchSAM(int _samCount, GameInfo& _gameData, UFO _flyingObject)
+{
+    int hitProbability = 0; //This int represents the change of a missile hitting
+    hitProbability += _samCount*3; //For every sam site in range, add 30% hit porbability
+
+    cout << endl << "    >- " << _samCount << " SAM sites detected in range. Hit porbability at: " << _samCount*10 + 10 << "%" << endl; //Display hit porbability
+    cout << endl << "    >- Are you sure you want to launch a SAM at this ufo? There could be international consequences" << endl; //Ask for confirmation
+
+    if(getConfirmation())
+    {
+        if(_samCount >= 3 || hitProbability + rand()%11 >= 10) //If three or more SAM sites are in range, rig hit to 100%
+        { //Otherwise generate number between 0 and 10. If added to the hit porbability is greater than 10%, you hit plane!
+            cout << endl << "    >- UFO hit confirmed" << endl;
+            if(_flyingObject.tag == "Friendly" || _flyingObject.type == "Cargo" || _flyingObject.type == "Passenger")
+            {
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Updating defcon by 0.2
+            }
+            else
+            {
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Updating defcon by 0.1 and national secuirty by 1
+            }
+        }
+        else
+        {
+            cout << endl << "    >- Command has confirmed that the missile has missed" << endl;
+        }
     }
     else
     {
