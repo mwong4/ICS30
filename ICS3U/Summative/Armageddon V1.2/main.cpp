@@ -12,14 +12,14 @@
 
     ////////////////////////////// Goals for today
 
-    ////////////////////////////// Goal for tomorrow
-
     >- Test SAM missile combat system
 
-    >- Increasing negatively bug
-        >- triggered by building?
-        >- after initial negative, increases negatively maybe in similar fashion
-        >- UI also not updating income
+    >- Restricted placement system
+        >-Fill map?
+        >- Russia
+        >- Ocean
+
+    ////////////////////////////// Goal for tomorrow
 
     >- Combat system
         >- Deploy air force - force landing
@@ -27,11 +27,6 @@
                 >-immidietly land
         >- Radio and order to land
             >- In quadrant and friendly or neutral
-
-    >- Restricted placement system
-        >-Fill map?
-        >- Russia
-        >- Ocean
 
     >- UFO array can't be in struct bug
 */
@@ -482,7 +477,7 @@ void worldEvent(float& _budgetPercent, string _worldEvents[], Event _events[], i
         cout << "        + ";
         cout << _worldEvents[(randomInt - 7) % 3 + 3] << endl; //Show world event
         cout << "        + Increase US Military Spending by ";
-        randomFloat = ((rand()%5+1)/100.0);//Get the random increase in inflation
+        randomFloat = ((rand()%2+1)/100.0);//Get the random increase in inflation
         cout << randomFloat*100 << "%" << endl; //Display change
         _budgetPercent += randomFloat; //Increase funding
     }
@@ -711,7 +706,7 @@ void buildingMode(GameInfo& _gameData, PlayerData& _playerInfo, string _menuOpti
             if(getConfirmation()) //If player confirms yes to placement, save and exit function
             {
                 menuInput = 4; //Trigger quit option
-                _playerInfo.currentIncome -= _gameData.baseCost; //Use up money
+                _playerInfo.currentBalance -= _gameData.baseCost; //Use up money
                 if(_building == '@')
                 {
                     //If building built is missile silo
@@ -739,7 +734,7 @@ void buildingMode(GameInfo& _gameData, PlayerData& _playerInfo, string _menuOpti
         }
         else
         {
-            cout << endl << "    >- Are you sure you want to quit build mode?";
+            cout << endl << "    >- Are you sure you want to quit build mode?" << endl;
             if(getConfirmation()) //If player confirms yes to placement, save and exit function
             {
                 setSpot(_gameData.gameMap[currentX][currentY], savedChar); //Set spot of map back to saved character before exiting
