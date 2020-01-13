@@ -5,16 +5,12 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.5.9]
+>- [version 1.6.0]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
-
-    >- Test SAM missile combat system
-    >- suspiscious hit probability sucess
-        >- 2/2 times hit
 
     >- Restricted placement system
         >-Fill map?
@@ -293,6 +289,10 @@ void display(char _mapSpot)
         //Else if character is a number, highlight
         tempString = _mapSpot;
         displayColorText(tempString, false, 6); //Blue highlight
+    }
+    else if(_mapSpot == '*') //If place is destroyed
+    {
+        displayColorText("*", false, 8); //Grey color
     }
     else
     {
@@ -1270,7 +1270,7 @@ void launchSAM(int _samCount, GameInfo& _gameData, UFO& _ufo)
     int hitProbability = 0; //This int represents the change of a missile hitting
     hitProbability += _samCount*3; //For every sam site in range, add 30% hit porbability
 
-    cout << endl << "    >- " << _samCount << " SAM sites detected in range. Hit porbability at: " << _samCount*10 + 10 << "%" << endl; //Display hit porbability
+    cout << endl << "    >- " << _samCount << " SAM sites detected in range. Hit porbability at: " << _samCount*30 + 10 << "%" << endl; //Display hit porbability
     cout << endl << "    >- Are you sure you want to launch a SAM at this ufo? There could be international consequences" << endl; //Ask for confirmation
 
     if(getConfirmation())
@@ -1280,10 +1280,12 @@ void launchSAM(int _samCount, GameInfo& _gameData, UFO& _ufo)
             cout << endl << "    >- UFO hit confirmed" << endl;
             if(_ufo.tag == "Friendly" || _ufo.type == "Cargo" || _ufo.type == "Passenger")
             {
+                cout << endl << "    >- Command believes you hit a neutral or friendly civilian plane" << endl << "        + defcon (- world peace)" << endl;
                 _gameData.defcon += 0.2; //Increase defcon by 0.2
             }
             else
             {
+                cout << endl << "    >- Command believes you hit an enemy plane" << endl << "        + defcon (- world peace)"  << endl << "        + national security"  << endl;
                 _gameData.defcon += 0.1; //Increase defcon by 0.1
                 _gameData.nationalSecurity += 0.2;
             }
