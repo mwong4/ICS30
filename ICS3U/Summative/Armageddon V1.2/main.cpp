@@ -1,11 +1,11 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 12, 2020
+>- Updated: Jan 13, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.5.7]
+>- [version 1.5.9]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -13,6 +13,8 @@
     ////////////////////////////// Goals for today
 
     >- Test SAM missile combat system
+    >- suspiscious hit probability sucess
+        >- 2/2 times hit
 
     >- Restricted placement system
         >-Fill map?
@@ -72,6 +74,7 @@ struct UFO //This struct holds the core data for each UFO spawned in the game
     char savedChar; //This represents the char of the original spot of the object
     int xPos; //This represents the x position of the object
     int yPos; //This represents the y position of the object
+    bool destroyed; //If place is shot down, set bool to true
 };
 
 struct PlayerData //This struct holds the data for each player
@@ -139,9 +142,9 @@ void placeLabel(PlayerData&, GameInfo&, UFO, int); //This is for placing a label
 void clearLabel(PlayerData&, GameInfo&); //This is for clearing all labels after exiting scan mode
 bool scanRadius(UFO, Building, int); //This function is purely for returning true or false depending on if an object is within the radius
 
-void actionMenu(string[], UFO, Building[], PlayerData, GameInfo&); //This function is used to display the possible actions against ufo's
+void actionMenu(string[], UFO&, Building[], PlayerData, GameInfo&); //This function is used to display the possible actions against ufo's
 void launchNukes(GameInfo&); //This is one of the game's endings, if you choose to launch all nukes
-void launchSAM(int, GameInfo&, UFO); //This will initiate the launch of a SAM against ufo's
+void launchSAM(int, GameInfo&, UFO&); //This will initiate the launch of a SAM against ufo's
 bool inArea(int, int, int, int, UFO); //This function is in charge of finding out if a ufo is in a certain map area
 void securityPenalty(GameInfo&, UFO[]); //This is for updating the penalty given to the player in secuirty every turn
 
@@ -995,6 +998,9 @@ void setUFO(UFO& _ufoData, string _origin[], string _type[], char _symbol[], cha
     //Now that ufo data is saved, update map data
     setSpot(_gameMap[_ufoData.xPos][_ufoData.yPos], '?');
 
+    //Set UFO to not destroyed
+    _ufoData.destroyed = false;
+
     return;
 }
 
@@ -1181,48 +1187,54 @@ bool scanRadius(UFO _ufo, Building _buildObject, int _radius)
 }
 
 //This function is used to display the possible actions against ufo's
-void actionMenu(string _actionOption[], UFO _ufo, Building _buildObject[], PlayerData _playerData, GameInfo& _gameData)
+void actionMenu(string _actionOption[], UFO& _ufo, Building _buildObject[], PlayerData _playerData, GameInfo& _gameData)
 {
     int userInput; //this is an integer used to get player input
     int samCounter = 0; //Temporary integer that keeps track of how many sam sites are in range
 
-    displayMenu(_actionOption, 4, _playerData, 1945, false);
     for(int i = 0;  i < _playerData.samCount; i++)
-    {
+    { //Run a for loop through all sam sites
         if(scanRadius(_ufo, _buildObject[i], 15))
-        {
-            samCounter++; //Found a sam site, add 1 to the storing veriable
+        { //If sam site is found in range of tghe specific ufo
+            samCounter++; //Add 1 to the storing veriable
         }
     }
 
-    if(samCounter > 0)
-    { //If same site is in range
-        cout << "    >- [5] local SAM site in range. Launch intercepter missile." << endl; //display option
-        userInput = getAnswer(5, 1); //allow option to be picked
+    if(_ufo.destroyed)
+    { //If ufo is destroyed, tell user
+        cout << "    >- Sorry, this target has been destroyed" << endl;
+        anyInput();
     }
     else
-    {
-        userInput = getAnswer(4, 1); //Otherwise, remove option 5
-    }
+    { //Otherwise, show attack options
+        displayMenu(_actionOption, 4, _playerData, 1945, false); //Display options
+        if(samCounter > 0)
+        { //If same site is in range
+            cout << "    >- [5] local SAM site in range. Launch intercepter missile." << endl; //display option
+            userInput = getAnswer(5, 1); //allow option to be picked
+        }
+        else
+        {
+            userInput = getAnswer(4, 1); //Otherwise, remove option 5
+        }
 
+        if(userInput == 1)
+        {
 
-    if(userInput == 1)
-    {
+        }
+        else if(userInput == 2)
+        {
 
+        }
+        else if(userInput == 4)
+        {
+            launchNukes(_gameData); //Launch all nuclear weapons
+        }
+        else if(userInput == 5)
+        {
+            launchSAM(samCounter, _gameData, _ufo); //Call function to launch sam missile
+        }
     }
-    else if(userInput == 2)
-    {
-
-    }
-    else if(userInput == 4)
-    {
-        launchNukes(_gameData); //Launch all nuclear weapons
-    }
-    else if(userInput == 5)
-    {
-        launchSAM(samCounter, _gameData, _ufo);
-    }
-
     return;
 }
 
@@ -1253,7 +1265,7 @@ void launchNukes(GameInfo& _gameData)
 }
 
 //This will initiate the launch of a SAM against ufo's
-void launchSAM(int _samCount, GameInfo& _gameData, UFO _ufo)
+void launchSAM(int _samCount, GameInfo& _gameData, UFO& _ufo)
 {
     int hitProbability = 0; //This int represents the change of a missile hitting
     hitProbability += _samCount*3; //For every sam site in range, add 30% hit porbability
@@ -1275,6 +1287,9 @@ void launchSAM(int _samCount, GameInfo& _gameData, UFO _ufo)
                 _gameData.defcon += 0.1; //Increase defcon by 0.1
                 _gameData.nationalSecurity += 0.2;
             }
+            _ufo.destroyed = true; //Set destroyed to true
+            _ufo.symbol = '*'; //Make new character show status: destroyed
+            setSpot(_gameData.gameMap[_ufo.xPos][_ufo.yPos], _ufo.symbol); //Set spot in map to destroyed
         }
         else
         {
