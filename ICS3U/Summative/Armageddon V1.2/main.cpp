@@ -13,9 +13,8 @@
     ////////////////////////////// Goals for today
 
     >- Restricted placement system
-        >-Fill map?
-        >- Russia
-        >- Ocean
+        >- On map indications of enemy borders
+        >- Restrict placement
 
     ////////////////////////////// Goal for tomorrow
 
@@ -141,7 +140,7 @@ bool scanRadius(UFO, Building, int); //This function is purely for returning tru
 void actionMenu(string[], UFO&, Building[], PlayerData, GameInfo&); //This function is used to display the possible actions against ufo's
 void launchNukes(GameInfo&); //This is one of the game's endings, if you choose to launch all nukes
 void launchSAM(int, GameInfo&, UFO&); //This will initiate the launch of a SAM against ufo's
-bool inArea(int, int, int, int, UFO); //This function is in charge of finding out if a ufo is in a certain map area
+bool inArea(int, int, int, int, int, int); //This function is in charge of finding out if a ufo is in a certain map area
 void securityPenalty(GameInfo&, UFO[]); //This is for updating the penalty given to the player in secuirty every turn
 
 int main()
@@ -756,7 +755,7 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
     {
         if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
         {
-            if((_currentY - 1) >= 5) //Check to see if new position is legal
+            if((_currentY - 1) >= 5 && !(inArea(100, 1, 30, 1, _currentX, _currentY-1))) //Check to see if new position is legal
             {
                 updatePosition(_gameData, 0, -1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
@@ -764,7 +763,7 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
         //Else if specific key is pressed:
         else if((GetKeyState('S') & 0x8000) || (GetKeyState(VK_DOWN) & 0x8000))
         {
-            if((_currentY + 1) <= 45) //Check to see if new position is legal
+            if((_currentY + 1) <= 45 && !(inArea(100, 1, 30, 1, _currentX, _currentY + 1))) //Check to see if new position is legal
             {
                 updatePosition(_gameData, 0, 1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
@@ -772,7 +771,7 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
         //Else if specific key is pressed:
         else if((GetKeyState('A') & 0x8000) || (GetKeyState(VK_LEFT) & 0x8000))
         {
-            if((_currentX - 1) >= 0) //Check to see if new position is legal
+            if((_currentX - 1) >= 0 && !(inArea(100, 1, 30, 1, _currentX - 1, _currentY))) //Check to see if new position is legal
             {
                 updatePosition(_gameData, -1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
@@ -780,7 +779,7 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
         //Else if specific key is pressed:
         else if((GetKeyState('D') & 0x8000) || (GetKeyState(VK_RIGHT) & 0x8000))
         {
-            if((_currentX + 1) <= 199) //Check to see if new position is legal
+            if((_currentX + 1) <= 199 && !(inArea(100, 1, 30, 1, _currentX + 1, _currentY))) //Check to see if new position is legal
             {
                 updatePosition(_gameData, 1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
@@ -802,7 +801,15 @@ void coordinateMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _
     cout << "    >- Please input your y-position between 3 - 43 " << endl;
     tempY = getAnswer(43, 3); //Show range in y axis. Get input
 
-    updatePosition(_gameData, -_currentX + tempX, -_currentY + tempY, false, _currentX, _currentY, _savedChar, _building); //Set new position of the building
+    if(!(inArea(100, 1, 30, 1, _currentX, _currentY)))
+    {
+         updatePosition(_gameData, -_currentX + tempX, -_currentY + tempY, false, _currentX, _currentY, _savedChar, _building); //Set new position of the building
+    }
+    else
+    {
+         cout << endl << "    >- This area is a restricted Soviet and ally territory. Please choose another area" << endl;
+         anyInput();
+    }
     return;
 }
 
@@ -1306,9 +1313,9 @@ void launchSAM(int _samCount, GameInfo& _gameData, UFO& _ufo)
 }
 
 //This function is in charge of finding out if a ufo is in a certain map area
-bool inArea(int maxX, int minX, int maxY, int minY, UFO _object)
+bool inArea(int maxX, int minX, int maxY, int minY, int posX, int posY)
 {
-    if(_object.xPos < maxX && _object.xPos > minX && _object.yPos < maxY && _object.yPos > minY)
+    if(posX < maxX && posX > minX && posY < maxY && posY > minY)
     { //Check to see if coordinates is in the area. If yes to all conditions, return true
         return true;
     }
@@ -1320,7 +1327,7 @@ void securityPenalty(GameInfo& _data, UFO _objects[])
 {
     for(int i = 0; i < _data.ufoCount; i++)
     { //Run a for loop to use all UFO's
-        if(inArea(100, 1, 30, 1, _objects[i]) && _data.nationalSecurity < 10 && _objects[i].tag == "Enemy")
+        if(inArea(100, 1, 30, 1, _objects[i].xPos, _objects[i].yPos) && _data.nationalSecurity < 10 && _objects[i].tag == "Enemy")
         { //Check to see if they are in the specified area. If yes, penalize country
             _data.nationalSecurity -= 0.2; //add penalty to national security
         }
