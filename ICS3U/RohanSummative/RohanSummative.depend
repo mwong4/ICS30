@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1578953184 source:c:\users\max pc\documents\github\ics30\ics3u\rohansummative\main.cpp
+	<iostream>
+	<string>
+	<fstream>
+

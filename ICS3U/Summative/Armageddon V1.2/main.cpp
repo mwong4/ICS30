@@ -5,18 +5,12 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.6.0]
+>- [version 1.6.2]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
-
-    >- Restricted placement system
-        >- On map indications of enemy borders
-        >- Restrict placement
-
-    ////////////////////////////// Goal for tomorrow
 
     >- Combat system
         >- Deploy air force - force landing
@@ -24,6 +18,8 @@
                 >-immidietly land
         >- Radio and order to land
             >- In quadrant and friendly or neutral
+
+    ////////////////////////////// Goal for tomorrow
 
     >- UFO array can't be in struct bug
 */
