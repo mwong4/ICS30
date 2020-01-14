@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.6.2]
+>- [version 1.6.3]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -751,7 +751,7 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
     {
         if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
         {
-            if((_currentY - 1) >= 5 && !(inArea(100, 1, 30, 1, _currentX, _currentY-1))) //Check to see if new position is legal
+            if((_currentY - 1) >= 5 && !(inArea(198, 101, 324, 1, _currentX, _currentY-1))) //Check to see if new position is legal
             {
                 updatePosition(_gameData, 0, -1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
@@ -759,7 +759,7 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
         //Else if specific key is pressed:
         else if((GetKeyState('S') & 0x8000) || (GetKeyState(VK_DOWN) & 0x8000))
         {
-            if((_currentY + 1) <= 45 && !(inArea(100, 1, 30, 1, _currentX, _currentY + 1))) //Check to see if new position is legal
+            if((_currentY + 1) <= 45 && !(inArea(198, 101, 324, 1, _currentX, _currentY + 1))) //Check to see if new position is legal
             {
                 updatePosition(_gameData, 0, 1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
@@ -767,7 +767,7 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
         //Else if specific key is pressed:
         else if((GetKeyState('A') & 0x8000) || (GetKeyState(VK_LEFT) & 0x8000))
         {
-            if((_currentX - 1) >= 0 && !(inArea(100, 1, 30, 1, _currentX - 1, _currentY))) //Check to see if new position is legal
+            if((_currentX - 1) >= 0 && !(inArea(198, 101, 324, 1, _currentX - 1, _currentY))) //Check to see if new position is legal
             {
                 updatePosition(_gameData, -1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
@@ -775,7 +775,7 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
         //Else if specific key is pressed:
         else if((GetKeyState('D') & 0x8000) || (GetKeyState(VK_RIGHT) & 0x8000))
         {
-            if((_currentX + 1) <= 199 && !(inArea(100, 1, 30, 1, _currentX + 1, _currentY))) //Check to see if new position is legal
+            if((_currentX + 1) <= 199 && !(inArea(198, 101, 324, 1, _currentX + 1, _currentY))) //Check to see if new position is legal
             {
                 updatePosition(_gameData, 1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
@@ -797,13 +797,13 @@ void coordinateMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _
     cout << "    >- Please input your y-position between 3 - 43 " << endl;
     tempY = getAnswer(43, 3); //Show range in y axis. Get input
 
-    if(!(inArea(100, 1, 30, 1, _currentX, _currentY)))
-    {
+    if(!(inArea(198, 101, 24, 1, tempX, tempY)))
+    { //Check to see if player is trying to put bsae in soviet territory
          updatePosition(_gameData, -_currentX + tempX, -_currentY + tempY, false, _currentX, _currentY, _savedChar, _building); //Set new position of the building
     }
-    else
+    else //Else, person is not permitted to place base here. Let player know
     {
-         cout << endl << "    >- This area is a restricted Soviet and ally territory. Please choose another area" << endl;
+         cout << endl << "    >- This area is a restricted Soviet and ally territory. Please choose another location" << endl;
          anyInput();
     }
     return;
