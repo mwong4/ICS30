@@ -1,11 +1,11 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 13, 2020
+>- Updated: Jan 14, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.6.3]
+>- [version 1.6.4]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -13,11 +13,11 @@
     ////////////////////////////// Goals for today
 
     >- Combat system
+        >- Radio and order to land
+            >- In quadrant and friendly or neutral
         >- Deploy air force - force landing
             >- In quadrant and friendly or neutral
                 >-immidietly land
-        >- Radio and order to land
-            >- In quadrant and friendly or neutral
 
     ////////////////////////////// Goal for tomorrow
 
@@ -65,7 +65,7 @@ struct UFO //This struct holds the core data for each UFO spawned in the game
     char savedChar; //This represents the char of the original spot of the object
     int xPos; //This represents the x position of the object
     int yPos; //This represents the y position of the object
-    bool destroyed; //If place is shot down, set bool to true
+    bool undetected; //If place is shot down, set bool to true
 };
 
 struct PlayerData //This struct holds the data for each player
@@ -138,6 +138,7 @@ void launchNukes(GameInfo&); //This is one of the game's endings, if you choose 
 void launchSAM(int, GameInfo&, UFO&); //This will initiate the launch of a SAM against ufo's
 bool inArea(int, int, int, int, int, int); //This function is in charge of finding out if a ufo is in a certain map area
 void securityPenalty(GameInfo&, UFO[]); //This is for updating the penalty given to the player in secuirty every turn
+void radioPlane(GameInfo&, UFO&); //This function is for the passive attack option of radioing the plane
 
 int main()
 {
@@ -285,7 +286,7 @@ void display(char _mapSpot)
         tempString = _mapSpot;
         displayColorText(tempString, false, 6); //Blue highlight
     }
-    else if(_mapSpot == '*') //If place is destroyed
+    else if(_mapSpot == '*') //If place is destroyed, landed or fled
     {
         displayColorText("*", false, 8); //Grey color
     }
@@ -1002,7 +1003,7 @@ void setUFO(UFO& _ufoData, string _origin[], string _type[], char _symbol[], cha
     setSpot(_gameMap[_ufoData.xPos][_ufoData.yPos], '?');
 
     //Set UFO to not destroyed
-    _ufoData.destroyed = false;
+    _ufoData.undetected = false;
 
     return;
 }
@@ -1203,9 +1204,9 @@ void actionMenu(string _actionOption[], UFO& _ufo, Building _buildObject[], Play
         }
     }
 
-    if(_ufo.destroyed)
+    if(_ufo.undetected)
     { //If ufo is destroyed, tell user
-        cout << "    >- Sorry, this target has been destroyed" << endl;
+        cout << "    >- Sorry, this unidentified object is no longer detected" << endl;
         anyInput();
     }
     else
@@ -1292,7 +1293,7 @@ void launchSAM(int _samCount, GameInfo& _gameData, UFO& _ufo)
                 _gameData.defcon += 0.1; //Increase defcon by 0.1
                 _gameData.nationalSecurity += 0.2;
             }
-            _ufo.destroyed = true; //Set destroyed to true
+            _ufo.undetected = true; //Set destroyed (disappear) to true
             _ufo.symbol = '*'; //Make new character show status: destroyed
             setSpot(_gameData.gameMap[_ufo.xPos][_ufo.yPos], _ufo.symbol); //Set spot in map to destroyed
         }
@@ -1323,9 +1324,85 @@ void securityPenalty(GameInfo& _data, UFO _objects[])
 {
     for(int i = 0; i < _data.ufoCount; i++)
     { //Run a for loop to use all UFO's
-        if(inArea(100, 1, 30, 1, _objects[i].xPos, _objects[i].yPos) && _data.nationalSecurity < 10 && _objects[i].tag == "Enemy")
+        if(inArea(100, 1, 30, 1, _objects[i].xPos, _objects[i].yPos) && _data.nationalSecurity < 10 && _objects[i].tag == "Enemy" && !_objects[i].undetected)
         { //Check to see if they are in the specified area. If yes, penalize country
             _data.nationalSecurity -= 0.2; //add penalty to national security
+        }
+    }
+    return;
+}
+
+//This function is for the passive attack option of radioing the plane
+void radioPlane(GameInfo& _gameData, UFO& _ufo)
+{
+    int baseChance; //This represents the boost to the chance to land aircraft depending on the geographical region
+
+    if(_ufo.tag == "Friendly") //If plane is ally
+    {
+        cout << "    >- Local ATC has commanded plane to perform a landing at the nearest airport" << endl;
+        cout << "    >- Plane has landed and identified itself as friendly." << endl;
+
+        _ufo.undetected = true; //Set landed (disappear) to true
+        _ufo.symbol = '*'; //Make new character show status: landed
+        setSpot(_gameData.gameMap[_ufo.xPos][_ufo.yPos], _ufo.symbol); //Set spot in map to landed
+    }
+    else if(_ufo.tag == "Neutral") //If plane is neutral
+    {
+        cout << "    >- Local ATC has commanded plane to perform a landing at the nearest airport" << endl;
+        cout << "    >- Plane has landed and identified itself as neutral. World tension increase" << endl;
+
+        _gameData.defcon += 0.1; //Add penalty of 0.1 defcon (world tension)
+        _ufo.undetected = true; //Set landed (disappear) to true
+        _ufo.symbol = '*'; //Make new character show status: landed
+        setSpot(_gameData.gameMap[_ufo.xPos][_ufo.yPos], _ufo.symbol); //Set spot in map to landed
+    }
+    else //otherwise, if plane is enemy
+    {
+        if(inArea(100, 1, 30, 1, _ufo.xPos, _ufo.yPos)) //If plane is over NA
+        {
+            cout << "    >- UFO location classes as direct ally airspace" << endl;
+            baseChance = 9;
+        }
+        else if(inArea(198, 101, 24, 1, _ufo.xPos, _ufo.yPos)) //If plane is over latin america
+        {
+            cout << "    >- UFO location classes as over mostly unalligned latin america " << endl;
+            baseChance = 4;
+        }
+        else if(inArea(100, 1, 54, 31, _ufo.xPos, _ufo.yPos)) //If plane is over soviet controlled area
+        {
+            cout << "    >- UFO location classes as over soviet and proxy (enemy) controlled territory" << endl;
+            baseChance = -30;
+        }
+        else if(inArea(198, 101, 54, 25, _ufo.xPos, _ufo.yPos)) //If plane is over asia
+        {
+            cout << "    >- UFO location classes as over mostly neutral or western alligned asian continent" << endl;
+            baseChance = 6;
+        }
+        else //If plane is not in any of these areas
+        {
+            cout << "    >- UFO location can not be tracked" << endl;
+            baseChance = 4;
+        }
+
+        cout << "    >- Analytic software predicts approximately a: " << baseChance * 10 << "% of sucess. Would you like to continue?" << endl;
+        if(getConfirmation())
+        {
+            if(rand()%11 + baseChance + 1 > 10)
+            { //If random number generated + base chance is greater than 10, player has sucess
+                cout << "    >- UFO has followed your intructions and has landed." << endl; //Notify person
+                cout << "        + Increase security" << endl;
+                cout << "        + Decrease defcon" << endl;
+                _gameData.defcon -= 0.2; //decreasse defcon
+                _gameData.nationalSecurity += 0.2; //Increase security
+            }
+            else
+            { //Otherwise, player has no suceeded
+                cout << "    >- After ATC's attempt to gain contact, the UFO has dropped off the radar and fled local airspace" << endl; //Notify user
+                cout << "        + Increase security" << endl;
+                cout << "        + Decrease defcon" << endl;
+                _gameData.defcon -= 0.1; //Decrease defcon
+                _gameData.nationalSecurity += 0.1; //Increase security
+            }
         }
     }
     return;
