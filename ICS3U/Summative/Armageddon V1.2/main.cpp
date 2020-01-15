@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 14, 2020
+>- Updated: Jan 15, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
@@ -12,12 +12,14 @@
 
     ////////////////////////////// Goals for today
 
+    >- Playtesting
+
+    ////////////////////////////// Goal for tomorrow
+
     >- Combat system
         >- Deploy air force - force landing
             >- In quadrant and friendly or neutral
                 >-immidietly land
-
-    ////////////////////////////// Goal for tomorrow
 
     >- UFO array can't be in struct bug
 */
@@ -167,7 +169,7 @@ int main()
     //String arrays for UFO's
     string origin[13] = {"Soviet","Chinese","South Korea","Sweden","Switzerland","Egypt","Saudi Arabie","Austria", "West Germany", "United States of America", "Canada", "France", "United Kingdom"}; //The origins of enemy and neutral planes
     string type[4] = {"Military","Nuclear","Cargo","Passenger"}; //These represent the possible plane types in the game
-    string actionOptions[4] = {"Deploy the airforce, force the aircraft to land", "Radio ufo and order it to land", "Leave the ufo alone", "Set DEFCON to [1], launch all nuclear missiles in a first strike"}; //All options in interaction with ufo's and the world
+    string actionOptions[3] = {"Radio ufo and order it to land", "Leave the ufo alone", "Set DEFCON to [1], launch all nuclear missiles in a first strike"}; //All options in interaction with ufo's and the world
     char symbols[2] = {'^', '!'}; //Symbols of possible enemy planes
 
     int menuInput = 1; //This int represents the input taken from user
@@ -1208,22 +1210,18 @@ void actionMenu(string _actionOption[], UFO& _ufo, Building _buildObject[], Play
     }
     else
     { //Otherwise, show attack options
-        displayMenu(_actionOption, 4, _playerData, 1945, false); //Display options
+        displayMenu(_actionOption, 3, _playerData, 1945, false); //Display options
         if(samCounter > 0)
         { //If same site is in range
-            cout << "    >- [5] local SAM site in range. Launch intercepter missile." << endl; //display option
-            userInput = getAnswer(5, 1); //allow option to be picked
+            cout << "    >- [4] local SAM site in range. Launch intercepter missile." << endl; //display option
+            userInput = getAnswer(4, 1); //allow option to be picked
         }
         else
         {
-            userInput = getAnswer(4, 1); //Otherwise, remove option 5
+            userInput = getAnswer(3, 1); //Otherwise, remove option 5
         }
 
         if(userInput == 1)
-        {
-
-        }
-        else if(userInput == 2)
         {
             if(!(_gameData.gameMap[_ufo.xPos][_ufo.yPos] == '?'))
             { //If radar is in range and ufo was scanned
@@ -1234,11 +1232,11 @@ void actionMenu(string _actionOption[], UFO& _ufo, Building _buildObject[], Play
                 cout << "    >- Sorry, a radar station in proimity is required" << endl;
             }
         }
-        else if(userInput == 4)
+        else if(userInput == 3)
         {
             launchNukes(_gameData); //Launch all nuclear weapons
         }
-        else if(userInput == 5)
+        else if(userInput == 4)
         {
             launchSAM(samCounter, _gameData, _ufo); //Call function to launch sam missile
         }
