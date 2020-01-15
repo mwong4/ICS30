@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.6.4]
+>- [version 1.6.5]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [TO DO]
@@ -13,8 +13,6 @@
     ////////////////////////////// Goals for today
 
     >- Combat system
-        >- Radio and order to land
-            >- In quadrant and friendly or neutral
         >- Deploy air force - force landing
             >- In quadrant and friendly or neutral
                 >-immidietly land
@@ -372,21 +370,21 @@ void endTurn(PlayerData& _playerData, float _budgetChange, string _defconOptions
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
-    Sleep(400); //Delay by 0.4 seconds
+    Sleep(300); //Delay by 0.4 seconds
 
     _gameData.defcon -= 0.05; //Increase defcon naturally
     defconCounter(_defconOptions, _gameData.defcon); //Call function to display defcon information
 
-    Sleep(400); //Delay by 0.4 second
+    Sleep(300); //Delay by 0.4 second
 
     securityPenalty(_gameData, _flyingObjects); //Calculate and update security penalty
     displaySecurity(_gameData.nationalSecurity); //Call function to display national security
 
-    Sleep(400); //Delay by 0.4 second
+    Sleep(300); //Delay by 0.4 second
 
     worldEvent(_playerData.currentIncome, _worldEvents, _events, _gameData.currentYear); //Call function to display current world issues
 
-    Sleep(400); //Delay by 0.4 second
+    Sleep(300); //Delay by 0.4 second
     cout << endl << endl << "    ===========================================" << endl;
 
     randomValue = (rand()%5+1)/100.0; //Get the random increase or decrease of the GDP
@@ -1207,7 +1205,6 @@ void actionMenu(string _actionOption[], UFO& _ufo, Building _buildObject[], Play
     if(_ufo.undetected)
     { //If ufo is destroyed, tell user
         cout << "    >- Sorry, this unidentified object is no longer detected" << endl;
-        anyInput();
     }
     else
     { //Otherwise, show attack options
@@ -1228,7 +1225,14 @@ void actionMenu(string _actionOption[], UFO& _ufo, Building _buildObject[], Play
         }
         else if(userInput == 2)
         {
-
+            if(!(_gameData.gameMap[_ufo.xPos][_ufo.yPos] == '?'))
+            { //If radar is in range and ufo was scanned
+                radioPlane(_gameData, _ufo);
+            }
+            else
+            { //Else, radar is not in range, tell user
+                cout << "    >- Sorry, a radar station in proimity is required" << endl;
+            }
         }
         else if(userInput == 4)
         {
@@ -1337,6 +1341,8 @@ void radioPlane(GameInfo& _gameData, UFO& _ufo)
 {
     int baseChance; //This represents the boost to the chance to land aircraft depending on the geographical region
 
+    cout << endl << endl; //Spaceing
+
     if(_ufo.tag == "Friendly") //If plane is ally
     {
         cout << "    >- Local ATC has commanded plane to perform a landing at the nearest airport" << endl;
@@ -1389,7 +1395,7 @@ void radioPlane(GameInfo& _gameData, UFO& _ufo)
         {
             if(rand()%11 + baseChance + 1 > 10)
             { //If random number generated + base chance is greater than 10, player has sucess
-                cout << "    >- UFO has followed your intructions and has landed." << endl; //Notify person
+                cout << "    >- UFO, identified as enemy, has followed your intructions and has landed." << endl; //Notify person
                 cout << "        + Increase security" << endl;
                 cout << "        + Decrease defcon" << endl;
                 _gameData.defcon -= 0.2; //decreasse defcon
@@ -1397,12 +1403,15 @@ void radioPlane(GameInfo& _gameData, UFO& _ufo)
             }
             else
             { //Otherwise, player has no suceeded
-                cout << "    >- After ATC's attempt to gain contact, the UFO has dropped off the radar and fled local airspace" << endl; //Notify user
+                cout << "    >- After ATC's attempt to gain contact, the UFO, identified as enemy, has dropped off the radar and fled local airspace" << endl; //Notify user
                 cout << "        + Increase security" << endl;
                 cout << "        + Decrease defcon" << endl;
                 _gameData.defcon -= 0.1; //Decrease defcon
                 _gameData.nationalSecurity += 0.1; //Increase security
             }
+            _ufo.undetected = true; //Set landed (disappear) to true
+            _ufo.symbol = '*'; //Make new character show status: landed
+            setSpot(_gameData.gameMap[_ufo.xPos][_ufo.yPos], _ufo.symbol); //Set spot in map to landed
         }
     }
     return;
