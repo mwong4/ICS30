@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.6.5]
+>- [version 1.6.8]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [Playtest Counter: 1]
@@ -1056,10 +1056,10 @@ void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string 
         system("CLS"); //wipe consol
         goThroughMap(_gameData, ' ', false); //Display map
         ufoMenu(_ufos, _gameData.ufoCount, _gameData); //Call function to display menu
-        inputValue = getAnswer(_gameData.ufoCount+1, 1); //Get player's input
+        inputValue = getAnswer(_gameData.ufoCount, 0); //Get player's input
         cout << endl; //Skip a space
 
-        if(inputValue == _gameData.ufoCount + 1)
+        if(inputValue == 0)
         {
             clearLabel(_playerData, _gameData);
         }
@@ -1091,6 +1091,7 @@ void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string 
 //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
 void ufoMenu(UFO _ufos[], int _limit, GameInfo _gameData)
 {
+    cout << "    >- [" << 0 << "]  To Exit Scan Mode" << endl; //Show option to exit scan mode
     for(int i = 0; i < _limit; i++)
     {
         cout << "    >- [" << i+1 << "] ";
@@ -1120,7 +1121,6 @@ void ufoMenu(UFO _ufos[], int _limit, GameInfo _gameData)
             //displayColorText("Unknown", true, 9);
         }
     }
-    cout << "    >- [" << _limit + 1 << "]  To Exit Scan Mode" << endl; //Show option to exit scan mode
 
     if(_limit == 0)
     {
