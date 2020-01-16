@@ -9,6 +9,7 @@
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [Playtest Counter: 1]
+>-
 >- Thanks to the following people for play testing
     >- Thanks Mohammed Al-Anezi!
     >-
@@ -413,7 +414,7 @@ void endTurn(PlayerData& _playerData, float _budgetChange, string _defconOptions
     cout << "    >- Current Department Anual Budget: " << _playerData.currentBalance << " billion dollars" << endl;
 
 
-    randomValue = (rand()%3+7)/100.0; //Get the random increase in inflation
+    randomValue = (rand()%4+16)/100.0; //Get the random increase in inflation
     _gameData.baseCost += _gameData.baseCost*randomValue; //Increase price of buildings
 
     anyInput();//Get any input before continuing
@@ -747,38 +748,63 @@ void buildingMode(GameInfo& _gameData, PlayerData& _playerInfo, string _menuOpti
 //This function is for placing base using keyboard
 void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _savedChar, char _building)
 {
+    bool hitRestriction = false; //This indicates when the person has hit a restricted direction
     //If escape is pressed, exit
     while((!(GetKeyState(VK_ESCAPE) & 0x8000)))
     {
         if((GetKeyState('W') & 0x8000) || (GetKeyState(VK_UP) & 0x8000))
         {
-            if((_currentY - 1) >= 5 && !(inArea(198, 101, 324, 1, _currentX, _currentY-1))) //Check to see if new position is legal
+            if((_currentY - 2) >= 5 && !(inArea(198, 101, 324, 2, _currentX, _currentY-1))) //Check to see if new position is legal
             {
-                updatePosition(_gameData, 0, -1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+                hitRestriction = false; //Set hit restriction to false
+                updatePosition(_gameData, 0, -2, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+            }
+            else if(!hitRestriction)
+            {
+                cout << "    >- This direction [^] is restricted" << endl;
+                hitRestriction = true;
             }
         }
         //Else if specific key is pressed:
         else if((GetKeyState('S') & 0x8000) || (GetKeyState(VK_DOWN) & 0x8000))
         {
-            if((_currentY + 1) <= 45 && !(inArea(198, 101, 324, 1, _currentX, _currentY + 1))) //Check to see if new position is legal
+            if((_currentY + 2) <= 53 && !(inArea(198, 101, 324, 2, _currentX, _currentY + 1))) //Check to see if new position is legal
             {
-                updatePosition(_gameData, 0, 1, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+                hitRestriction = false; //Set hit restriction to false
+                updatePosition(_gameData, 0, 2, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+            }
+            else if(!hitRestriction)
+            {
+                cout << "    >- This direction [v] is restricted" << endl;
+                hitRestriction = true;
             }
         }
         //Else if specific key is pressed:
         else if((GetKeyState('A') & 0x8000) || (GetKeyState(VK_LEFT) & 0x8000))
         {
-            if((_currentX - 1) >= 0 && !(inArea(198, 101, 324, 1, _currentX - 1, _currentY))) //Check to see if new position is legal
+            if((_currentX - 2) >= 0 && !(inArea(198, 101, 324, 2, _currentX - 2, _currentY))) //Check to see if new position is legal
             {
-                updatePosition(_gameData, -1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+                hitRestriction = false; //Set hit restriction to false
+                updatePosition(_gameData, -2, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+            }
+            else if(!hitRestriction)
+            {
+                cout << "    >- This direction [<-] is restricted" << endl;
+                hitRestriction = true;
             }
         }
         //Else if specific key is pressed:
         else if((GetKeyState('D') & 0x8000) || (GetKeyState(VK_RIGHT) & 0x8000))
         {
-            if((_currentX + 1) <= 199 && !(inArea(198, 101, 324, 1, _currentX + 1, _currentY))) //Check to see if new position is legal
+            if((_currentX + 2) <= 199 && !(inArea(198, 101, 324, 2, _currentX + 2, _currentY))) //Check to see if new position is legal
             {
-                updatePosition(_gameData, 1, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+                hitRestriction = false; //Set hit restriction to false
+                updatePosition(_gameData, 2, 0, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
+            }
+            else if(!hitRestriction)
+            {
+                cout << "    >- This direction [->] is restricted" << endl;
+                hitRestriction = true;
             }
         }
     }
@@ -1365,12 +1391,12 @@ void radioPlane(GameInfo& _gameData, UFO& _ufo)
         if(inArea(100, 1, 30, 1, _ufo.xPos, _ufo.yPos)) //If plane is over NA
         {
             cout << "    >- UFO location classes as direct ally airspace" << endl;
-            baseChance = 9;
+            baseChance = 7;
         }
         else if(inArea(198, 101, 24, 1, _ufo.xPos, _ufo.yPos)) //If plane is over latin america
         {
             cout << "    >- UFO location classes as over mostly unalligned latin america " << endl;
-            baseChance = 4;
+            baseChance = 3;
         }
         else if(inArea(100, 1, 54, 31, _ufo.xPos, _ufo.yPos)) //If plane is over soviet controlled area
         {
@@ -1380,12 +1406,12 @@ void radioPlane(GameInfo& _gameData, UFO& _ufo)
         else if(inArea(198, 101, 54, 25, _ufo.xPos, _ufo.yPos)) //If plane is over asia
         {
             cout << "    >- UFO location classes as over mostly neutral or western alligned asian continent" << endl;
-            baseChance = 6;
+            baseChance = 5;
         }
         else //If plane is not in any of these areas
         {
             cout << "    >- UFO location can not be tracked" << endl;
-            baseChance = 4;
+            baseChance = 3;
         }
 
         cout << "    >- Analytic software predicts approximately a: " << baseChance * 10 << "% of sucess. Would you like to continue?" << endl;
