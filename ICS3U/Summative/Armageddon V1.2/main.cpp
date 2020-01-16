@@ -8,6 +8,11 @@
 >- [version 1.6.5]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
+>- [Playtest Counter: 0]
+>- Thanks to the following people for play testing
+    >-
+    >-
+>-
 >- [TO DO]
 
     ////////////////////////////// Goals for today
