@@ -8,9 +8,9 @@
 >- [version 1.6.5]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
->- [Playtest Counter: 0]
+>- [Playtest Counter: 1]
 >- Thanks to the following people for play testing
-    >-
+    >- Thanks Mohammed Al-Anezi!
     >-
 >-
 >- [TO DO]
@@ -20,11 +20,6 @@
     >- Playtesting
 
     ////////////////////////////// Goal for tomorrow
-
-    >- Combat system
-        >- Deploy air force - force landing
-            >- In quadrant and friendly or neutral
-                >-immidietly land
 
     >- UFO array can't be in struct bug
 */
@@ -164,7 +159,7 @@ int main()
     setBigEvents(advanceEvents);
 
     string primaryOptions[4] = {"Enter building mode","|| Finish Turn >>", "Scan all available UFOs", "Quit"}; //This array represents the optiosn available in the main menu
-    string buildingOptions[4] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning Complex [Range: 10]", "Surface to Air Missile Defense Station [Range 15]", "Quit"}; //This represents the available options for buildings
+    string buildingOptions[4] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning and Communications Complex [Range: 10]", "Surface to Air Missile Defense Station [Range 15]", "Quit"}; //This represents the available options for buildings
     string buildModeOptions[4] = {"Place using keyboard", "Place using coordinate", "Confirm place", "Cancel/Exit build mode"}; //These are the menu options for build mode
     //These are the five states of DEFCON advance warning
     string defconOptions[5]= {"CRITICAL|| Nuclear War Imminent","SEVERE|| Armed Forces Ready to Deploy in 6 hours","SUBSTANTIAL|| Air Force Mobilizes in 15 Minutes","MODERATE|| Increase Security Readiness","LOW|| Normal Peacetime Readiness"};
@@ -198,7 +193,7 @@ int main()
         else if(menuInput == 2)
         {
             //Go to end turn function
-            if(gameData.defcon - 0.05 <= 1 || gameData.nationalSecurity <= 0)
+            if(gameData.defcon - 0.05 <= 1 || gameData.nationalSecurity <= 0.4)
             {
                 system("CLS"); //Wipe consol
                 if(gameData.nationalSecurity <= 0) //If gameover was triggered by national security, let player know
@@ -917,7 +912,7 @@ string getName()
     cout << "    >- -UNSC User Management System-" << endl << "    ================================" << endl << "    ________________________________" << endl;
     cout << "    UNSC TacOS  v.337" <<  endl << "    (S) 2294 FLEETCOM" << endl << "    =======================" <<  endl << "    |  User Log:" << endl;
     cout << "    |  >> Administrator (UNSC ID 8384-C)" << endl << "    |  >>> " << "unknown.IDENTIFY_userGroup" << endl << endl;
-    cout << "    ________________________________" << endl << "    ================================" << endl << endl << "    >- Please enter your pin and ID" << endl << endl;
+    cout << "    ________________________________" << endl << "    ================================" << endl << endl << "    >- Please enter your pin and ID (HINT: You can put anything)" << endl << endl;
 
     cout << "    >- ID: ";
     cin >> userID;
