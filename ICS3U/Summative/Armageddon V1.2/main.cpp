@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.6.9]
+>- [version 1.7.0]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [Playtest Counter: 1]
@@ -13,16 +13,6 @@
 >- Thanks to the following people for play testing
     >- Thanks Mohammed Al-Anezi!
     >-
->-
->- [TO DO]
-
-    ////////////////////////////// Goals for today
-
-    >- Playtesting
-
-    ////////////////////////////// Goal for tomorrow
-
-    >- UFO array can't be in struct bug
 */
 
 //Declaring all used libraries
@@ -97,13 +87,14 @@ struct GameInfo //This struct holds the core game data
 void display(char); //This function is for displaying a single character
 void setSpot(char&, char); //This function is to set a specific spot in the map
 void goThroughMap(GameInfo&, char, bool); //This function is to go through every spot in the map. It can use other functions to set it all or display it
-void getMap(GameInfo&, bool); //This function is used to find each line in the map txt file
+void getMap(GameInfo&, int); //This function is used to find each line in the map txt file
 void saveMap(std::string, GameInfo&, int); //This function is used to extract each character in a map file line
 
 void endTurn(PlayerData&, float, string[], string[], Event[], GameInfo&, UFO[]); //This function is in charge of updating the player data for the next turn
 void defconCounter(string[], float); //This function is to display the defcon state
 void worldEvent(float&, string[], Event[], int); //This function is to display the world events
 bool gameOverScreen(GameInfo, string); //This function is for ending the game
+bool winGameScreen(GameInfo); //This function is called to show the user that they have "won"
 void resetGame(GameInfo&); //This function is for resting game info
 void resetPlayer(PlayerData&); //This function is for reseting a player
 void setBigEvents(Event[]); //This function is in charge of initializing the large advance events
@@ -140,6 +131,8 @@ void launchSAM(int, GameInfo&, UFO&); //This will initiate the launch of a SAM a
 bool inArea(int, int, int, int, int, int); //This function is in charge of finding out if a ufo is in a certain map area
 void securityPenalty(GameInfo&, UFO[]); //This is for updating the penalty given to the player in secuirty every turn
 void radioPlane(GameInfo&, UFO&); //This function is for the passive attack option of radioing the plane
+
+void winGame();
 
 int main()
 {
@@ -195,31 +188,45 @@ int main()
         }
         else if(menuInput == 2)
         {
-            //Go to end turn function
+            //Go to end game function
             if(gameData.defcon - 0.05 <= 1 || gameData.nationalSecurity <= 0.4)
-            {
+            { //If game over condition is detected
                 system("CLS"); //Wipe consol
                 if(gameData.nationalSecurity <= 0.4) //If gameover was triggered by national security, let player know
-                {
+                { //If the person lost by national security, let user know by setting this output char and sending it to the function
                     gameOverMessage = "By letting National Security drop too low, you have convinced the soviets to launch a first strike";
                 }
 
-                //If gameover trigger is detected
                 if(gameOverScreen(gameData, gameOverMessage))
-                {
+                { //If quit trigger is detected
                     return 0; //Close program
                 }
                 else
-                {
-                    //Calling function to reset all (Game and Player) data and UFO data
+                { //Calling function to reset all (Game and Player) data and UFO data
                     resetGame(gameData);
                     resetPlayer(usa);
                     resetUFOs(ufosOnMap);
                     gameOverMessage = ""; //Reset game over screen message
                 }
             }
+            else if(gameData.nationalSecurity >= 10)
+            { //Otherwise, if winning condition is met
+                if(winGameScreen(gameData))
+                { //If quit trigger is detected
+                    system("CLS"); //wipe consol
+                    cout << "Quitting..." << endl;
+                    anyInput(); //Get any input before continuing
+                    return 0; //Close program
+                }
+                else
+                { //Calling function to reset all (Game and Player) data and UFO data
+                    resetGame(gameData);
+                    resetPlayer(usa);
+                    resetUFOs(ufosOnMap);
+                }
+            }
             else
-            {
+            { //Otherwise, it's good, end turn funciton call
                 gameData.currentYear ++;//Update year
                 endTurn(usa, 0, defconOptions, worldEvents, advanceEvents, gameData, ufosOnMap); //Calls function to update income
 
@@ -333,15 +340,16 @@ void goThroughMap(GameInfo& _gameData, char _clearValue, bool _setMap)
 }
 
 //This function is used to find each line in the map txt file
-void getMap(GameInfo& _gameData, bool _saveFile)
+void getMap(GameInfo& _gameData, int _selectFile)
 {
     std::string line; //String line used to seperate the text file into lines
     ifstream mapFile_("MapFile.txt"); //This is the map file
     ifstream endFile_("NuclearEnding.txt"); //This is the game over file
+    ifstream winFile_("winFile.txt"); //This is the game over file
 
     int currentRow = 0; //This integer keeps count of the row number for the saving in array
 
-    if(mapFile_.is_open() && _saveFile) //If instricted to save the file
+    if(mapFile_.is_open() && _selectFile == 1) //If instricted to save the file
     {
         while(getline(mapFile_,line)) //This function uses the builtin function: getline
         {
@@ -350,13 +358,21 @@ void getMap(GameInfo& _gameData, bool _saveFile)
         }
         mapFile_.close(); //Close file
     }
-    else if(endFile_.is_open() && !_saveFile) //Otherwise, if instructed to read out file
+    else if(endFile_.is_open() && _selectFile == 2) //Otherwise, if instructed to read out file
     {
         while(getline(endFile_,line)) //This function uses the builtin function: getline
         {
             cout << line << endl; //Find each line and print it out
         }
         endFile_.close(); //Close file
+    }
+    else if(winFile_.is_open() && _selectFile == 3) //Otherwise, if instructed to read out file
+    {
+        while(getline(winFile_,line)) //This function uses the builtin function: getline
+        {
+            cout << line << endl; //Find each line and print it out
+        }
+        winFile_.close(); //Close file
     }
     return;
 }
@@ -504,12 +520,25 @@ void worldEvent(float& _budgetPercent, string _worldEvents[], Event _events[], i
 //This function is for ending the game
 bool gameOverScreen(GameInfo _data, string savedMessage)
 {
-    getMap(_data, false); //Print game over screen
+    getMap(_data, 2); //Print game over screen
     cout << endl << endl << "            =========================================================================================================================" << endl;
     cout << "            >- " << savedMessage << endl;
     cout << "            >- GAMEOVER: The world has ended by nuclear war. At your hands, billions have died. There really is no winning is there?" << endl;
     cout << "            >- Maybe you can be the savior that this world needs, and change it for the better. Stay DETERMINED" << endl;
     cout << "               >- Would you like to play again?" << endl << "            ";
+    if(getConfirmation()) //If they want to play again: return false
+    {
+        return false;
+    }
+    return true; //Else, return true
+}
+
+//This function is called to show the user that they have "won"
+bool winGameScreen(GameInfo _data)
+{
+    system("CLS"); //wipe consol
+    getMap(_data, 3); //Print game over screen
+    cout << "    >- Would you like to play again?" << endl << "    ";
     if(getConfirmation()) //If they want to play again: return false
     {
         return false;
@@ -523,10 +552,10 @@ void resetGame(GameInfo& _data)
     _data.currentYear = 1945; //Set the starting year to 1945
     _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
     _data.defcon = 5; //Set defcon by default to 5
-    getMap(_data, true); //Initialize the value of the map array //error
+    getMap(_data, 1); //Initialize the value of the map array //error
     _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
     _data.endGame = false; //Make sure to set the end of the game to false
-    _data.nationalSecurity = 5;
+    _data.nationalSecurity = 10;
     return;
 }
 
