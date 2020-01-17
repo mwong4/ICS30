@@ -1,11 +1,11 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 16, 2020
+>- Updated: Jan 17, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.6.8]
+>- [version 1.6.9]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [Playtest Counter: 1]
@@ -103,7 +103,7 @@ void saveMap(std::string, GameInfo&, int); //This function is used to extract ea
 void endTurn(PlayerData&, float, string[], string[], Event[], GameInfo&, UFO[]); //This function is in charge of updating the player data for the next turn
 void defconCounter(string[], float); //This function is to display the defcon state
 void worldEvent(float&, string[], Event[], int); //This function is to display the world events
-bool gameOverScreen(GameInfo); //This function is for ending the game
+bool gameOverScreen(GameInfo, string); //This function is for ending the game
 void resetGame(GameInfo&); //This function is for resting game info
 void resetPlayer(PlayerData&); //This function is for reseting a player
 void setBigEvents(Event[]); //This function is in charge of initializing the large advance events
@@ -174,6 +174,8 @@ int main()
     char symbols[2] = {'^', '!'}; //Symbols of possible enemy planes
 
     int menuInput = 1; //This int represents the input taken from user
+    string gameOverMessage = ""; //This is a message that will be displayed by the game over screen
+
     while(menuInput != 4)//While player does not choose to quit
     {
         if(!gameData.endGame) //If game has not ended yet
@@ -197,15 +199,15 @@ int main()
             if(gameData.defcon - 0.05 <= 1 || gameData.nationalSecurity <= 0.4)
             {
                 system("CLS"); //Wipe consol
-                if(gameData.nationalSecurity <= 0) //If gameover was triggered by national security, let player know
+                if(gameData.nationalSecurity <= 0.4) //If gameover was triggered by national security, let player know
                 {
-                    cout << "    >- By letting National Security drop too low, you have convinced the soviets to launch a first strike" << endl;
+                    gameOverMessage = "By letting National Security drop too low, you have convinced the soviets to launch a first strike";
                 }
 
                 //If gameover trigger is detected
-                if(gameOverScreen(gameData))
+                if(gameOverScreen(gameData, gameOverMessage))
                 {
-                    return 0;
+                    return 0; //Close program
                 }
                 else
                 {
@@ -213,6 +215,7 @@ int main()
                     resetGame(gameData);
                     resetPlayer(usa);
                     resetUFOs(ufosOnMap);
+                    gameOverMessage = ""; //Reset game over screen message
                 }
             }
             else
@@ -499,10 +502,11 @@ void worldEvent(float& _budgetPercent, string _worldEvents[], Event _events[], i
 }
 
 //This function is for ending the game
-bool gameOverScreen(GameInfo _data)
+bool gameOverScreen(GameInfo _data, string savedMessage)
 {
     getMap(_data, false); //Print game over screen
     cout << endl << endl << "            =========================================================================================================================" << endl;
+    cout << "            >- " << savedMessage << endl;
     cout << "            >- GAMEOVER: The world has ended by nuclear war. At your hands, billions have died. There really is no winning is there?" << endl;
     cout << "            >- Maybe you can be the savior that this world needs, and change it for the better. Stay DETERMINED" << endl;
     cout << "               >- Would you like to play again?" << endl << "            ";
@@ -1048,10 +1052,10 @@ void resetUFOs(UFO _ufos[])
 //This function is used for all interactions between player and UFO's including a special UI place
 void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string _actionOptions[])
 {
-    int inputValue = 0;
+    int inputValue = 10;
     ufoScanAll(_ufos, _gameData.ufoCount, _playerData, _gameData, 10); //Scan all the possible ufo's
 
-    while(inputValue <= _gameData.ufoCount && !_gameData.endGame)
+    while(inputValue != 0 && !_gameData.endGame)
     {
         system("CLS"); //wipe consol
         goThroughMap(_gameData, ' ', false); //Display map
@@ -1307,7 +1311,7 @@ void launchSAM(int _samCount, GameInfo& _gameData, UFO& _ufo)
 
     if(getConfirmation())
     {
-        if(_samCount >= 3 || hitProbability + rand()%11 >= 10) //If three or more SAM sites are in range, rig hit to 100%
+        if(_samCount >= 3 || hitProbability + rand()%11 + 1 >= 10) //If three or more SAM sites are in range, rig hit to 100%
         { //Otherwise generate number between 0 and 10. If added to the hit porbability is greater than 10%, you hit plane!
             cout << endl << "    >- UFO hit confirmed" << endl;
             if(_ufo.tag == "Friendly" || _ufo.type == "Cargo" || _ufo.type == "Passenger")
