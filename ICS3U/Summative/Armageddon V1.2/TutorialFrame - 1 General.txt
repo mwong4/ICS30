@@ -1,0 +1,43 @@
+	
+		              _-o#&&*''''?d:>b\_
+		          _o/"`''  '',, dMF9MMMMMHo_
+		       .o&#'        `"MbHMMMMMMMMMMMHo.
+		     .o"" '         vodM*$&&HMMMMMMMMMM?.
+		    ,'              $M&ood,~'`(&##MMMMMMH\
+		   /               ,MMMMMMM#b?#bobMMMMHMMML
+		  &              ?MMMMMMMMMMMMMMMMM7MMM$R*Hk
+		 ?$.            :MMMMMMMMMMMMMMMMMMM/HMMM|`*L
+		|               |MMMMMMMMMMMMMMMMMMMMbMH'   T,
+		$H#:            `*MMMMMMMMMMMMMMMMMMMMb#}'  `?
+		]MMH#             ""*""""*#MMMMMMMMMMMMM'    -
+		MMMMMb_                   |MMMMMMMMMMMP'     :
+		HMMMMMMMHo                 `MMMMMMMMMT       .
+		?MMMMMMMMP                  9MMMMMMMM}       -
+		-?MMMMMMM                  |MMMMMMMMM?,d-    '
+		 :|MMMMMM-                 `MMMMMMMT .M|.   :
+		  .9MMM[                    &MMMMM*' `'    .
+		   :9MMk                    `MMM#"        -
+		     &M}                     `          .-
+  		      `&.                             .
+  	 	       `~,   .                     ./
+   		           . _                  .-
+   		             '`--._,dd###pp=""'
+
+    		     [Credit] to ASCIIart.eu for the globe
+
+
+    >- Welcome to the North American Aerospace Defence Command (NORAD Command)
+
+    >- Our enemies are the communist forces of the east and they will test our defenses vigorously
+
+    >- Your main objective is to safeguard the lives north america and by extension, the world
+
+    >- To complete this objective, this consol will provide a range of tools and data that you must consider and use
+    >- These tools and sources of data are listed below
+
+        >- Building mode
+        >- Scan mode
+        >- End turn
+        >- Win/Lose Conditions
+
+

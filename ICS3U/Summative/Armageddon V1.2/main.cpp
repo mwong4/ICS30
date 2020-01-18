@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.7.0]
+>- [version 1.7.1]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [Playtest Counter: 1]
@@ -158,7 +158,7 @@ int main()
     //These are the five states of DEFCON advance warning
     string defconOptions[5]= {"CRITICAL|| Nuclear War Imminent","SEVERE|| Armed Forces Ready to Deploy in 6 hours","SUBSTANTIAL|| Air Force Mobilizes in 15 Minutes","MODERATE|| Increase Security Readiness","LOW|| Normal Peacetime Readiness"};
     //World events that may or may not change your income/funding
-    string worldEvents[10] = {"Funding is re-directed to Boost the Economy","New Governemnt Against-Military","Anti-War Protests are Widespread","Sovites Become More Agresive","New US Government is Pro-Military","Public Opinion Swings Pro-Military","NATO Military Exercise Occurs in Western Europe","Warsaw Pact Meet For Annual Military Sumit","Refugees Continue to Flee Eastern Europe","Civil War Occurs in South America"};
+    string worldEvents[10] = {"Funding is re-directed to Boost the Economy","New Governemnt Against-Military","Anti-War Protests are Widespread","Sovietss Become More Aggresive","New US Government is Pro-Military","Public Opinion Swings Pro-Military","NATO Military Exercise Occurs in Western Europe","Warsaw Pact Meet For Annual Military Sumit","Refugees Continue to Flee Eastern Europe","Civil War Occurs in South America"};
 
     //String arrays for UFO's
     string origin[13] = {"Soviet","Chinese","South Korea","Sweden","Switzerland","Egypt","Saudi Arabie","Austria", "West Germany", "United States of America", "Canada", "France", "United Kingdom"}; //The origins of enemy and neutral planes
@@ -214,7 +214,7 @@ int main()
                 if(winGameScreen(gameData))
                 { //If quit trigger is detected
                     system("CLS"); //wipe consol
-                    cout << "Quitting..." << endl;
+                    cout << "    >- Quitting..." << endl;
                     anyInput(); //Get any input before continuing
                     return 0; //Close program
                 }
@@ -555,7 +555,7 @@ void resetGame(GameInfo& _data)
     getMap(_data, 1); //Initialize the value of the map array //error
     _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
     _data.endGame = false; //Make sure to set the end of the game to false
-    _data.nationalSecurity = 10;
+    _data.nationalSecurity = 5;
     return;
 }
 
@@ -576,7 +576,7 @@ void setBigEvents(Event _events[])
 {
     string tempString; //This is a temporary string to try resolving the save string -> crash bug
     //Set event for 1946
-    tempString = "The year is 1946. Only one year ago, the worlds largest war ended. Only one year ago, the Atmoic age was born";
+    tempString = "The year is 1946. Only one year ago, the worlds largest war ended. Only one year ago, the Atomic age was born";
     _events[0].year = 1946;
     _events[0].note = tempString;
     //Set event for 1950

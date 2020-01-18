@@ -1,0 +1,20 @@
+    >- Buildings
+
+    >- Option 1 on the main menu allows you to build buildings
+    >- Each building cost a certain amount and will deduct from your account
+    >- Each buildings have a variety of effects
+
+    >- ICBM (Intercontinental Ballistic Nuclear Missile Silo) [@]
+        >- Increases national security
+
+    >- AWCC (Advance Warning & Communications Center) [#]
+        >- Will give you more information on UFO's
+        >- Has a maximum range of 10 tiles
+        >- Allows you to communicate with the radar
+
+    >- SAMDS (Surface to Air Missile Defense Station)[&]
+        >- Allows you to shoot down a UFO
+        >- The more SAM's you have, the more likely to shoot the plane down
+        >- Maximum range of 15 tiles
+
+    >- Build these tools around your territory and defend your nation
