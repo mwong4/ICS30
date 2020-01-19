@@ -5,7 +5,7 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.7.1]
+>- [version 1.7.3]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [Playtest Counter: 1]
@@ -132,7 +132,7 @@ bool inArea(int, int, int, int, int, int); //This function is in charge of findi
 void securityPenalty(GameInfo&, UFO[]); //This is for updating the penalty given to the player in secuirty every turn
 void radioPlane(GameInfo&, UFO&); //This function is for the passive attack option of radioing the plane
 
-void winGame();
+void tutorial(GameInfo); //This function is shown to teach the game
 
 int main()
 {
@@ -144,7 +144,6 @@ int main()
     PlayerData usa; //This struct represents the important information for player usa
     UFO ufosOnMap[20]; //This is an array containing the information on every ufo on the map
     Event advanceEvents[11]; //These are the big 11 events that happen throughout the 20th century
-
 
     //Calling function to reset all (Game and Player) data and UFO data and events data
     resetGame(gameData);
@@ -169,6 +168,13 @@ int main()
     int menuInput = 1; //This int represents the input taken from user
     string gameOverMessage = ""; //This is a message that will be displayed by the game over screen
 
+    //Offer the user the tutorial
+    cout << endl << "    >- Would you like to view the tutorial?" << endl;
+    if(getConfirmation())
+    { //If user says yes
+        tutorial(gameData); //Call function to display tutorial
+    }
+
     while(menuInput != 4)//While player does not choose to quit
     {
         if(!gameData.endGame) //If game has not ended yet
@@ -191,7 +197,7 @@ int main()
             //Go to end game function
             if(gameData.defcon - 0.05 <= 1 || gameData.nationalSecurity <= 0.4)
             { //If game over condition is detected
-                system("CLS"); //Wipe consol
+                system("CLS"); //Wipe console
                 if(gameData.nationalSecurity <= 0.4) //If gameover was triggered by national security, let player know
                 { //If the person lost by national security, let user know by setting this output char and sending it to the function
                     gameOverMessage = "By letting National Security drop too low, you have convinced the soviets to launch a first strike";
@@ -213,7 +219,7 @@ int main()
             { //Otherwise, if winning condition is met
                 if(winGameScreen(gameData))
                 { //If quit trigger is detected
-                    system("CLS"); //wipe consol
+                    system("CLS"); //wipe console
                     cout << "    >- Quitting..." << endl;
                     anyInput(); //Get any input before continuing
                     return 0; //Close program
@@ -346,6 +352,11 @@ void getMap(GameInfo& _gameData, int _selectFile)
     ifstream mapFile_("MapFile.txt"); //This is the map file
     ifstream endFile_("NuclearEnding.txt"); //This is the game over file
     ifstream winFile_("winFile.txt"); //This is the game over file
+    ifstream tutOne_("TutorialFrame - 1 General.txt"); //This is the first turorial page
+    ifstream tutTwo_("TutorialFrame - 2 Loosing.txt"); //This is the second turorial page
+    ifstream tutThree_("TutorialFrame - 3 Building.txt"); //This is the third turorial page
+    ifstream tutFour_("TutorialFrame - 4 Scanning.txt"); //This is the fourth turorial page
+    ifstream tutFive_("TutorialFrame - 5 EndTurn.txt"); //This is the fifth turorial page
 
     int currentRow = 0; //This integer keeps count of the row number for the saving in array
 
@@ -373,6 +384,46 @@ void getMap(GameInfo& _gameData, int _selectFile)
             cout << line << endl; //Find each line and print it out
         }
         winFile_.close(); //Close file
+    }
+    else if(tutOne_.is_open() && _selectFile == 4) //Otherwise, if instructed to read out file
+    {
+        while(getline(tutOne_,line)) //This function uses the builtin function: getline
+        {
+            cout << line << endl; //Find each line and print it out
+        }
+        tutOne_.close(); //Close file
+    }
+    else if(tutTwo_.is_open() && _selectFile == 5) //Otherwise, if instructed to read out file
+    {
+        while(getline(tutTwo_,line)) //This function uses the builtin function: getline
+        {
+            cout << line << endl; //Find each line and print it out
+        }
+        tutTwo_.close(); //Close file
+    }
+    else if(tutThree_.is_open() && _selectFile == 6) //Otherwise, if instructed to read out file
+    {
+        while(getline(tutThree_,line)) //This function uses the builtin function: getline
+        {
+            cout << line << endl; //Find each line and print it out
+        }
+        tutThree_.close(); //Close file
+    }
+    else if(tutFour_.is_open() && _selectFile == 7) //Otherwise, if instructed to read out file
+    {
+        while(getline(tutFour_,line)) //This function uses the builtin function: getline
+        {
+            cout << line << endl; //Find each line and print it out
+        }
+        tutFour_.close(); //Close file
+    }
+    else if(tutFive_.is_open() && _selectFile == 8) //Otherwise, if instructed to read out file
+    {
+        while(getline(tutFive_,line)) //This function uses the builtin function: getline
+        {
+            cout << line << endl; //Find each line and print it out
+        }
+        tutFive_.close(); //Close file
     }
     return;
 }
@@ -536,7 +587,7 @@ bool gameOverScreen(GameInfo _data, string savedMessage)
 //This function is called to show the user that they have "won"
 bool winGameScreen(GameInfo _data)
 {
-    system("CLS"); //wipe consol
+    system("CLS"); //wipe console
     getMap(_data, 3); //Print game over screen
     cout << "    >- Would you like to play again?" << endl << "    ";
     if(getConfirmation()) //If they want to play again: return false
@@ -967,7 +1018,7 @@ string getName()
     string randInput = ""; //This represents the password inputted by the user
     char ch; //This is used to get each individual input
 
-    system("CLS"); //Wiping consol
+    system("CLS"); //Wiping console
     cout << "    >- -UNSC User Management System-" << endl << "    ================================" << endl << "    ________________________________" << endl;
     cout << "    UNSC TacOS  v.337" <<  endl << "    (S) 2294 FLEETCOM" << endl << "    =======================" <<  endl << "    |  User Log:" << endl;
     cout << "    |  >> Administrator (UNSC ID 8384-C)" << endl << "    |  >>> " << "unknown.IDENTIFY_userGroup" << endl << endl;
@@ -1086,7 +1137,7 @@ void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string 
 
     while(inputValue != 0 && !_gameData.endGame)
     {
-        system("CLS"); //wipe consol
+        system("CLS"); //wipe console
         goThroughMap(_gameData, ' ', false); //Display map
         ufoMenu(_ufos, _gameData.ufoCount, _gameData); //Call function to display menu
         inputValue = getAnswer(_gameData.ufoCount, 0); //Get player's input
@@ -1471,5 +1522,18 @@ void radioPlane(GameInfo& _gameData, UFO& _ufo)
             setSpot(_gameData.gameMap[_ufo.xPos][_ufo.yPos], _ufo.symbol); //Set spot in map to landed
         }
     }
+    return;
+}
+
+//This function is shown to teach the game
+void tutorial(GameInfo _gameData)
+{
+    for(int i = 4; i < 9; i++)
+    { //Runa for loop through every tutorial frame
+        system("CLS"); //Wipe console
+        getMap(_gameData, i); //Display frame
+        anyInput(); //Get any input before continuing
+    }
+    system("CLS"); //Wipe console
     return;
 }
