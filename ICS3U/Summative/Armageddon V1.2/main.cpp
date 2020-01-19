@@ -267,7 +267,7 @@ void display(char _mapSpot)
     {
         displayColorText("@", false, 6); //yellow color -14, 6
     }
-    else if(_mapSpot == '$') //If place is missile silo
+    else if(_mapSpot == '$') //If place is a sam silo
     {
         displayColorText("$", false, 6); //yellow color - 14, 6
     }
@@ -553,7 +553,7 @@ void resetGame(GameInfo& _data)
     _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
     _data.defcon = 5; //Set defcon by default to 5
     getMap(_data, 1); //Initialize the value of the map array //error
-    _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
+    _data.ufoCount = 15; //Set amount of ufo's in the sky to 0
     _data.endGame = false; //Make sure to set the end of the game to false
     _data.nationalSecurity = 5;
     return;

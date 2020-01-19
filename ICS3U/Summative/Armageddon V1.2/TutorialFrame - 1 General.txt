@@ -38,6 +38,6 @@
         >- Building mode
         >- Scan mode
         >- End turn
-        >- Win/Lose Conditions
+        >- How to die
 
 

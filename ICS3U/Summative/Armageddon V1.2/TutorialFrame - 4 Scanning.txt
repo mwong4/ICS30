@@ -1,13 +1,12 @@
+
     >- Scanning
 
     >- Selecting option 3 on the main menu will enter you into scan mode
     >- A list of all the UFO's will be displayed
-    >- Before scanning, the UFO's symbols on the map should be updated if in range of an AWCC
     >- Selecting the specific UFO will give you more information on the UFO and open the Action Menu
 
 
     >- Action Menu
-
 
     >- [1] Radio ufo and order it to land
     >- [2] Leave the ufo alone
@@ -26,6 +25,3 @@
     >- "Setting defcon to 1" will launch all nuclear missiles
 
     >- "local SAM site" will launch a missile at the UFO
-
-
-	

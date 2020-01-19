@@ -1,0 +1,44 @@
+
+    >- End Turn
+
+    >- Once you have completed any actions you wish to perform
+    >- Select Option 2 on the main menu: ||END TURN>>
+
+    >- Ending your turn will finish the year and give you an annual summary
+    >- An example of the summary is provided below
+
+
+
+    >- DEFCON: [5]
+    >- LOW|| Normal Peacetime Readiness
+
+    ===========================================
+    >- National Security: ||#####-----|| [5]
+
+    ===========================================
+    >- Major International Events Summary (M.I.E.S) -<
+        + Soviets Become More Aggressive
+        + Increase US Military Spending by 1%
+        + The year is 1946. Only one year ago, the worlds largest war ended. Only one year ago, the Atomic age was born
+
+    ===========================================
+    >- Economy increased by -> 1%
+    >- GDP is Now: 2020 billion dollars
+    >- Current Department Annual Budget: 0.904 billion dollars
+
+
+
+
+    >- In this menu your defcon and national security will be shown
+    >- A summary of economic and world events will also be given
+    >- These events can affect your income and spending budget
+
+    >- In the new year, you will encounter new UFO's in random locations
+    >- Good luck, were relying on you
+
+
+
+
+
+
+

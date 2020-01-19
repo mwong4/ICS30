@@ -1,3 +1,4 @@
+
     >- Buildings
 
     >- Option 1 on the main menu allows you to build buildings
@@ -12,7 +13,7 @@
         >- Has a maximum range of 10 tiles
         >- Allows you to communicate with the radar
 
-    >- SAMDS (Surface to Air Missile Defense Station)[&]
+    >- SAMDS (Surface to Air Missile Defense Station)[$]
         >- Allows you to shoot down a UFO
         >- The more SAM's you have, the more likely to shoot the plane down
         >- Maximum range of 15 tiles
