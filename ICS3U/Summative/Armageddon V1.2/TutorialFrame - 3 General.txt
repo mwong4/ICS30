@@ -1,8 +1,3 @@
 
     >- Try [1] and [2] below!
     >- When you are ready to end your turn, select [3]
-
-    >- Use [1] to build on map
-    >- Use [2] to scan UFO's
-    >- Use [3] to end your turn
-    >- Use [4] to quit game

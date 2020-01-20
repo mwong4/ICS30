@@ -1,5 +1,6 @@
+============================================================================
 
-    >- Scanning
+    >- Tutorial: Scanning
 
     >- A list of all the UFO's will is displayed
     >- Selecting UFO will give more info + action menu
@@ -20,3 +21,5 @@
 
 
     ? Unknown, ^ Neutral, & Friendly, ! Enemy
+
+============================================================================

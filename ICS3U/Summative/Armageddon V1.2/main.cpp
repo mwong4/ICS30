@@ -1,11 +1,11 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 17, 2020
+>- Updated: Jan 20, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.7.4]
+>- [version 1.7.5]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
 >- [Playtest Counter: 2]
@@ -71,6 +71,9 @@ struct PlayerData //This struct holds the data for each player
     Building tempLabel[20]; //These are temporary labels in the scan mode just to know what target it which
     int samCount; //This keeps track of how many SAM sites there is
     Building samData[100]; //This represents the data of each SAM site
+
+    bool buildTutorial; //This starts false because the user has not seen the build tutorial. Sets to true once they have
+    bool scanTutorial; //This starts false because the user has not seen the scan tutorial. Sets to true once they have
 };
 
 struct GameInfo //This struct holds the core game data
@@ -175,6 +178,11 @@ int main()
     { //If user says yes
         tutorial(gameData); //Call function to display tutorial
     }
+    else
+    { //Otherwise
+        usa.scanTutorial = true; //Set the tutorial off
+        usa.buildTutorial = true; //Set the tutorial off
+    }
 
     while(menuInput != 4)//While player does not choose to quit
     {
@@ -198,6 +206,11 @@ int main()
             chooseBuilding(gameData, usa, buildingOptions, buildModeOptions);
         }
         else if(menuInput == 2)
+        {
+            //Scan all ufo's
+            scanMode(ufosOnMap, gameData, usa, actionOptions);
+        }
+        else if(menuInput == 3)
         {
             //Go to end game function
             if(gameData.defcon - 0.05 <= 1 || gameData.nationalSecurity <= 0.4)
@@ -248,11 +261,6 @@ int main()
                 }
                 spawnUFO(ufosOnMap, gameData.ufoCount, origin, type, symbols, gameData); //Call function to spawn all the UFO's
             }
-        }
-        else if(menuInput == 3)
-        {
-            //Scan all ufo's
-            scanMode(ufosOnMap, gameData, usa, actionOptions);
         }
         else
         {
@@ -359,9 +367,10 @@ void getMap(GameInfo& _gameData, int _selectFile)
     ifstream winFile_("winFile.txt"); //This is the game over file
     ifstream tutOne_("TutorialFrame - 1 General.txt"); //This is the first turorial page
     ifstream tutTwo_("TutorialFrame - 2 Loosing.txt"); //This is the second turorial page
-    ifstream tutThree_("TutorialFrame - 3 Building.txt"); //This is the third turorial page
-    ifstream tutFour_("TutorialFrame - 4 Scanning.txt"); //This is the fourth turorial page
-    ifstream tutFive_("TutorialFrame - 5 EndTurn.txt"); //This is the fifth turorial page
+    ifstream tutThree_("TutorialFrame - 3 General.txt"); //This is the second turorial page
+    ifstream tutFour_("TutorialFrame - 4 Building.txt"); //This is the third turorial page
+    ifstream tutFive_("TutorialFrame - 5 Scanning.txt"); //This is the fourth turorial page
+    ifstream tutSix_("TutorialFrame - 6 EndTurn.txt"); //This is the fifth turorial page
 
     int currentRow = 0; //This integer keeps count of the row number for the saving in array
 
@@ -430,6 +439,14 @@ void getMap(GameInfo& _gameData, int _selectFile)
         }
         tutFive_.close(); //Close file
     }
+    else if(tutSix_.is_open() && _selectFile == 9) //Otherwise, if instructed to read out file
+    {
+        while(getline(tutSix_,line)) //This function uses the builtin function: getline
+        {
+            cout << line << endl; //Find each line and print it out
+        }
+        tutSix_.close(); //Close file
+    }
     return;
 }
 
@@ -448,6 +465,11 @@ void endTurn(PlayerData& _playerData, float _budgetChange, string _defconOptions
 {
     float randomValue; //This number is randomly generated
     system("CLS"); //Clear console first
+
+    if(_gameData.currentYear == 1946)
+    { //If on first year
+        getMap(_gameData, 9); //Load building tutorial
+    }
     Sleep(300); //Delay by 0.4 seconds
 
     _gameData.defcon -= 0.05; //Increase defcon naturally
@@ -624,6 +646,8 @@ void resetPlayer(PlayerData& _data)
     _data.playerName = getName(); //Initialize name by using the loading screen
     _data.radarCount = 0; //By default, set radar count to 0
     _data.samCount = 0; //By default, set radar count to 0
+    _data.buildTutorial = false; //Set intially to false
+    _data.buildTutorial = false; //Set intially to false
     return;
 }
 
@@ -726,6 +750,13 @@ void displaySecurity(float _security)
 void chooseBuilding(GameInfo& _gameData, PlayerData& _playerInfo, string _buildingOptions[], string _buildModeOptions[])
 {
     int inputValue; //This is used to get the input of the player
+
+    system("CLS");
+    if(!_playerInfo.buildTutorial)
+    { //If on first year
+        getMap(_gameData, 7); //Load building tutorial
+        _playerInfo.buildTutorial = true; //Set to true
+    }
 
     //Output message
     cout << endl << endl << "    ===================================" << endl << "    >- What would you like to build?" << endl;
@@ -1023,11 +1054,14 @@ string getName()
     string randInput = ""; //This represents the password inputted by the user
     char ch; //This is used to get each individual input
 
+    /*
     system("CLS"); //Wiping console
     cout << "    >- -UNSC User Management System-" << endl << "    ================================" << endl << "    ________________________________" << endl;
     cout << "    UNSC TacOS  v.337" <<  endl << "    (S) 2294 FLEETCOM" << endl << "    =======================" <<  endl << "    |  User Log:" << endl;
     cout << "    |  >> Administrator (UNSC ID 8384-C)" << endl << "    |  >>> " << "unknown.IDENTIFY_userGroup" << endl << endl;
-    cout << "    ________________________________" << endl << "    ================================" << endl << endl << "    >- Please enter your pin and ID (HINT: You can put anything)" << endl << endl;
+    cout << "    ________________________________" << endl << "    ================================" << endl << endl;
+    */
+    cout << endl << "    >- Please enter your pin and ID (HINT: You can put anything)" << endl << endl; //Print instructions
 
     cout << "    >- ID: ";
     cin >> userID;
@@ -1143,6 +1177,13 @@ void scanMode(UFO _ufos[], GameInfo& _gameData, PlayerData& _playerData, string 
     while(inputValue != 0 && !_gameData.endGame)
     {
         system("CLS"); //wipe console
+
+        if(!_playerData.scanTutorial)
+        { //If on first year
+            getMap(_gameData, 8); //Load Scanning tutorial
+            _playerData.scanTutorial = true; //Set to true
+        }
+
         goThroughMap(_gameData, ' ', false); //Display map
         ufoMenu(_ufos, _gameData.ufoCount, _gameData); //Call function to display menu
         inputValue = getAnswer(_gameData.ufoCount, 0); //Get player's input
@@ -1533,12 +1574,11 @@ void radioPlane(GameInfo& _gameData, UFO& _ufo)
 //This function is shown to teach the game
 void tutorial(GameInfo _gameData)
 {
-    for(int i = 4; i < 9; i++)
+    for(int i = 4; i < 7; i++)
     { //Runa for loop through every tutorial frame
         system("CLS"); //Wipe console
         getMap(_gameData, i); //Display frame
         anyInput(); //Get any input before continuing
     }
-    system("CLS"); //Wipe console
     return;
 }

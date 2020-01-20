@@ -38,5 +38,3 @@
         >- Scan mode
         >- End turn
         >- How to die
-
-

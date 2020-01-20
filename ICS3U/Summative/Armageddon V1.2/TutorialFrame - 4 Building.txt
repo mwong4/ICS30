@@ -1,5 +1,6 @@
+============================================================================
 
-    >- Buildings
+    >- Tutorial: Buildings
 
     >- Each building cost a certain amount and will deduct from your account
     >- Each buildings have a variety of effects
@@ -18,3 +19,5 @@
         >- Maximum range of 15 tiles
 
     >- Build these tools around your territory and defend your nation
+
+============================================================================

@@ -1,5 +1,6 @@
+============================================================================
 
-    >- End Turn
+    >- Tutorial: End Turn
 
     >- In this menu your defcon and national security will be updated
     >- A summary of economic and world events will also be given
@@ -8,9 +9,4 @@
     >- In the new year, you will encounter new UFO's in random locations
     >- Good luck, we are relying on you
 
-
-
-
-
-
-
+============================================================================
