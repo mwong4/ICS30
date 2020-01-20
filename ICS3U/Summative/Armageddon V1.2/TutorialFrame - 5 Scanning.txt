@@ -1,0 +1,22 @@
+
+    >- Scanning
+
+    >- A list of all the UFO's will is displayed
+    >- Selecting UFO will give more info + action menu
+
+
+    >- Action Menu
+
+    >- The action menu allows you to interact with the UFO's
+
+    >- "Radio the UFO" method requires a AWCC (Radar) in range
+        >- Try to communicate with UFO
+
+    >- "Leaving the UFO alone" will exit you from the actions menu
+
+    >- "Setting defcon to 1" will launch all nuclear missiles
+
+    >- "local SAM site" will launch a missile at the UFO
+
+
+    ? Unknown, ^ Neutral, & Friendly, ! Enemy

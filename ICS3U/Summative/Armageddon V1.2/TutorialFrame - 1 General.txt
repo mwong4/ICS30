@@ -28,12 +28,11 @@
 
     >- Welcome to the North American Aerospace Defence Command (NORAD Command)
 
-    >- Our enemies are the communist forces of the east and they will test our defenses vigorously
+    >- Our enemies are the communist forces of the east
 
-    >- Your main objective is to safeguard the lives north america and by extension, the world
+    >- Your job is to safeguard the lives north america and by extension, the world
 
-    >- To complete this objective, this consol will provide a range of tools and data that you must consider and use
-    >- These tools and sources of data are listed below
+    >- To complete this objective, many tools will be porvided, listed below:
 
         >- Building mode
         >- Scan mode

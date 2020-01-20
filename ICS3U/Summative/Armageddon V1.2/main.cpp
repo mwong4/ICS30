@@ -5,13 +5,14 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.7.3]
+>- [version 1.7.4]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
->- [Playtest Counter: 1]
+>- [Playtest Counter: 2]
 >-
 >- Thanks to the following people for play testing
     >- Thanks Mohammed Al-Anezi!
+    >- Thanks Tieran Chan!
     >-
 */
 
@@ -151,8 +152,8 @@ int main()
     resetUFOs(ufosOnMap);
     setBigEvents(advanceEvents);
 
-    string primaryOptions[4] = {"Enter building mode","|| Finish Turn >>", "Scan all available UFOs", "Quit"}; //This array represents the optiosn available in the main menu
-    string buildingOptions[4] = {"InterContinental Balistic Missile Launch Facility", "Advance Warning and Communications Complex [Range: 10]", "Surface to Air Missile Defense Station [Range 15]", "Quit"}; //This represents the available options for buildings
+    string primaryOptions[2] = {"Enter building mode", "Scan all available UFOs"}; //This array represents the optiosn available in the main menu
+    string buildingOptions[4] = {"Nuclear Missile (ICBM)", "Radar Station (AWCC) [Range: 10]", "Interceptor Missile (SAMDS) [Range 15]", "Quit"}; //This represents the available options for buildings
     string buildModeOptions[4] = {"Place using keyboard", "Place using coordinate", "Confirm place", "Cancel/Exit build mode"}; //These are the menu options for build mode
     //These are the five states of DEFCON advance warning
     string defconOptions[5]= {"CRITICAL|| Nuclear War Imminent","SEVERE|| Armed Forces Ready to Deploy in 6 hours","SUBSTANTIAL|| Air Force Mobilizes in 15 Minutes","MODERATE|| Increase Security Readiness","LOW|| Normal Peacetime Readiness"};
@@ -180,7 +181,11 @@ int main()
         if(!gameData.endGame) //If game has not ended yet
         {
             goThroughMap(gameData, ' ', false); //Display map
-            displayMenu(primaryOptions, 4, usa, gameData.currentYear, true); //Display all menu options
+            displayMenu(primaryOptions, 2, usa, gameData.currentYear, true); //Display all menu options
+            cout << "    >- [3] "; //Display number 3
+            displayColorText("|| Finish Turn >>", true, 10); //Display end turn in green color
+            cout << "    >- [4] "; //Display number 4
+            displayColorText("Quit Game", true, 4); //Display quit game in red
             menuInput = getAnswer(4,1); //Get player input
         }
         else //Otherwise, initiate ending/game over
@@ -604,7 +609,7 @@ void resetGame(GameInfo& _data)
     _data.baseCost = 0.1; //Set the starting cost of buildings to 0.1 billion dollars
     _data.defcon = 5; //Set defcon by default to 5
     getMap(_data, 1); //Initialize the value of the map array //error
-    _data.ufoCount = 15; //Set amount of ufo's in the sky to 0
+    _data.ufoCount = 0; //Set amount of ufo's in the sky to 0
     _data.endGame = false; //Make sure to set the end of the game to false
     _data.nationalSecurity = 5;
     return;
@@ -973,7 +978,7 @@ int getAnswer (int _maxLimit, int _minLimit)
 void displayMenu(string _options[], int _arraySize, PlayerData _data, int _year, bool showInfo)
 {
     //Display UI
-    cout << "    >- Please enter a direct command. Below are the primary listed commands.                                                  ";
+    cout << "    >- Please pick a command.                                                  ";
     if(showInfo)
     {
         cout << "[January 1, " << _year << "] <> Current Department Balance: " << _data.currentBalance<< " billion dollars";

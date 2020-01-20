@@ -5,21 +5,15 @@
         >- Defcon
         >- National Security
 
-    >- Defcon starts at 5
+    >- If defcon it reaches 1, everyone dies
     >- Defcon increases if you are agressive to other countries
-    >- If it reaches 1, everyone dies
 
-    >- National security starts at 5
-    >- National security decreases if you do not protect your country
     >- If it reaches 0, everyone dies
+    >- National security decreases if you do not protect your country
 
 
     >- UFO's
 
     >- ? signs will appear on the map
-    >- These are Unidentified Flying Objects
-    >- They could be a Belgian passenger plane, they could be a soviet bomber
-    >- Make sure to deal with the enemy UFO's, but keep the friendly ones safe
-        >- Or they will decrease security
-
-    ? Unknown, ^ Neutral, & Friendly, ! Enemy
+    >- These are UFO's
+    >- You must check them to see if they are friendly or enemies
