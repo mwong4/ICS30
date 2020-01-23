@@ -199,7 +199,7 @@ int main()
         }
         else //Otherwise, initiate ending/game over
         {
-            menuInput = 2;
+            menuInput = 3;
         }
 
         if(menuInput == 1)
@@ -607,6 +607,7 @@ bool gameOverScreen(GameInfo _data, string savedMessage)
     cout << "               >- Would you like to play again?" << endl << "            ";
     if(getConfirmation()) //If they want to play again: return false
     {
+        system("CLS");
         return false;
     }
     return true; //Else, return true
@@ -1405,7 +1406,6 @@ void actionMenu(string _actionOption[], UFO& _ufo, Building _buildObject[], Play
 void launchNukes(GameInfo& _gameData)
 {
     cout << endl << "    >- The president has authorized full use of all nuclear weapons on pre-determined targets. Please confirm order:" << endl;
-
     if(getConfirmation())
     {
         cout << "    >- Processing" << endl;
