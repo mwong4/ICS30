@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1579710992 source:c:\users\max pc\desktop\maxwong_retialprogram\main.cpp
+	<iostream>
+	<limits>
+	<windows.h>
+	<math.h>
+

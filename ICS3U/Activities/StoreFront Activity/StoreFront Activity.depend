@@ -23,3 +23,15 @@
 	<windows.h>
 	<fstream>
 
+1578010652 source:c:\users\max pc\documents\github\ics30\ics3u\activities\storefront activity\main.cpp
+	<iostream>
+	<conio.h>
+	<stdlib.h>
+	<sstream>
+	<iomanip>
+	<math.h>
+	<string>
+	<dos.h>
+	<windows.h>
+	<fstream>
+

@@ -1,0 +1,17 @@
+# depslib dependency file v1.0
+1579575052 source:c:\users\max pc\desktop\maxwong_numerator_project\main.cpp
+	<iostream>
+	<limits>
+	<string>
+	<cstring>
+	<math.h>
+	<stdio.h>
+
+1579575052 source:c:\users\max pc\desktop\examprep\maxwong_numerator_project\main.cpp
+	<iostream>
+	<limits>
+	<string>
+	<cstring>
+	<math.h>
+	<stdio.h>
+

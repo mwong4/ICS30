@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1579616788 source:c:\users\max pc\desktop\maxwong_short_question_3\main.cpp
+	<iostream>
+	<windows.h>
+

@@ -1,0 +1,84 @@
+/*
+>- Author: Max Wong
+>- Date: Jan 22, 2020
+>- Updated: Jan 22, 2020
+>- Purpose:
+*/
+
+==================================================
+
+#include<limits>     //For error trapping
+
+int getAnswer(int, int); //Function used to get the players response as an integer (with error trapping)
+
+int getAnswer (int _maxLimit, int _minLimit)
+{
+    int playerInput; //This variable is used to get the player's input
+    bool findingInput; //This bool determines if the loop continues running
+    do
+    {
+        findingInput = false; //By default, the loop will end
+        cout << "    >- Your input: "; //Get player input
+        cin >> playerInput;
+        if(cin.fail())//Check to see if player entered a "bad" input type
+        {
+            cin.clear(); //Clear all flags
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //ignore incorrect symbols
+            cout << "  >- Please enter a valid input number" << endl;
+            findingInput = true; //If the input is invalid, then the loop will loop
+        }
+        else if(playerInput > _maxLimit || playerInput < _minLimit ) //Otherwise, print an error message
+        {
+            cout << "  >- Please enter a number between " << _minLimit << " and " << _maxLimit << endl;
+            findingInput = true; //If the input is invalid, then the loop will loop
+        }
+    }
+    while(findingInput);
+    return playerInput;//Otherwise input is good, return input
+}
+
+==================================================
+
+#include<limits>     //For error trapping
+
+int getAnswer(); //Function used to get the players response as an integer (with error trapping)
+
+int getAnswer ()
+{
+    int playerInput; //This variable is used to get the player's input
+    bool findingInput; //This bool determines if the loop continues running
+    do
+    {
+        findingInput = false; //By default, the loop will end
+        cout << "    >- Your input: "; //Get player input
+        cin >> playerInput;
+        if(cin.fail())//Check to see if player entered a "bad" input type
+        {
+            cin.clear(); //Clear all flags
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //ignore incorrect symbols
+            cout << "  >- Please enter a valid input number" << endl;
+            findingInput = true; //If the input is invalid, then the loop will loop
+        }
+    }
+    while(findingInput);
+    return playerInput;//Otherwise input is good, return input
+}
+
+
+==================================================
+
+void displayMenu(string[], int); //Function to show the menu: All positions are options except last which is reserved for quit number
+
+//Displays the menu
+void displayMenu(string _options[], int _arraySize)
+{
+    //Display UI
+    cout << "    >- Please enter a direct command. Below are the primary listed commands.                                                  ";
+    cout << endl;
+    //Display instructions
+    for(int i = 0; i < _arraySize; i++) //For every option, display with number indicator
+    {
+        cout << "    >- [" << i+1 << "] " << _options[i] << endl;
+    }
+    return;
+}
