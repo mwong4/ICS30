@@ -5,14 +5,15 @@
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.7.5]
+>- [version 1.8.0]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
->- [Playtest Counter: 2]
+>- [Playtest Counter: 3]
 >-
 >- Thanks to the following people for play testing
     >- Thanks Mohammed Al-Anezi!
     >- Thanks Tieran Chan!
+    >- Thanks Jacob Kim!
     >-
 */
 
@@ -82,7 +83,7 @@ struct GameInfo //This struct holds the core game data
     float baseCost; //This is the price of the buildings
     int currentYear; //Year counter
     float defcon; //This is the world tension counter. If it reaches 1, everyone dies
-    char gameMap [199][55];//This is the double array that houses the whole map
+    char gameMap [199][50];//This is the double array that houses the whole map
     bool endGame; //This bool determines if we should close the game or not
     float nationalSecurity; //This float represents the security of the nation. If it reaches 0, game ends
 };
@@ -119,7 +120,7 @@ string getName(); //This function is used to get the player's name, disguised as
 bool getConfirmation(); //This function is to get a boolean response from the player
 
 void spawnUFO(UFO[], int, string[], string[], char[], GameInfo&); //This function is in charge of spawning all unscanned planes
-void setUFO(UFO&, string[], string[], char[], char[199][55]); //This function is in charge of setting the information on the plane
+void setUFO(UFO&, string[], string[], char[], char[199][50]); //This function is in charge of setting the information on the plane
 void resetUFOs(UFO[]); //This resets the position of the ufo's
 void scanMode(UFO[], GameInfo&, PlayerData&, string[]); //This function is used for all interactions between player and UFO's including a special UI place
 void ufoMenu(UFO[], int, GameInfo); //This function is a specialized function to display the ufo scan mode menu. It will be replaced wtih a more versitile menu function later
@@ -337,7 +338,7 @@ void setSpot(char& _spot, char _newValue)
 //This function is to set completely clean off the map at the start of the game
 void goThroughMap(GameInfo& _gameData, char _clearValue, bool _setMap)
 {
-    for(int i = 0; i < 55; i++) //Using double for loop, go through entire double array
+    for(int i = 0; i < 50; i++) //Using double for loop, go through entire double array
     {
         for(int j = 0; j < 199; j++)
         {
@@ -881,21 +882,21 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
             }
             else if(!hitRestriction)
             {
-                cout << "    >- This direction [^] is restricted" << endl;
+                cout << "    >- This direction [^] is restricted. It is soviet controlled territory." << endl;
                 hitRestriction = true;
             }
         }
         //Else if specific key is pressed:
         else if((GetKeyState('S') & 0x8000) || (GetKeyState(VK_DOWN) & 0x8000))
         {
-            if((_currentY + 2) <= 53 && !(inArea(198, 101, 324, 2, _currentX, _currentY + 1))) //Check to see if new position is legal
+            if((_currentY + 2) <= 49 && !(inArea(198, 101, 324, 2, _currentX, _currentY + 1))) //Check to see if new position is legal
             {
                 hitRestriction = false; //Set hit restriction to false
                 updatePosition(_gameData, 0, 2, true, _currentX, _currentY, _savedChar, _building); //Set spot of map back to saved character before exiting
             }
             else if(!hitRestriction)
             {
-                cout << "    >- This direction [v] is restricted" << endl;
+                cout << "    >- This direction [v] is restricted. It is soviet controlled territory." << endl;
                 hitRestriction = true;
             }
         }
@@ -909,7 +910,7 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
             }
             else if(!hitRestriction)
             {
-                cout << "    >- This direction [<-] is restricted" << endl;
+                cout << "    >- This direction [<-] is restricted. It is soviet controlled territory." << endl;
                 hitRestriction = true;
             }
         }
@@ -923,7 +924,7 @@ void keyboardMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _sa
             }
             else if(!hitRestriction)
             {
-                cout << "    >- This direction [->] is restricted" << endl;
+                cout << "    >- This direction [->] is restricted. It is soviet controlled territory." << endl;
                 hitRestriction = true;
             }
         }
@@ -942,7 +943,7 @@ void coordinateMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _
     tempX = getAnswer(198, 3); //Show range on x-axis. Get input
 
     cout << "    >- Please input your y-position between 3 - 43 " << endl;
-    tempY = getAnswer(43, 3); //Show range in y axis. Get input
+    tempY = 50 - getAnswer(47, 3); //Show range in y axis. Get input
 
     if(!(inArea(198, 101, 24, 1, tempX, tempY)))
     { //Check to see if player is trying to put bsae in soviet territory
@@ -950,7 +951,7 @@ void coordinateMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _
     }
     else //Else, person is not permitted to place base here. Let player know
     {
-         cout << endl << "    >- This area is a restricted Soviet and ally territory. Please choose another location" << endl;
+         cout << endl << "    >- This area is a restricted Soviet and soviet alligned territory. Please choose another location" << endl;
          anyInput();
     }
     return;
@@ -1009,7 +1010,7 @@ int getAnswer (int _maxLimit, int _minLimit)
 void displayMenu(string _options[], int _arraySize, PlayerData _data, int _year, bool showInfo)
 {
     //Display UI
-    cout << "    >- Please pick a command.                                                  ";
+    cout << "    >- Please pick a command.                                                                                             ";
     if(showInfo)
     {
         cout << "[January 1, " << _year << "] <> Current Department Balance: " << _data.currentBalance<< " billion dollars";
@@ -1105,7 +1106,7 @@ void spawnUFO(UFO _ufosData[], int _ufoCount, string _origin[], string _type[], 
 }
 
 //This function is in charge of setting the information on the plane
-void setUFO(UFO& _ufoData, string _origin[], string _type[], char _symbol[], char _gameMap[199][55])
+void setUFO(UFO& _ufoData, string _origin[], string _type[], char _symbol[], char _gameMap[199][50])
 {
     int randValue; //This represents a random value
     randValue = rand() % 10; //Determine random number to find out what allegiance is the plane
@@ -1145,7 +1146,7 @@ void setUFO(UFO& _ufoData, string _origin[], string _type[], char _symbol[], cha
         }
     }
     _ufoData.xPos = rand()%198; //Get the random x position
-    _ufoData.yPos = rand()%47 + 3; //Get the random y position
+    _ufoData.yPos = rand()%45 + 3; //Get the random y position
     setSpot(_ufoData.savedChar, _gameMap[_ufoData.xPos][_ufoData.yPos]); //Save the character on the map of the UFO before updating map
 
     //Now that ufo data is saved, update map data
@@ -1412,7 +1413,7 @@ void launchNukes(GameInfo& _gameData)
         _gameData.endGame = true; //End game set true now
         for(int i = 0; i < 120; i++) //Spawn 100 different ! marks to symbolize nuclear missiles
         {
-            setSpot(_gameData.gameMap[rand()%198][rand()%54], '!');
+            setSpot(_gameData.gameMap[rand()%198][rand()%47], '!');
         }
         goThroughMap(_gameData, ' ', false); //Display map
         cout << endl << "    >- Launch protocol status: |ACTIVE|" << endl;
@@ -1528,12 +1529,12 @@ void radioPlane(GameInfo& _gameData, UFO& _ufo)
             cout << "    >- UFO location classes as over mostly unalligned latin america " << endl;
             baseChance = 3;
         }
-        else if(inArea(100, 1, 54, 31, _ufo.xPos, _ufo.yPos)) //If plane is over soviet controlled area
+        else if(inArea(100, 1, 49, 31, _ufo.xPos, _ufo.yPos)) //If plane is over soviet controlled area
         {
             cout << "    >- UFO location classes as over soviet and proxy (enemy) controlled territory" << endl;
             baseChance = -30;
         }
-        else if(inArea(198, 101, 54, 25, _ufo.xPos, _ufo.yPos)) //If plane is over asia
+        else if(inArea(198, 101, 49, 25, _ufo.xPos, _ufo.yPos)) //If plane is over asia
         {
             cout << "    >- UFO location classes as over mostly neutral or western alligned asian continent" << endl;
             baseChance = 5;
