@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 20, 2020
+>- Updated: Jan 24, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
@@ -14,7 +14,7 @@
     >- Thanks Mohammed Al-Anezi!
     >- Thanks Tieran Chan!
     >- Thanks Jacob Kim!
-    >-
+    >- Thanks Alain Xu
 */
 
 //Declaring all used libraries
@@ -1063,6 +1063,14 @@ string getName()
     cout << "    |  >> Administrator (UNSC ID 8384-C)" << endl << "    |  >>> " << "unknown.IDENTIFY_userGroup" << endl << endl;
     cout << "    ________________________________" << endl << "    ================================" << endl << endl;
     */
+    cout << "    >- [version 1.8.2]" << endl;
+    cout << "    >- Thanks to Thomas Maloley for teaching me how to program with C++" << endl << endl;
+    cout << "    >- Thanks to the following people for play testing" << endl;
+    cout << "        >- Thanks Mohammed Al-Anezi!" << endl;
+    cout << "        >- Thanks Tieran Chan!" << endl;
+    cout << "        >- Thanks Jacob Kim!" << endl;
+    cout << "        >- Thanks Alain Xu" << endl;
+
     cout << endl << "    >- Please enter your pin and ID (HINT: You can put anything)" << endl << endl; //Print instructions
 
     cout << "    >- ID: ";
