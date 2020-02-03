@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1579901875 source:c:\users\max pc\desktop\rohansummative2\main.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<windows.h>
+
