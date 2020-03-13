@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1583880077 source:c:\users\max pc\desktop\stockincomesystem\main.cpp
+	<iostream>
+	<vector>
+	<stdlib.h>
+	<fstream>
+	<limits>
+

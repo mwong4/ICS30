@@ -1,0 +1,15 @@
+Apple
+100
+50
+unsold
+/////
+Microsoft
+160
+30
+unsold
+/////
+Google
+200
+140
+unsold
+/////
