@@ -9,7 +9,7 @@ Link image file
 */
 
 #include <iostream>
-#include <vector>
+#include <vector> //For vectors
 #include <stdlib.h>
 #include <fstream>  //For txt file
 #include <limits>     //For error trapping

@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1584906239 source:c:\users\max pc\documents\github\ics30\ics3u\rand\encryptianprogram\main.cpp
+	<iostream>
+	<vector>
+	<fstream>
+	<string>
+	<windows.h>
+
