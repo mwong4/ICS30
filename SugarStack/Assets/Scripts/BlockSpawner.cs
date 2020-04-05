@@ -14,6 +14,9 @@ public class BlockSpawner : MonoBehaviour {
 	public int difficulty; //This is the difficulty setting
 
 	public List<GameObject> treePieces;
+	private GameObject tempObj; //This is a temporary 
+
+	int countdown;
 
 	// Use this for initialization
 	void Start () {
@@ -21,14 +24,16 @@ public class BlockSpawner : MonoBehaviour {
 
 		spawnQueue = 10;
 		difficulty = 6;
+		countdown = 0;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		//this.gameObject.GetComponent<DisplayPoints>().displayPoints(20000);
+		countdown --; //always reduce counter
 
-		if(spawnQueue > 0)
+		//if something in queue and countdown is over
+		if(spawnQueue > 0 && countdown < 0)
 		{
 			//Generate random number
 			generateNumber = Random.Range(0, difficulty);
@@ -37,22 +42,23 @@ public class BlockSpawner : MonoBehaviour {
 			if(generateNumber - (difficulty - 2) < 0)
 			{
 				//spawn normal
-				Instantiate(treeOrig);
-				treePieces.Add(treeOrig); //Add to list
+				tempObj = Instantiate(treeOrig);
+				treePieces.Add(tempObj); //Add to list
 			}
 			else if(generateNumber - (difficulty - 2) == 0)
 			{
 				//spawn right branch
-				Instantiate(treeRight);
-				treePieces.Add(treeRight); //Add to list
+				tempObj = Instantiate(treeRight);
+				treePieces.Add(tempObj); //Add to list
 			}
 			else if(generateNumber - (difficulty - 2) > 0)
 			{
 				//spawn left branch
-				Instantiate(treeLeft);
-				treePieces.Add(treeLeft); //Add to list
+				tempObj = Instantiate(treeLeft);
+				treePieces.Add(tempObj); //Add to list
 			}
 			spawnQueue --; //Decrease queue by 1
+			countdown = 20; //reset countdown
 		}
 	}
 }

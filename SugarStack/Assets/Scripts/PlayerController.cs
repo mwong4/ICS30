@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		transform.position = new Vector2(7,-3);
+		atRight = true;
 	}
 	
 	// Update is called once per frame
