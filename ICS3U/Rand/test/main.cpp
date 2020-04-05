@@ -2,14 +2,17 @@
 
 using namespace std;
 
+const char CHARS[26] = {'a', 'b', 'c','d','e','f','g','h','i','j','k','l','m','n','o','v','q','r','s','t','u','v','w','x','y','z'};
+
+void display(int, int, int);
+
 int main()
 {
-    //string tempString(1, 'a');
-    //cout << tempString;
 
-    string hi = "";
-    hi.push_back('a');
-    hi.push_back('c');
-    cout << hi << endl;
     return 0;
+}
+
+void display(int a, int b, int c)
+{
+
 }

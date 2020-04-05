@@ -15,6 +15,7 @@ TO DO
 //Libraries used
 #include <iostream>
 #include<limits> //For error trapping
+#include<windows.h> //For rand and system
 
 //Pre-processor commands used
 using namespace std;
@@ -69,7 +70,7 @@ int main()
 
         if(getInput == 1) //If option 1 is chosen
         {
-            cout << ">- Please the card you would like to display (from 0 to 51)" << endl;
+            cout << ">- Please indicate the card you would like to display (from 0 to 51)" << endl;
             viewWhichCard = getAnswer(51,0); //Get a specific card to display
             displayCard(myCards[viewWhichCard]); //Then call function to display it
         }
