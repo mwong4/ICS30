@@ -14,10 +14,9 @@ public class IsGrounded : MonoBehaviour {
 	//To tell if grounded
 	void OnCollisionEnter2D (Collision2D obj)
 	{
-		Debug.Log("Collision");
 		if(obj.gameObject.tag == "floor")
 		{
-			Debug.Log("Updated");
+			this.gameObject.GetComponent<Rigidbody2D>().constraints = ~RigidbodyConstraints2D.FreezePositionX & ~RigidbodyConstraints2D.FreezePositionY;
 			grounded = true;
 		}
 	}

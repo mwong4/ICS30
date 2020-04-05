@@ -55,9 +55,13 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\BlockSpawner.cs" />
      <Compile Include="Assets\Scripts\CutTree.cs" />
+     <Compile Include="Assets\Scripts\DeathOnCollision.cs" />
      <Compile Include="Assets\Scripts\DisplayPoints.cs" />
      <Compile Include="Assets\Scripts\IsGrounded.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
+     <Compile Include="Assets\Scripts\RestartOnClick.cs" />
+     <Compile Include="Assets\Scripts\SelfDestruct.cs" />
+     <Compile Include="Assets\Scripts\StartOnClick.cs" />
      <Compile Include="Assets\Scripts\TimerScript.cs" />
  <Reference Include="UnityEditor.StandardEvents">
  <HintPath>C:/Users/Max pc/Documents/GitHub/ICS30/SugarStack/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>

@@ -5,10 +5,12 @@ using UnityEngine;
 public class BlockSpawner : MonoBehaviour {
 
 	public GameObject treeOrig; //Prefab items
-	public GameObject treeRight;
-	public GameObject treeLeft;
+	public GameObject treeLongLeft;
+	public GameObject treeLongRight;
+	public GameObject treeShortLeft;
+	public GameObject treeShortRight;
 
-	public int spawnQueue; //Queue of numbers
+	public float spawnQueue; //Queue of numbers
 	private int generateNumber; //Number randomly generated
 
 	public int difficulty; //This is the difficulty setting
@@ -16,7 +18,8 @@ public class BlockSpawner : MonoBehaviour {
 	public List<GameObject> treePieces;
 	private GameObject tempObj; //This is a temporary 
 
-	int countdown;
+	int countdown; //This counts down before updating difficulty
+	bool firstOne; //Tells if log spawned is first one
 
 	// Use this for initialization
 	void Start () {
@@ -25,6 +28,7 @@ public class BlockSpawner : MonoBehaviour {
 		spawnQueue = 10;
 		difficulty = 6;
 		countdown = 0;
+		firstOne = true;
 	}
 	
 	// Update is called once per frame
@@ -33,7 +37,7 @@ public class BlockSpawner : MonoBehaviour {
 		countdown --; //always reduce counter
 
 		//if something in queue and countdown is over
-		if(spawnQueue > 0 && countdown < 0)
+		if(spawnQueue > 0 && countdown < 0 && !firstOne)
 		{
 			//Generate random number
 			generateNumber = Random.Range(0, difficulty);
@@ -48,17 +52,43 @@ public class BlockSpawner : MonoBehaviour {
 			else if(generateNumber - (difficulty - 2) == 0)
 			{
 				//spawn right branch
-				tempObj = Instantiate(treeRight);
-				treePieces.Add(tempObj); //Add to list
+				if(Random.Range(0, 2) == 1)
+				{
+					tempObj = Instantiate(treeLongRight);
+					treePieces.Add(tempObj); //Add to list
+				}
+				else
+				{
+					tempObj = Instantiate(treeLongLeft);
+					treePieces.Add(tempObj); //Add to list
+				}
 			}
 			else if(generateNumber - (difficulty - 2) > 0)
 			{
 				//spawn left branch
-				tempObj = Instantiate(treeLeft);
-				treePieces.Add(tempObj); //Add to list
+				if(Random.Range(0, 2) == 1)
+				{
+					tempObj = Instantiate(treeShortRight);
+					treePieces.Add(tempObj); //Add to list
+				}
+				else
+				{
+					tempObj = Instantiate(treeShortLeft);
+					treePieces.Add(tempObj); //Add to list
+				}
 			}
 			spawnQueue --; //Decrease queue by 1
 			countdown = 20; //reset countdown
+		}
+		else if(firstOne)
+		{
+			//spawn normal
+			tempObj = Instantiate(treeOrig);
+			treePieces.Add(tempObj); //Add to list
+
+			spawnQueue --; //Decrease queue by 1
+			countdown = 20; //reset countdown
+			firstOne = false; //Set first one off
 		}
 	}
 }

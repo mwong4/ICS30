@@ -6,7 +6,13 @@ using UnityEngine.UI;
 public class TimerScript : MonoBehaviour {
 
 	public float countdown; //If this reaches 0, game ends
-	public Image timeBar;
+	public Image timeBar; //Time holding text component
+
+	//referencing player scripts
+	public CutTree cutTree; 
+	public PlayerController playerController;
+
+	public GameObject restartMenu; //This is the restart menu obj
 
 	// Use this for initialization
 	void Start () {
@@ -21,7 +27,9 @@ public class TimerScript : MonoBehaviour {
 		if(countdown < 0) //If time is out
 		{
 			//trigger game over
-			Debug.Log("Game Over");
+			restartMenu.SetActive(true);
+			cutTree.active = false; //freeze cutting
+			playerController.active = false;//freeze movement
 		}
 		else if(countdown > 1000)
 		{
