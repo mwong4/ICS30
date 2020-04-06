@@ -31,6 +31,7 @@ public class CutTree : MonoBehaviour {
 			//check if grounded
 			if(blockSpawner.treePieces[0].GetComponent<IsGrounded>().grounded == true)
 			{
+				blockSpawner.treePieces[0].GetComponent<IsGrounded>().destroyed = true; //Set branch to destroyed
 				Destroy(blockSpawner.treePieces[0], 0.3f); //if yes -> destory
 				force = 20.0f + 4.0f*(10.0f-blockSpawner.spawnQueue);//calculate force
 				blockSpawner.treePieces[0].GetComponent<Rigidbody2D>().AddForce(transform.right * force, ForceMode2D.Impulse); //Use force

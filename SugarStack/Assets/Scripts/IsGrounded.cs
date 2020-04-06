@@ -5,10 +5,12 @@ using UnityEngine;
 public class IsGrounded : MonoBehaviour {
 
 	public bool grounded; //boolean to tell if grounded
+	public bool destroyed; //Indicates if branch is broken
 
 	void start()
 	{
 		grounded = false; //originally no
+		destroyed = false; //Starts alive
 	}
 
 	//To tell if grounded

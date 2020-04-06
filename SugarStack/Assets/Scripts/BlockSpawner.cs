@@ -21,6 +21,9 @@ public class BlockSpawner : MonoBehaviour {
 	int countdown; //This counts down before updating difficulty
 	bool firstOne; //Tells if log spawned is first one
 
+	bool recentRight; //recently did right
+	bool recentLeft; //recently did left
+
 	// Use this for initialization
 	void Start () {
 		List<GameObject> treePieces = new List<GameObject>(); //This list is composed of the tree components
@@ -48,39 +51,59 @@ public class BlockSpawner : MonoBehaviour {
 				//spawn normal
 				tempObj = Instantiate(treeOrig);
 				treePieces.Add(tempObj); //Add to list
+
+				//updating recent values
+				recentRight = false;
+				recentLeft = false;
 			}
 			else if(generateNumber - (difficulty - 2) == 0)
 			{
 				//spawn right branch
-				if(Random.Range(0, 2) == 1)
+				if(Random.Range(0, 2) == 1 && !recentLeft || recentRight)
 				{
 					tempObj = Instantiate(treeLongRight);
 					treePieces.Add(tempObj); //Add to list
+
+					//updating recent values
+					recentRight = true;
+					recentLeft = false;
 				}
-				else
+				else if(!recentRight)
 				{
 					tempObj = Instantiate(treeLongLeft);
 					treePieces.Add(tempObj); //Add to list
+
+					//updating recent values
+					recentRight = false;
+					recentLeft = true;
 				}
 			}
 			else if(generateNumber - (difficulty - 2) > 0)
 			{
 				//spawn left branch
-				if(Random.Range(0, 2) == 1)
+				if(Random.Range(0, 2) == 1 && !recentLeft || recentRight)
 				{
 					tempObj = Instantiate(treeShortRight);
 					treePieces.Add(tempObj); //Add to list
+
+					//updating recent values
+					recentRight = true;
+					recentLeft = false;
 				}
-				else
+				else if(!recentRight)
 				{
 					tempObj = Instantiate(treeShortLeft);
 					treePieces.Add(tempObj); //Add to list
+
+					//updating recent values
+					recentRight = false;
+					recentLeft = true;
 				}
 			}
 			spawnQueue --; //Decrease queue by 1
 			countdown = 20; //reset countdown
 		}
-		else if(firstOne)
+		else if(firstOne && countdown < 0)
 		{
 			//spawn normal
 			tempObj = Instantiate(treeOrig);

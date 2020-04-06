@@ -34,8 +34,7 @@ public class TimerScript : MonoBehaviour {
 		else if(countdown > 1000)
 		{
 			//if too much time
-			countdown = 1000;
-			//reset to 1000
+			countdown = 1000; //reset to 1000
 		}
 	}
 }

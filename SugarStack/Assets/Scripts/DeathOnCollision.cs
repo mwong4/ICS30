@@ -15,7 +15,7 @@ public class DeathOnCollision : MonoBehaviour {
 	void OnCollisionEnter2D (Collision2D obj)
 	{
 		Debug.Log("Hit");
-		if(obj.gameObject.tag == "Branch")
+		if(obj.gameObject.tag == "Branch" && !obj.gameObject.GetComponent<IsGrounded>().destroyed)
 		{
 			Debug.Log("Died");
 			//trigger game over
