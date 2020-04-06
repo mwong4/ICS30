@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		transform.position = new Vector2(4,-3);
+		transform.position = new Vector2(2.5f,-2.8f);
 		atRight = true;
 		active = true;
 	}
@@ -18,13 +18,13 @@ public class PlayerController : MonoBehaviour {
 	void Update () {
 		if(Input.GetKeyDown(KeyCode.RightArrow) && !atRight && active) //If player is on left and chooses to go right
 		{
-			transform.position = new Vector2(4,-3); //Change position to right
+			transform.position = new Vector2(2.5f,-2.8f); //Change position to right
 			transform.rotation = Quaternion.Euler(Vector3.up * 180); //Rotate to face into center
 			atRight = true; //Update variable
 		}
 		else if(Input.GetKeyDown(KeyCode.LeftArrow) && atRight && active) //If player is on right and chooses to go left
 		{
-			transform.position = new Vector2(-4,-3); //Change position to left
+			transform.position = new Vector2(-2.5f,-2.8f); //Change position to left
 			transform.rotation = Quaternion.Euler(Vector3.up * 360); //Rotate to face into center
 			atRight = false; //Update variable
 		}
