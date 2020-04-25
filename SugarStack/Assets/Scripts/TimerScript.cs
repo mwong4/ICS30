@@ -23,7 +23,7 @@ public class TimerScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		countdown -= takeAway;
+		countdown -= (Time.deltaTime*takeAway*25);
 		timeBar.fillAmount = countdown / 3000;
 
 		if(countdown < 0) //If time is out
