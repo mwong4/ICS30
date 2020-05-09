@@ -1,14 +1,14 @@
 /*
 >- Author: Max Wong
 >- Date: Sep 1, 2019
->- Updated: Jan 24, 2020
+>- Updated: May 9, 2020
 >- Purpose: To write a game for a summative project.
 >- Game should incorperate all the major programming requirements from the course.
 >-
->- [version 1.8.2]
+>- [version 1.8.4]
 >-Thanks to Thomas Maloley for teaching me how to program with C++
 >-
->- [Playtest Counter: 3]
+>- [Playtest Counter: 4]
 >-
 >- Thanks to the following people for play testing
     >- Thanks Mohammed Al-Anezi!
@@ -944,7 +944,7 @@ void coordinateMode(GameInfo& _gameData, int& _currentX, int& _currentY, char& _
     tempX = getAnswer(198, 3); //Show range on x-axis. Get input
 
     cout << "    >- Please input your y-position between 3 - 43 " << endl;
-    tempY = 50 - getAnswer(47, 3); //Show range in y axis. Get input
+    tempY = getAnswer(47, 3); //Show range in y axis. Get input
 
     if(!(inArea(198, 101, 27, 1, tempX, tempY)))
     { //Check to see if player is trying to put bsae in soviet territory
@@ -1147,11 +1147,11 @@ void setUFO(UFO& _ufoData, string _origin[], string _type[], char _symbol[], cha
         _ufoData.type = _type[randValue]; //Take integer and set the type of the plane
         if(randValue == 1 || randValue == 2) //Give custom symbol depending of if plane is neutral enemy or agressive enemy
         {
-            _ufoData.symbol = '!'; //Agressive
+            _ufoData.symbol = '^'; //Neutral
         }
         else
         {
-            _ufoData.symbol = '^'; //Neutral
+            _ufoData.symbol = '!'; //Agressive
         }
     }
     _ufoData.xPos = rand()%198; //Get the random x position

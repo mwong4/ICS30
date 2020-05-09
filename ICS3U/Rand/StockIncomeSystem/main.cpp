@@ -1,11 +1,15 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: Mar 10, 2020
+>- Updated: April 25, 2020
 >- Purpose: To write a program to practice vectors
 
 To Do
 Link image file
+
+extra info
+    display
+    adding stocks
 */
 
 #include <iostream>
@@ -23,6 +27,9 @@ struct Stock
     int dividend; //This represents the income the stock brings
     string status; //This represents the status of the stock
     string emptyFiller; //This is a filler string
+
+    //extra info
+    string extraInfo; //This contains any extra info stored as a chain
 };
 
 
@@ -145,9 +152,10 @@ void showStocks(int* _stockCount, vector<Stock> _stocks)
     {
         cout << " >- " << i+1 << ". Name|| " << _stocks[i].name << endl;
         cout << " >- Cost|| " << _stocks[i].cost << endl;
-        cout <<" >- Return/m|| " << _stocks[i].dividend << endl;
-        cout <<" >- Status|| " << _stocks[i].status << endl;
-        cout <<" >- empty|| " << _stocks[i].emptyFiller << endl << endl;
+        cout << " >- Return/m|| " << _stocks[i].dividend << endl;
+        cout << " >- Status|| " << _stocks[i].status << endl;
+        cout << " >- empty|| " << _stocks[i].emptyFiller << endl;
+        cout << " >- Extra Info|| " << _stocks[i].extraInfo << endl << endl;
     }
     return;
 }
@@ -194,6 +202,8 @@ void addStock(vector<Stock>* _stocks, int* _size)
     cin >> tempStock.status;
     cout << " >- Filler Value" << endl;
     cin >> tempStock.emptyFiller;
+    cout << " >- What extra information would you like?" << endl;
+    cin >> tempStock.extraInfo;
 
     (*_stocks).push_back(tempStock); //Push stock to list
     *_size += 1; //Update index
@@ -217,25 +227,29 @@ void resetVector(vector<Stock>* _stocks, int* _size, int _file)
     {
         while(getline(stockFile_,line)) //This function uses the builtin function: getline
         {
-            if(lineRow % 5 == 0)
+            if(lineRow % 6 == 0)
             {
                 tempStock.name = line;
             }
-            else if(lineRow % 5 == 1)
+            else if(lineRow % 6 == 1)
             {
                 tempStock.cost = atoi(line.c_str());
             }
-            else if(lineRow % 5 == 2)
+            else if(lineRow % 6 == 2)
             {
                 tempStock.dividend = atoi(line.c_str());
             }
-            else if(lineRow % 5 == 3)
+            else if(lineRow % 6 == 3)
             {
                 tempStock.status = line;
             }
-            else if(lineRow % 5 == 4)
+            else if(lineRow % 6 == 4)
             {
                 tempStock.emptyFiller = line;
+            }
+            else if(lineRow % 6 == 5)
+            {
+                tempStock.extraInfo = line;
                 (*_stocks).push_back(tempStock);
                 *_size += 1;
             }
@@ -247,25 +261,29 @@ void resetVector(vector<Stock>* _stocks, int* _size, int _file)
     {
         while(getline(myStocksFile_,line)) //This function uses the builtin function: getline
         {
-            if(lineRow % 5 == 0)
+            if(lineRow % 6 == 0)
             {
                 tempStock.name = line;
             }
-            else if(lineRow % 5 == 1)
+            else if(lineRow % 6 == 1)
             {
                 tempStock.cost = atoi(line.c_str());
             }
-            else if(lineRow % 5 == 2)
+            else if(lineRow % 6 == 2)
             {
                 tempStock.dividend = atoi(line.c_str());
             }
-            else if(lineRow % 5 == 3)
+            else if(lineRow % 6 == 3)
             {
                 tempStock.status = line;
             }
-            else if(lineRow % 5 == 4)
+            else if(lineRow % 6 == 4)
             {
                 tempStock.emptyFiller = line;
+            }
+            else if(lineRow % 6 == 5)
+            {
+                tempStock.extraInfo = line;
                 (*_stocks).push_back(tempStock);
                 *_size += 1;
             }
@@ -321,6 +339,7 @@ void writeFile(vector<Stock>* _stocks, int* _size, int _file)
             myfile << (*_stocks)[i].dividend << endl;
             myfile << (*_stocks)[i].status << endl;
             myfile << (*_stocks)[i].emptyFiller << endl;
+            myfile << (*_stocks)[i].extraInfo << endl;
         }
         else if(_file == 2)
         {
@@ -329,6 +348,7 @@ void writeFile(vector<Stock>* _stocks, int* _size, int _file)
             stockFile << (*_stocks)[i].dividend << endl;
             stockFile << (*_stocks)[i].status << endl;
             stockFile << (*_stocks)[i].emptyFiller << endl;
+            stockFile << (*_stocks)[i].extraInfo << endl;
         }
     }
 
