@@ -1,7 +1,7 @@
 /*****************************************
 
 Title: Library Summative
-Date Last Modified: June 9, 2020
+Date Last Modified: June 11, 2020
 Description: Gives you the job of both the librarian and the customer.
 
 *****************************************/
@@ -15,7 +15,7 @@ struct Book
 {
     string title;
     string author;
-    int pages;
+    string pages;
     string availability;
     bool removeBook;
 };
@@ -27,7 +27,7 @@ struct Library
 };
 int career_opt();//called when choosing between librarian and customer
 int librarian_opt();//called when choosing options associated with the librarian
-int costumer_opt();//called when choosing options associated with the customer
+int customer_opt();//called when choosing options associated with the customer
 void add_book(Library&);//called when adding a book to the array
 void remove_book(Library&, int);//called when removing a book to the array
 int search_book(Library&, int);//called when searching for book
@@ -41,13 +41,16 @@ void initalize_availability(Library&, int);//inititalizes the availability of th
 void initalize_removeBook(Library&, int);//determines if the book is going to be viewable
 void modify_book(Library&, int);//called when modifying book info
 void view_content(Library);//displays every book
-void rewrite_file(Library);
+void rewrite_file(Library);//puts all of the books data in the external file
+void readFile(Library&);//puts the information from the external file back into the stream
 
 int main()
 {
     int career, librarian_menu, customer_menu;
     Library myLibrary;
     myLibrary.book_total = 0;
+
+    readFile(myLibrary);
 
     do
     {
@@ -65,15 +68,17 @@ int main()
             else if (librarian_menu == 2)//search for book
             {
                 search_book(myLibrary, career);
+                rewrite_file(myLibrary);
             }
         }
         else if (career == 2)//customer
         {
-            customer_menu = costumer_opt();//determines what they want to do
+            customer_menu = customer_opt();//determines what they want to do
 
             if (customer_menu == 1)//search for book
             {
                 search_book(myLibrary, career);
+                rewrite_file(myLibrary);
             }
             else if (customer_menu == 2)//view libraries content
             {
@@ -121,7 +126,7 @@ int librarian_opt()//called when choosing options associated with the librarian
     return choice;
 }
 
-int costumer_opt()//called when choosing options associated with the customer
+int customer_opt()//called when choosing options associated with the customer
 {
     int choice;
     do
@@ -153,14 +158,13 @@ void add_book(Library& myLibrary)//called when adding a book to the array
 void remove_book(Library& myLibrary, int i)//called when removing a book to the array
 {
     myLibrary.books[i].removeBook = true;//if myLibrary.book[i].removeBook = true; then that book won't be viewed
-    myLibrary.book_total--;
     return;
 }
 
 int search_book(Library& myLibrary, int career)//called when searching for book
 {
-    int choice, pages_;
-    string title_, author_;
+    int choice;
+    string title_, author_, pages_;
 
     do
     {
@@ -182,7 +186,8 @@ int search_book(Library& myLibrary, int career)//called when searching for book
         else if (choice == 3)//searching for book by the number of pages
         {
             cout << "\nHow many pages does the book have?" << endl;
-            cin >> pages_;
+            cin.ignore();
+            getline(cin, pages_);
         }
         if (choice < 1 || choice > 3)
         {
@@ -325,7 +330,7 @@ void initalize_author(Library& myLibrary, int i)//initializes the author of a bo
 void initalize_pages(Library& myLibrary, int i)//initializes the pages of a book
 {
     cout << "How many pages does the book have?" << endl;
-    cin >> myLibrary.books[i].pages;
+    getline(cin, myLibrary.books[i].pages);
     return;
 }
 
@@ -371,6 +376,7 @@ void modify_book(Library& myLibrary, int i)//called when modifying book info
         }
         else if (choice == 3)
         {
+            cin.ignore();//incase a cin statement was used right before this
             initalize_pages(myLibrary, i);
         }
     }
@@ -387,14 +393,13 @@ void view_content(Library myLibrary)//displays every book
     return;
 }
 
-void rewrite_file(Library myLibrary)
+void rewrite_file(Library myLibrary)//puts all of the books data in the external file
 {
     ofstream extFile;
 
-    extFile.open("Library.txt", ios::trunc);
-    if(extFile.is_open())
+    extFile.open("Library.txt", ios::trunc);//opens the file and everytime this runs it wripes the data and rewrites it
+    if(extFile.is_open())//if file is opem
     {
-        extFile << myLibrary.book_total << endl;
         for (int i = 0; i < myLibrary.book_total; i++)
         {
             extFile << myLibrary.books[i].title << endl;
@@ -403,12 +408,48 @@ void rewrite_file(Library myLibrary)
             extFile << myLibrary.books[i].availability << endl;
             extFile << myLibrary.books[i].removeBook << endl;
         }
-        cout << "File opened" << endl;
-        extFile.close();
+        extFile.close();//close the file
     }
-    else
+    return;
+}
+
+void readFile(Library& myLibrary)//puts the information from the external file back into the stream
+{
+    ifstream libraryFile_;
+    string line1;
+    bool line2;
+    int currentRow = 0;
+    libraryFile_.open("Library.txt");//opens the file
+
+    if(libraryFile_.is_open())//if the file is open
     {
-        cout << "File didn't open\n\n";
+        while(getline(libraryFile_,line1) || libraryFile_ >> line2)
+        {
+            if(currentRow % 5 == 0)
+            {
+                myLibrary.books[myLibrary.book_total].title = line1;
+            }
+            else if(currentRow % 5 == 1)
+            {
+                myLibrary.books[myLibrary.book_total].author = line1;
+            }
+            else if(currentRow % 5 == 2)
+            {
+                myLibrary.books[myLibrary.book_total].pages = line1;
+            }
+            else if(currentRow % 5 == 3)
+            {
+                myLibrary.books[myLibrary.book_total].availability = line1;
+            }
+            else if(currentRow % 5 == 4)
+            {
+                cout << line2 << endl;
+                myLibrary.books[myLibrary.book_total].removeBook = line2;
+                myLibrary.book_total++;//counts the book number
+            }
+            currentRow++;
+        }
+        libraryFile_.close(); //Close file
     }
     return;
 }
