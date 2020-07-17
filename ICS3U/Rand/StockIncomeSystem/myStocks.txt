@@ -1,7 +1,13 @@
-193.06
+174.9
 Apple
-10
-58
+9
+50
 sold
-5
+1
 Most popular platforms include the mobile iphone and ipad series. Main desktop series is an integrated tower-monitor OSX series -> current version is El Capitain.
+Microsoft
+160
+30
+sold
+1
+Most popular platforms include Windows 7 and 10. Currently owners of multiple game franchises including Xbox and Minecraft.

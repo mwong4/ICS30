@@ -6,11 +6,6 @@
 
 To Do
 Link image file
-
-extra info
-    display
-
-    Upgade sell/barter
 */
 
 #include <iostream>
@@ -32,6 +27,7 @@ struct Stock
     int dividend; //This represents the income the stock brings
     string status; //This represents the status of the stock
     int timeOwned; //This is a filler string
+    bool triedSelling; //to prevent spamming the selling button
 
     //extra info
     string extraInfo; //This contains any extra info stored as a chain
@@ -65,6 +61,8 @@ int main()
 
     int inputValue = 0; //This int represents what the player inputs
     int savedNumber = 0; //For saving a number temp
+    int markup = 0; //How much the player is willing to mark up their product
+    int randNum = 0; //Rand num assigned by the computer
 
     vector<Stock> stockSelection; //This vector represents the available stocks
     int selectionSize = 0; //This determines the size of the selection
@@ -143,14 +141,41 @@ int main()
 
                 if(inputValue == 1)
                 {
-                    cout << " >- Are you sure? Press 1 for yes" << endl;
-                    getAnswer(2, 1, &inputValue);
-                    if(inputValue == 1)
+                    if(!myData.ownedStock[savedNumber-1].triedSelling)
                     {
-                        myData.balance += myData.ownedStock[savedNumber-1].cost; //Seel your item and get money
-                        myData.ownedStock.erase(myData.ownedStock.begin() + savedNumber-1); //Erase the chosen element
-                        myData.index --; //Decrease index
+                        cout << " >- Please enter a markup: "; //get player's markup
+                        getAnswer(myData.balance, -myData.ownedStock[savedNumber-1].cost, &markup);
+
+                        //Display availability
+                        cout << " >- Action Available: ";
+                        if(myData.ownedStock[savedNumber-1].triedSelling) cout << "No" << endl;
+                        else cout << "Yes" << endl;
+                        //Display Chance
+                        cout << " >- Chance of success: " << 100 - round((markup*150)/myData.ownedStock[savedNumber-1].cost) - 20 + myData.ownedStock[savedNumber-1].timeOwned*2 << "%" << endl;
+                        //Breakdown
+                        cout << "             >- 100% - 20%(Base) - " << round((markup*150)/myData.ownedStock[savedNumber-1].cost) << "%(For Markup) + " << myData.ownedStock[savedNumber-1].timeOwned*2 << "%(Time Owned)" << endl;
+                        //Revenue
+                        cout << " >- Approximate Revenue: " << myData.ownedStock[savedNumber-1].cost + myData.ownedStock[savedNumber-1].cost*0.001*myData.ownedStock[savedNumber-1].timeOwned + markup << endl << endl;
+
+                        cout << " >- Are you sure? Press 1 for Yes. 2 for No" << endl;
+                        getAnswer(2, 1, &inputValue);
+                        if(inputValue == 1)
+                        {   //Spin the lottery wheel!
+                            if(rand()%100 > 100 - round((markup*150)/myData.ownedStock[savedNumber-1].cost) - 20 + myData.ownedStock[savedNumber-1].timeOwned*2)
+                            {
+                                cout << " >- Selling Failed" << endl;
+                                myData.ownedStock[savedNumber-1].triedSelling = true;
+                            }
+                            else
+                            {
+                                cout << " >- Sold Success" << endl;
+                                myData.balance += myData.ownedStock[savedNumber-1].cost; //Seel your item and get money
+                                myData.ownedStock.erase(myData.ownedStock.begin() + savedNumber-1); //Erase the chosen element
+                                myData.index --; //Decrease index
+                            }
+                        }
                     }
+                    else cout << " >- Action not available" << endl;
                 }
                 else if(inputValue == 2)
                 {
@@ -225,7 +250,8 @@ void updateMonth(UserData* _data)
 
     for(int i = 0; i < (*_data).index; i++) //For each stock owned, increase time owned by a month
     {
-        (*_data).ownedStock[i].timeOwned ++;
+        (*_data).ownedStock[i].timeOwned ++; //increase age
+        (*_data).ownedStock[i].triedSelling = false; //set to false
     }
     return;
 }
@@ -332,6 +358,7 @@ void resetVector(vector<Stock>* _stocks, int* _size, int _file, float* _balance)
             }
             else if(lineRow % 6 == 5)
             {
+                tempStock.triedSelling = false; //by default set to false
                 tempStock.extraInfo = line;
                 (*_stocks).push_back(tempStock);
                 *_size += 1;
