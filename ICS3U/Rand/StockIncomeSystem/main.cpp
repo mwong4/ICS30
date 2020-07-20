@@ -1,11 +1,14 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: July 16, 2020
+>- Updated: July 19, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
 Link image file
+
+Fix rounding/missing money bug?
+    Upgrade
 */
 
 #include <iostream>
@@ -38,6 +41,7 @@ struct UserData
 {
     int index; //This represents how many items are in the vector
     float balance; //This represents the amout of money you have
+    int timeKeeper; //keeps track of the time
     vector<Stock> ownedStock; //This vector saves all the stock you have
 };
 
@@ -46,11 +50,11 @@ void showStocks(int*, vector<Stock>, int); //This function is in charge of displ
 float countIncome(int*, vector<Stock>); //This function is in charge of finding and returning your monthly income
 void resetData(UserData*); //This resets user data as the initializer
 void updateMonth(UserData*); //This ends your turn/month
-void resetVector(vector<Stock>*, int*, int, float*); //This function is used to find each line in the stock file and save it into the vector
+void resetVector(vector<Stock>*, int*, int, float*, int*); //This function is used to find each line in the stock file and save it into the vector
 void getAnswer(int, int, int*); //Function used to get the players response as an integer (with error trapping)
-void writeFile(vector<Stock>*, int*, int, float*); //This function is in charge of saving the vector into the txt file
+void writeFile(vector<Stock>*, int*, int, float*, int*); //This function is in charge of saving the vector into the txt file
 void wipeFile(int); //Wipe file
-void addStock(vector<Stock>*, int*, float*); //Used to add a new stock
+void addStock(vector<Stock>*, int*, float*, int*); //Used to add a new stock
 
 int main()
 {
@@ -69,15 +73,16 @@ int main()
     int selectionSize = 0; //This determines the size of the selection
 
     //Get the stocks selection
-    resetVector(&stockSelection, &selectionSize, 1, &myData.balance);
+    resetVector(&stockSelection, &selectionSize, 1, &myData.balance, &myData.timeKeeper);
 
     //Get user owned stocks
-    resetVector(&myData.ownedStock, &myData.index, 2, &myData.balance);
+    resetVector(&myData.ownedStock, &myData.index, 2, &myData.balance, &myData.timeKeeper);
 
     while(inputValue < 5)
     {
         cout << " >- Welcome, You have: ~" << round(myData.balance) << " hundred thousand dollars" << endl;
         cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars" << endl;
+        cout << " >- Current Month Count: ||" << myData.timeKeeper << "||" << endl;
         cout << " >- Press 1 to see stocks" << endl << " >- Press 2 to end month" << endl << " >- Press 3 to show my stocks" << endl << " >- Press 4 to add a stock" << endl;
         getAnswer(4, 1, &inputValue);
 
@@ -101,7 +106,7 @@ int main()
                         myData.index ++; //Add to index
 
                         wipeFile(2); //Wipe file
-                        writeFile(&stockSelection, &selectionSize, 2, &myData.balance); //Update my stock file
+                        writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper); //Update my stock file
                     }
                     else
                     {
@@ -199,7 +204,7 @@ int main()
                         myData.ownedStock[savedNumber-1].dividend += round(myData.ownedStock[savedNumber-1].dividend*0.15);
                         myData.balance -= round(myData.ownedStock[savedNumber-1].cost*0.2);
                         wipeFile(1); //Wipe file
-                        writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance); //Update my stock file
+                        writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper); //Update my stock file
                     }
                     else //Print erro rotherwise
                     {
@@ -213,12 +218,12 @@ int main()
         }
         else if(inputValue == 4)
         {
-            addStock(&stockSelection, &selectionSize, &myData.balance); //call function to add a stock
+            addStock(&stockSelection, &selectionSize, &myData.balance, &myData.timeKeeper); //call function to add a stock
             system("PAUSE");
             system("CLS");
         }
     wipeFile(1); //Wipe file
-    writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance); //Update my stock file
+    writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper); //Update my stock file
     }
     return 0;
 }
@@ -263,6 +268,7 @@ void resetData(UserData* _data)
 //This ends your turn/month
 void updateMonth(UserData* _data)
 {
+    (*_data).timeKeeper ++;
     (*_data).balance += countIncome(&(*_data).index, (*_data).ownedStock);
 
     for(int i = 0; i < (*_data).index; i++) //For each stock owned, increase time owned by a month
@@ -274,7 +280,7 @@ void updateMonth(UserData* _data)
 }
 
 //Used to add a new stock
-void addStock(vector<Stock>* _stocks, int* _size, float* _balance)
+void addStock(vector<Stock>* _stocks, int* _size, float* _balance, int* _date)
 {
     Stock tempStock; //This is a temporary stock
 
@@ -296,19 +302,19 @@ void addStock(vector<Stock>* _stocks, int* _size, float* _balance)
     *_size += 1; //Update index
 
     wipeFile(2); //Wipe file
-    writeFile(_stocks, _size, 2, _balance); //Update the stock file
+    writeFile(_stocks, _size, 2, _balance, _date); //Update the stock file
     return;
 }
 
 //This function is used to find each line in the stock file and save it into the vector
-void resetVector(vector<Stock>* _stocks, int* _size, int _file, float* _balance)
+void resetVector(vector<Stock>* _stocks, int* _size, int _file, float* _balance, int* _date)
 {
     string line; //String line used to seperate the text file into lines
     ifstream stockFile_("Stocks.txt"); //This is the map file
     ifstream myStocksFile_("myStocks.txt"); //This is the map file
     Stock tempStock; //This is a temporary stock
 
-    int lineRow = -1; //This integer keeps count of the row number for the saving in array
+    int lineRow = -2; //This integer keeps count of the row number for the saving in array
 
     if(stockFile_.is_open() && _file == 1) //If instricted to save the file
     {
@@ -349,9 +355,16 @@ void resetVector(vector<Stock>* _stocks, int* _size, int _file, float* _balance)
     {
         while(getline(myStocksFile_,line)) //This function uses the builtin function: getline
         {
-            if(lineRow == -1) //Run at very start
+            if(lineRow < 0)
             {
-                *_balance = atoi(line.c_str());
+                if(lineRow == -2) //Run at very start
+                {
+                    *_balance = atoi(line.c_str());
+                }
+                if(lineRow == -1) //Run at very start
+                {
+                    *_date = atoi(line.c_str());
+                }
             }
             else if(lineRow % 6 == 0)
             {
@@ -416,7 +429,7 @@ void getAnswer (int _maxLimit, int _minLimit, int* _value)
 }
 
 //This function is in charge of saving the vector into the txt file
-void writeFile(vector<Stock>* _stocks, int* _size, int _file, float* _balance)
+void writeFile(vector<Stock>* _stocks, int* _size, int _file, float* _balance, int* _date)
 {
     ofstream myfile;
     ofstream stockFile;
@@ -424,6 +437,7 @@ void writeFile(vector<Stock>* _stocks, int* _size, int _file, float* _balance)
     {
         myfile.open("myStocks.txt"); //Open files
         myfile << *_balance << endl; //Add balance on first line
+        myfile << *_date << endl; //Add date to second line
     }
     else if(_file == 2)
     {
