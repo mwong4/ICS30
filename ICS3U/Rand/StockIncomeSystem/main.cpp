@@ -42,7 +42,7 @@ struct UserData
 };
 
 
-void showStocks(int*, vector<Stock>); //This function is in charge of displaying all your stocks
+void showStocks(int*, vector<Stock>, int); //This function is in charge of displaying all your stocks
 float countIncome(int*, vector<Stock>); //This function is in charge of finding and returning your monthly income
 void resetData(UserData*); //This resets user data as the initializer
 void updateMonth(UserData*); //This ends your turn/month
@@ -62,6 +62,7 @@ int main()
     int inputValue = 0; //This int represents what the player inputs
     int savedNumber = 0; //For saving a number temp
     int markup = 0; //How much the player is willing to mark up their product
+    int counter = 0; //For search function/system
     int randNum = 0; //Rand num assigned by the computer
 
     vector<Stock> stockSelection; //This vector represents the available stocks
@@ -84,7 +85,7 @@ int main()
         {
             cout << " >- Loading stock selection" << endl << endl;
             cout << " >- Please select the stock to purchase:" << endl;
-            showStocks(&selectionSize, stockSelection);
+            showStocks(&selectionSize, stockSelection, 1);
             cout << cout << " >- " << selectionSize + 1 << ". To exit" << endl;
             getAnswer(selectionSize + 1, 1, &inputValue);
 
@@ -98,6 +99,9 @@ int main()
                         myData.balance -= stockSelection[inputValue-1].cost; //Subtract from budget to purchase
                         myData.ownedStock.push_back(stockSelection[inputValue-1]); //Add element to vector
                         myData.index ++; //Add to index
+
+                        wipeFile(2); //Wipe file
+                        writeFile(&stockSelection, &selectionSize, 2, &myData.balance); //Update my stock file
                     }
                     else
                     {
@@ -125,7 +129,7 @@ int main()
         {
             cout << endl << " >- Loading my stocks" << endl;
             cout << " >- Please select a stock:" << endl << endl;
-            showStocks(&myData.index, myData.ownedStock);
+            showStocks(&myData.index, myData.ownedStock, 2);
             cout << " >- " << myData.index + 1 << ". To exit" << endl;
             getAnswer(myData.index + 1, 1, &inputValue);
 
@@ -144,16 +148,16 @@ int main()
                     if(!myData.ownedStock[savedNumber-1].triedSelling)
                     {
                         cout << " >- Please enter a markup: "; //get player's markup
-                        getAnswer(myData.balance, -myData.ownedStock[savedNumber-1].cost, &markup);
+                        getAnswer(2000, -myData.ownedStock[savedNumber-1].cost, &markup);
 
                         //Display availability
                         cout << " >- Action Available: ";
                         if(myData.ownedStock[savedNumber-1].triedSelling) cout << "No" << endl;
                         else cout << "Yes" << endl;
-                        //Display Chance
-                        cout << " >- Chance of success: " << 100 - round((markup*150)/myData.ownedStock[savedNumber-1].cost) - 20 + myData.ownedStock[savedNumber-1].timeOwned*2 << "%" << endl;
+                        //Display Chanced
+                        cout << " >- Chance of success: " << 100 - round((markup*150)/myData.ownedStock[savedNumber-1].cost) - 20 + myData.ownedStock[savedNumber-1].timeOwned*1.5 << "%" << endl;
                         //Breakdown
-                        cout << "             >- 100% - 20%(Base) - " << round((markup*150)/myData.ownedStock[savedNumber-1].cost) << "%(For Markup) + " << myData.ownedStock[savedNumber-1].timeOwned*2 << "%(Time Owned)" << endl;
+                        cout << "             >- 100% - 20%(Base) - " << round((markup*150)/myData.ownedStock[savedNumber-1].cost) << "%(For Markup) + " << myData.ownedStock[savedNumber-1].timeOwned*1.5 << "%(Time Owned)" << endl;
                         //Revenue
                         cout << " >- Approximate Revenue: " << myData.ownedStock[savedNumber-1].cost + myData.ownedStock[savedNumber-1].cost*0.001*myData.ownedStock[savedNumber-1].timeOwned + markup << endl << endl;
 
@@ -172,6 +176,16 @@ int main()
                                 myData.balance += myData.ownedStock[savedNumber-1].cost; //Seel your item and get money
                                 myData.ownedStock.erase(myData.ownedStock.begin() + savedNumber-1); //Erase the chosen element
                                 myData.index --; //Decrease index
+
+                                counter = 0;
+                                while(myData.ownedStock[savedNumber-1].name != stockSelection[counter].name) //Search for sold stock in stock selection
+                                {
+                                    counter ++;
+                                }
+                                if(myData.ownedStock[savedNumber-1].name == stockSelection[counter].name) //Safety check
+                                {
+                                    stockSelection[counter].status = "unsold"; //Set to unsold
+                                }
                             }
                         }
                     }
@@ -210,16 +224,19 @@ int main()
 }
 
 //This function is in charge of displaying all your stocks
-void showStocks(int* _stockCount, vector<Stock> _stocks)
+void showStocks(int* _stockCount, vector<Stock> _stocks, int _type)
 {
     for(int i = 0; i < *_stockCount; i++)
     {
-        cout << " >- " << i+1 << ". Name|| " << _stocks[i].name << endl;
-        cout << " >- Cost|| " << _stocks[i].cost << endl;
-        cout << " >- Return/m|| " << _stocks[i].dividend << endl;
-        cout << " >- Status|| " << _stocks[i].status << endl;
-        cout << " >- Months Owned|| " << _stocks[i].timeOwned << endl;
-        cout << " >- Extra Info|| " << _stocks[i].extraInfo << endl << endl;
+        if((_stocks[i].status == "unsold" && _type == 1) || _type == 2)
+        {
+            cout << " >- " << i+1 << ". Name|| " << _stocks[i].name << endl;
+            cout << " >- Cost|| " << _stocks[i].cost << endl;
+            cout << " >- Return/m|| " << _stocks[i].dividend << endl;
+            cout << " >- Status|| " << _stocks[i].status << endl;
+            cout << " >- Months Owned|| " << _stocks[i].timeOwned << endl;
+            cout << " >- Extra Info|| " << _stocks[i].extraInfo << endl << endl;
+        }
     }
     return;
 }

@@ -1,7 +1,7 @@
 Apple
 9
 50
-unsold
+sold
 0
 Most popular platforms include the mobile iphone and ipad series. Main desktop series is an integrated tower-monitor OSX series -> current version is El Capitain.
 Microsoft
