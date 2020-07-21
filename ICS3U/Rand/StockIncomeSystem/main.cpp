@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: July 19, 2020
+>- Updated: July 21, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
@@ -55,6 +55,9 @@ void getAnswer(int, int, int*); //Function used to get the players response as a
 void writeFile(vector<Stock>*, int*, int, float*, int*); //This function is in charge of saving the vector into the txt file
 void wipeFile(int); //Wipe file
 void addStock(vector<Stock>*, int*, float*, int*); //Used to add a new stock
+void searchName(vector<Stock>*, int, int*, string); //For finding a stock by name
+void searchLetter(vector<Stock>*, int, vector<int>*, int*, char); //For finding stocks by first letter
+void searchRange(vector<Stock>*, int, vector<int>*, int*, int, int); //For finding stocks with range
 
 int main()
 {
@@ -69,6 +72,14 @@ int main()
     int counter = 0; //For search function/system
     int randNum = 0; //Rand num assigned by the computer
 
+    string keyWord = " ";
+    char keyLetter = ' ';
+    int rangeMax = 0;
+    int rangeMin = 0;
+    vector<int> foundResults;
+    int resultSize = 0;
+    int result = 0;
+
     vector<Stock> stockSelection; //This vector represents the available stocks
     int selectionSize = 0; //This determines the size of the selection
 
@@ -78,13 +89,13 @@ int main()
     //Get user owned stocks
     resetVector(&myData.ownedStock, &myData.index, 2, &myData.balance, &myData.timeKeeper);
 
-    while(inputValue < 5)
+    while(inputValue < 6)
     {
         cout << " >- Welcome, You have: ~" << round(myData.balance) << " hundred thousand dollars" << endl;
         cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars" << endl;
         cout << " >- Current Month Count: ||" << myData.timeKeeper << "||" << endl;
-        cout << " >- Press 1 to see stocks" << endl << " >- Press 2 to end month" << endl << " >- Press 3 to show my stocks" << endl << " >- Press 4 to add a stock" << endl;
-        getAnswer(4, 1, &inputValue);
+        cout << " >- Press 1 to see stocks" << endl << " >- Press 2 to end month" << endl << " >- Press 3 to show my stocks" << endl << " >- Press 4 to add a stock" << endl << " >- Press 5 to search stock selection" << endl;
+        getAnswer(5, 1, &inputValue);
 
         if(inputValue == 1)
         {
@@ -189,6 +200,7 @@ int main()
                                 }
                                 if(myData.ownedStock[savedNumber-1].name == stockSelection[counter].name) //Safety check
                                 {
+                                    cout << "changed" << endl;
                                     stockSelection[counter].status = "unsold"; //Set to unsold
                                 }
                             }
@@ -221,6 +233,147 @@ int main()
             addStock(&stockSelection, &selectionSize, &myData.balance, &myData.timeKeeper); //call function to add a stock
             system("PAUSE");
             system("CLS");
+        }
+        else if(inputValue == 5)
+        {
+            cout << endl << " >- What would you like to search with" << endl; //Display options and get input
+            cout << " >- [1] To search by name" << endl << " >- [2] To search by first letter" << endl << " >- [3] To search by cost range" << endl << " >- [4] To quit" << endl;
+            getAnswer(3, 1, &inputValue);
+
+            if(inputValue == 1) //If user chooses to search by name
+            {
+                cout << endl << " >- Please enter the name" << endl;
+                cin >> keyWord;
+
+                searchName(&stockSelection, selectionSize, &result, keyWord); //Call function to search for a match
+
+                if(result != 1000)
+                {
+                    cout << " >- " << result+1 << ". Name|| " << stockSelection[result].name << endl;
+                    cout << " >- Cost|| " << stockSelection[result].cost << endl;
+                    cout << " >- Return/m|| " << stockSelection[result].dividend << endl;
+                    cout << " >- Status|| " << stockSelection[result].status << endl;
+                    cout << " >- Months Owned|| " << stockSelection[result].timeOwned << endl;
+                    cout << " >- Extra Info|| " << stockSelection[result].extraInfo << endl << endl;
+
+                    if(stockSelection[result].status == "unsold" && myData.balance > stockSelection[result].cost) //If stock is unsold offer purchase offer
+                    {
+                        cout << endl << " >- Would you like to purchase? Press 1 for Yes, 2 for No" << endl;
+                        getAnswer(2, 1, &inputValue);
+                        if(inputValue == 1) //If they say yes, purchase stock
+                        {
+                            stockSelection[result].status = "sold";
+                            myData.balance -= stockSelection[result].cost; //Subtract from budget to purchase
+                            myData.ownedStock.push_back(stockSelection[result]); //Add element to vector
+                            myData.index ++; //Add to index
+
+                            wipeFile(2); //Wipe file
+                            writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper); //Update my stock file
+                        }
+                    }
+                }
+            }
+            else if(inputValue == 2) //If user chooses to search by first letter
+            {
+                cout << endl << " >- Please enter key first letter" << endl;
+                cin >> keyLetter;
+
+                searchLetter(&stockSelection, selectionSize, &foundResults, &resultSize, keyLetter); //Call function to search for results
+                if(resultSize != 0)
+                {
+                    cout << endl << " >- Please select a stock to purchase it " << endl << endl;
+                    for(int i = 0; i < resultSize; i++) //Show all information
+                    {
+                        cout << " >- " << i+1 << ". Name|| " << stockSelection[foundResults[i]].name << endl;
+                        cout << " >- Cost|| " << stockSelection[foundResults[i]].cost << endl;
+                        cout << " >- Return/m|| " << stockSelection[foundResults[i]].dividend << endl;
+                        cout << " >- Status|| " << stockSelection[foundResults[i]].status << endl;
+                        cout << " >- Months Owned|| " << stockSelection[foundResults[i]].timeOwned << endl;
+                        cout << " >- Extra Info|| " << stockSelection[foundResults[i]].extraInfo << endl << endl;
+                    }
+                    cout << " >- Press " << resultSize + 1 << " to exit" << endl;
+                    getAnswer(resultSize + 1, 1, &inputValue); //Get options
+
+                    if(inputValue < resultSize + 1)
+                    {
+                        savedNumber = inputValue - 1; //Save selected stock
+                        if(stockSelection[result].status == "unsold" && myData.balance > stockSelection[result].cost) //If stock is unsold offer purchase offer
+                        {
+                            cout << endl << " >- Would you like to purchase? Press 1 for Yes, 2 for No" << endl;
+                            getAnswer(2, 1, &inputValue);
+                            if(inputValue == 1) //If they say yes, purchase stock
+                            {
+                                stockSelection[savedNumber].status = "sold";
+                                myData.balance -= stockSelection[savedNumber].cost; //Subtract from budget to purchase
+                                myData.ownedStock.push_back(stockSelection[savedNumber]); //Add element to vector
+                                myData.index ++; //Add to index
+
+                                wipeFile(2); //Wipe file
+                                writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper); //Update my stock file
+                            }
+                        }
+                        else
+                        {
+                            cout << " >- Unable to purchase..." << endl;
+                        }
+                    }
+                }
+
+                inputValue = 1;//Reset to some value between 1 & 5
+            }
+            else if(inputValue == 3) //If user chooses to search by cost range
+            {
+                cout << endl << " >- Please enter the max value" << endl;
+                getAnswer(1000, 0, &rangeMax);
+                cout << " >- Please enter the min value" << endl;
+                getAnswer(1000, 0, &rangeMin);
+
+                searchRange(&stockSelection, selectionSize, &foundResults, &resultSize, rangeMax, rangeMin); //Call function to search for results
+
+                if(resultSize != 0)
+                {
+                    cout << endl << " >- Please select a stock to purchase it " << endl << endl;
+                    for(int i = 0; i < resultSize; i++) //Show all information
+                    {
+                        cout << " >- " << i+1 << ". Name|| " << stockSelection[foundResults[i]].name << endl;
+                        cout << " >- Cost|| " << stockSelection[foundResults[i]].cost << endl;
+                        cout << " >- Return/m|| " << stockSelection[foundResults[i]].dividend << endl;
+                        cout << " >- Status|| " << stockSelection[foundResults[i]].status << endl;
+                        cout << " >- Months Owned|| " << stockSelection[foundResults[i]].timeOwned << endl;
+                        cout << " >- Extra Info|| " << stockSelection[foundResults[i]].extraInfo << endl << endl;
+                    }
+                    cout << " >- Press " << resultSize + 1 << " to exit" << endl;
+                    getAnswer(resultSize + 1, 1, &inputValue); //Get options
+
+                    if(inputValue < resultSize + 1)
+                    {
+                        savedNumber = inputValue - 1; //Save selected stock
+                        if(stockSelection[result].status == "unsold" && myData.balance > stockSelection[result].cost) //If stock is unsold offer purchase offer
+                        {
+                            cout << endl << " >- Would you like to purchase? Press 1 for Yes, 2 for No" << endl;
+                            getAnswer(2, 1, &inputValue);
+                            if(inputValue == 1) //If they say yes, purchase stock
+                            {
+                                stockSelection[savedNumber].status = "sold";
+                                myData.balance -= stockSelection[savedNumber].cost; //Subtract from budget to purchase
+                                myData.ownedStock.push_back(stockSelection[savedNumber]); //Add element to vector
+                                myData.index ++; //Add to index
+
+                                wipeFile(2); //Wipe file
+                                writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper); //Update my stock file
+                            }
+                        }
+                        else
+                        {
+                            cout << " >- Unable to purchase..." << endl;
+                        }
+                    }
+                }
+
+                inputValue = 1;//Reset to some value between 1 & 5
+            }
+        system("PAUSE");
+        system("CLS");
         }
     wipeFile(1); //Wipe file
     writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper); //Update my stock file
@@ -489,4 +642,72 @@ void wipeFile(int _file)
     return;
 }
 
+//For finding a stock by name
+void searchName(vector<Stock>* _stocks, int _stocksSize, int* _result, string _condition)
+{
+    cout << " >- Searching..." << endl; //Print to console for indication
+    *_result = 1000; //Set to null value
+    for(int i = 0; i < _stocksSize; i++) //Search for matching name
+    {
+        if((*_stocks)[i].name == _condition) //If mathc is found, save in result
+        {
+            *_result = i;
+            i = 1000; //Skip for loop
+        }
+    }
 
+    if(*_result == 1000) //If no result is found, print to console
+    {
+        cout << " >- No result found" << endl;
+    }
+    return;
+}
+
+//For finding stocks by first letter
+void searchLetter(vector<Stock>* _stocks, int _stocksSize, vector<int>* _results, int* _resultSize, char _condition)
+{
+    int counter = 0;
+    *_resultSize = 0;
+    cout << " >- Searching..." << endl; //Print to console for indication
+    for(int i = 0; i < _stocksSize; i++) //Search for matching name
+    {
+        if((*_stocks)[i].name.at(0) == _condition) //If mathc is found, save in result
+        {
+            counter ++;
+            (*_results).push_back(i);
+        }
+    }
+
+    *_resultSize = counter; //Transfer size, go around bug
+
+    if(*_resultSize == 0) //If no result is found, print to console
+    {
+        cout << " >- No result found" << endl;
+    }
+
+    return;
+}
+
+//For finding stocks with range
+void searchRange(vector<Stock>* _stocks, int _stocksSize, vector<int>* _results, int* _resultSize, int _max, int _min)
+{
+    int counter = 0;
+    *_resultSize = 0;
+    cout << " >- Searching..." << endl; //Print to console for indication
+    for(int i = 0; i < _stocksSize; i++) //Search for matching name
+    {
+        if(_min < (*_stocks)[i].cost < _max) //If mathc is found, save in result
+        {
+            counter ++;
+            (*_results).push_back(i);
+        }
+    }
+
+    *_resultSize = counter; //Transfer size, go around bug
+
+    if(*_resultSize == 0) //If no result is found, print to console
+    {
+        cout << " >- No result found" << endl;
+    }
+    return;
+}
