@@ -1,14 +1,12 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: July 21, 2020
+>- Updated: July 22, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
 Link image file
 
-Fix rounding/missing money bug?
-    Upgrade
 */
 
 #include <iostream>
@@ -175,7 +173,7 @@ int main()
                         //Breakdown
                         cout << "             >- 100% - 20%(Base) - " << round((markup*150)/myData.ownedStock[savedNumber-1].cost) << "%(For Markup) + " << myData.ownedStock[savedNumber-1].timeOwned*1.5 << "%(Time Owned)" << endl;
                         //Revenue
-                        cout << " >- Approximate Revenue: " << myData.ownedStock[savedNumber-1].cost + myData.ownedStock[savedNumber-1].cost*0.001*myData.ownedStock[savedNumber-1].timeOwned + markup << endl << endl;
+                        cout << " >- Approximate Revenue: " << round(myData.ownedStock[savedNumber-1].cost + myData.ownedStock[savedNumber-1].cost*0.001*myData.ownedStock[savedNumber-1].timeOwned + markup) << endl << endl;
 
                         cout << " >- Are you sure? Press 1 for Yes. 2 for No" << endl;
                         getAnswer(2, 1, &inputValue);
@@ -189,7 +187,7 @@ int main()
                             else
                             {
                                 cout << " >- Sold Success" << endl;
-                                myData.balance += myData.ownedStock[savedNumber-1].cost; //Seel your item and get money
+                                myData.balance += round(myData.ownedStock[savedNumber-1].cost + myData.ownedStock[savedNumber-1].cost*0.001*myData.ownedStock[savedNumber-1].timeOwned + markup); //Seel your item and get money
                                 myData.ownedStock.erase(myData.ownedStock.begin() + savedNumber-1); //Erase the chosen element
                                 myData.index --; //Decrease index
 
