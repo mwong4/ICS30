@@ -1,7 +1,7 @@
 Apple
 9
 50
-sold
+unsold
 0
 Most popular platforms include the mobile iphone and ipad series. Main desktop series is an integrated tower-monitor OSX series -> current version is El Capitain.
 Microsoft
@@ -19,6 +19,6 @@ The most efficient and widely used search engin on earth. Offers multiple other 
 Facebook
 58
 65
-sold
+unsold
 0
 Social Media Platform

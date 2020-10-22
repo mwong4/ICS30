@@ -1,12 +1,12 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: July 22, 2020
+>- Updated: October 21, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
 Link image file
-
+Auction system
 */
 
 #include <iostream>
@@ -89,6 +89,9 @@ int main()
 
     while(inputValue < 6)
     {
+        //test
+        //auctionMode(&stockSelection, selectionSize, &myData.balance, &myData.ownedStock, &myData.index);
+
         cout << " >- Welcome, You have: ~" << round(myData.balance) << " hundred thousand dollars" << endl;
         cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars" << endl;
         cout << " >- Current Month Count: ||" << myData.timeKeeper << "||" << endl;
