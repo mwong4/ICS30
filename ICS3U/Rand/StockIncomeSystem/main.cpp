@@ -757,7 +757,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
     }
 
     //Generate the baseline decay of interest that the ai has for the stock based on price, random chance, and the baseline % const given
-    oddsIntervals = round((((100 - BASEODDS)/10) / (((round((*_stocks)[target].cost/100)*100))/100)))*2; //////////////////////TODO: Fix this/////////////////////////
+    oddsIntervals = round((100 - BASEODDS)/((*_stocks)[target].cost/100));
 
     cout << "int odds intervals " << oddsIntervals << endl;
 
