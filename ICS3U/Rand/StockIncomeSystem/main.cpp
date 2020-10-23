@@ -7,6 +7,10 @@
 To Do
 Link image file
 Auction system
+    not triggering AI
+    crashes after allocation -> whenever writing stock to file type 1
+    bidding intervals
+    making auction only appear once in a while
 */
 
 #include <iostream>
@@ -61,7 +65,7 @@ void searchRange(vector<Stock>*, int, vector<int>*, int*, int, int); //For findi
 void auctionMode(vector<Stock>*, int, vector<Stock>*, int*, float*, int*); //For the auction system
 
 //For auction mode
-const int AUCTIONLIMIT = 70000; //This is how long the auction timer goes before time is up
+const int AUCTIONLIMIT = 7000; //This is how long the auction timer goes before time is up
 const int BASEODDS = 30; //This is the baseline % odds at the price of stock in 100s
 const int RANDRANGE = 3; //This is the range od deviation that the odds have for the ai's interest
 
@@ -97,14 +101,11 @@ int main()
 
     while(inputValue < 6)
     {
-        //test
-        auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper);
-
         cout << " >- Welcome, You have: ~" << round(myData.balance) << " hundred thousand dollars" << endl;
         cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars" << endl;
         cout << " >- Current Month Count: ||" << myData.timeKeeper << "||" << endl;
-        cout << " >- Press 1 to see stocks" << endl << " >- Press 2 to end month" << endl << " >- Press 3 to show my stocks" << endl << " >- Press 4 to add a stock" << endl << " >- Press 5 to search stock selection" << endl;
-        getAnswer(5, 1, &inputValue);
+        cout << " >- Press 1 to see stocks" << endl << " >- Press 2 to end month" << endl << " >- Press 3 to show my stocks" << endl << " >- Press 4 to add a stock" << endl << " >- Press 5 to search stock selection" << endl << " >- Press 6 to check auction" << endl;
+        getAnswer(6, 1, &inputValue);
 
         if(inputValue == 1)
         {
@@ -383,6 +384,10 @@ int main()
             }
         system("PAUSE");
         system("CLS");
+        }
+        else
+        {
+            auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper);
         }
     wipeFile(1); //Wipe file
     writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper); //Update my stock file
@@ -733,6 +738,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
     int odds = 100; //This is the percent chance for the ai to bid higher
     int oddsIntervals = 0; //Set to null initiially, determines approx what % of lossed interest will happen with ai each time
     bool playerHasIt = false; //Indicates who currently has the highest bid
+    int intervenePeriod = rand() % (AUCTIONLIMIT/1000);
 
     //Randomly choose stock to auction -> Make sure the stock has not been sold yet
     do
@@ -754,6 +760,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
         cout << " >- Stock found" << endl;
         cout << " >- Name|| " << (*_stocks)[target].name << endl;
         cout << " >- Return/m|| " << (*_stocks)[target].dividend << endl << endl;
+        cout << " [Your Balance: $" << *_balance << "]" << endl << endl;
     }
 
     //Generate the baseline decay of interest that the ai has for the stock based on price, random chance, and the baseline % const given
@@ -775,34 +782,91 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
         {
             interTime = clock(); //This is to make sure that between miliseconds counted the number is not repeated
             cout << "[" << round((AUCTIONLIMIT - (clock() - timer))/1000) << "]" << endl;
+
+            //When the pre-determined time is right, AI will make it's decision
+            if(intervenePeriod == clock() - timer)
+            {
+                if(rand() % 100 > odds && playerHasIt) //AI generates randomly if they want to bid higher. If yes, enter if
+                {
+                    cout << "<<Other Raises>> + $100" << endl;
+                    value += 100; //Increase value
+                    cout << " >- Value ||> " << value << endl;
+                    cout << "[" << AUCTIONLIMIT/1000 << "]" << endl;//Print initial time
+                    timer = clock(); //Reset timer
+                    playerHasIt = false;
+
+                    //Affect the odds of the AI giving a response
+                    if(rand()%2 == 0)
+                    {
+                        odds -= oddsIntervals + round(rand() % (oddsIntervals/3));
+                    }
+                    else
+                    {
+                        odds -= oddsIntervals - round(rand() % (oddsIntervals/3));
+                    }
+
+                    //Generate new intervention time
+                    intervenePeriod = rand() % (AUCTIONLIMIT/1000);
+                }
+            }
         }
 
         if(GetKeyState(VK_UP) & 0x8000) //Check for input , if yes reset timer
         {
-            ///////////////////TODO: Actual bidding process//////////////////////////////////
+            ///////////////////TODO: Make Intervals Varry//////////////////////////////////
+
             if(*_balance > value + 100)
             {
                 cout << "<<Player Raises>> + $100" << endl;
+                value += 100; //Increase value
+                cout << " >- Value ||> " << value << endl;
                 cout << "[" << AUCTIONLIMIT/1000 << "]" << endl;//Print initial time
                 timer = clock(); //Reset timer
+                playerHasIt = true;
+
+                //Affect the odds of the AI giving a response
+                if(rand()%2 == 0)
+                {
+                    odds -= oddsIntervals + round(rand() % (oddsIntervals/3));
+                }
+                else
+                {
+                    odds -= oddsIntervals - round(rand() % (oddsIntervals/3));
+                }
+
+                Sleep(200);
+            }
+            else
+            {
+                cout << " >- Not enough money" << endl;
                 Sleep(200);
             }
         }
     }
-
-    cout << "<<sold>>" << endl;
+    cout << "<<sold";
 
     //If player one, allocate stock to player. Remove from stock market
     if(playerHasIt)
     {
+        cout << endl << " to Player>>" << endl;
+
         (*_stocks)[target].status = "sold";
         *_balance -= value; //Subtract from budget to purchase
         (*_myStocks).push_back((*_stocks)[target]); //Add element to vector
         *_myIndex ++; //Add to index
 
         wipeFile(2); //Wipe file
-        writeFile(_myStocks, _myIndex, 2, _balance, _date); //Update my stock file
+        writeFile(_stocks, &_index, 2, _balance, _date); //Update my stock file
     }
+    else
+    {
+        cout << " to Other>>" << endl;
+    }
+
+    cout << " >- Press any key to return to menu" << endl;
+    getch();
+
+    system("CLS"); //Wipe screen
 
     return; //Return to main()
 }
