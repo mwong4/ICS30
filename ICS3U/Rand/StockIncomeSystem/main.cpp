@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: October 21, 2020
+>- Updated: October 22, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
@@ -56,6 +56,9 @@ void addStock(vector<Stock>*, int*, float*, int*); //Used to add a new stock
 void searchName(vector<Stock>*, int, int*, string); //For finding a stock by name
 void searchLetter(vector<Stock>*, int, vector<int>*, int*, char); //For finding stocks by first letter
 void searchRange(vector<Stock>*, int, vector<int>*, int*, int, int); //For finding stocks with range
+void auctionMode(vector<Stock>*, int*, vector<Stock>*, int*, float*) //For the auction system
+
+const AUCTIONTIME = 7000;
 
 int main()
 {
@@ -711,4 +714,43 @@ void searchRange(vector<Stock>* _stocks, int _stocksSize, vector<int>* _results,
         cout << " >- No result found" << endl;
     }
     return;
+}
+
+//For the auction system
+void auctionMode(vector<Stock>* _myStocks, int* _myStockCount, vector<Stock>* _stocks, int* _stockCount, float* _balance)
+{
+    time_t timer = clock(); //Retains a time
+    int interTime = 0; //To prevent repeating a print of time while between miliseconds
+
+    ///////////////////TODO: Randomly generate stock and display//////////////////////////////////
+
+    cout << " >- Ready? Press any key to continue" << endl;
+    getch();
+
+    cout << "<<start>>" << endl;
+    cout << "[" << LIMIT/1000 << "]" << endl;//Print initial time
+
+    ///////////////////TODO: Track bidding amount//////////////////////////////////
+
+    while(clock() - timer < LIMIT) //Run through the timer phase untill timer runs out
+    {
+        if((clock() - timer) % 1000 == 0 && interTime != clock()) //if time has not been shown yet and rests on a second interval, print out
+        {
+            interTime = clock(); //This is to make sure that between miliseconds counted the number is not repeated
+            cout << "[" << round((LIMIT - (clock() - timer))/1000) << "]" << endl;
+        }
+
+        if(GetKeyState(VK_UP) & 0x8000) //Check for input , if yes reset timer
+        {
+            cout << "<<reset>> + " << endl;
+            cout << "[" << LIMIT/1000 << "]" << endl;//Print initial time
+            timer = clock(); //Reset timer
+            Sleep(200);
+        }
+    }
+
+    cout << "<<sold>>" << endl;
+
+    ///////////////////TODO: Do Sold System//////////////////////////////////
+
 }
