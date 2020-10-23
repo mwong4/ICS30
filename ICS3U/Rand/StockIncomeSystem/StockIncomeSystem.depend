@@ -6,7 +6,7 @@
 	<fstream>
 	<limits>
 
-1601586945 source:c:\users\max pc\documents\github\ics30\ics3u\rand\stockincomesystem\main.cpp
+1603466106 source:c:\users\max pc\documents\github\ics30\ics3u\rand\stockincomesystem\main.cpp
 	<iostream>
 	<vector>
 	<stdlib.h>
@@ -16,4 +16,6 @@
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
+	<conio.h>
+	<windows.h>
 

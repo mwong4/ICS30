@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: October 22, 2020
+>- Updated: October 23, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
@@ -10,14 +10,16 @@ Auction system
 */
 
 #include <iostream>
-#include <vector> //For vectors
+#include <vector>     //For vectors
 #include <stdlib.h>
-#include <fstream>  //For txt file
+#include <fstream>    //For txt file
 #include <limits>     //For error trapping
-#include <tgmath.h>  //For rounding
+#include <tgmath.h>   //For rounding
 #include <stdio.h>    //For NULL (srand)
 #include <stdlib.h>   //For srand, rand
 #include <time.h>     //For time
+#include <conio.h>    //For getch()
+#include <windows.h>  //For key detection
 
 using namespace std;
 
@@ -56,9 +58,12 @@ void addStock(vector<Stock>*, int*, float*, int*); //Used to add a new stock
 void searchName(vector<Stock>*, int, int*, string); //For finding a stock by name
 void searchLetter(vector<Stock>*, int, vector<int>*, int*, char); //For finding stocks by first letter
 void searchRange(vector<Stock>*, int, vector<int>*, int*, int, int); //For finding stocks with range
-void auctionMode(vector<Stock>*, int*, vector<Stock>*, int*, float*) //For the auction system
+void auctionMode(vector<Stock>*, int, vector<Stock>*, int*, float*, int*); //For the auction system
 
-const AUCTIONTIME = 7000;
+//For auction mode
+const int AUCTIONLIMIT = 70000; //This is how long the auction timer goes before time is up
+const int BASEODDS = 30; //This is the baseline % odds at the price of stock in 100s
+const int RANDRANGE = 3; //This is the range od deviation that the odds have for the ai's interest
 
 int main()
 {
@@ -93,7 +98,7 @@ int main()
     while(inputValue < 6)
     {
         //test
-        //auctionMode(&stockSelection, selectionSize, &myData.balance, &myData.ownedStock, &myData.index);
+        auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper);
 
         cout << " >- Welcome, You have: ~" << round(myData.balance) << " hundred thousand dollars" << endl;
         cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars" << endl;
@@ -700,7 +705,7 @@ void searchRange(vector<Stock>* _stocks, int _stocksSize, vector<int>* _results,
     cout << " >- Searching..." << endl; //Print to console for indication
     for(int i = 0; i < _stocksSize; i++) //Search for matching name
     {
-        if(_min < (*_stocks)[i].cost < _max) //If mathc is found, save in result
+        if(_min < (*_stocks)[i].cost < _max) //If match is found, save in result
         {
             counter ++;
             (*_results).push_back(i);
@@ -717,40 +722,87 @@ void searchRange(vector<Stock>* _stocks, int _stocksSize, vector<int>* _results,
 }
 
 //For the auction system
-void auctionMode(vector<Stock>* _myStocks, int* _myStockCount, vector<Stock>* _stocks, int* _stockCount, float* _balance)
+void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, int* _myIndex, float* _balance, int* _date)
+
 {
     time_t timer = clock(); //Retains a time
     int interTime = 0; //To prevent repeating a print of time while between miliseconds
+    int target = 0; //This is a randomly generated number for the target stock
+    int counter = 0; //for safety in case a stock cannot be found
+    float value = 100; //This is for tracking the value of the stock
+    int odds = 100; //This is the percent chance for the ai to bid higher
+    int oddsIntervals = 0; //Set to null initiially, determines approx what % of lossed interest will happen with ai each time
+    bool playerHasIt = false; //Indicates who currently has the highest bid
 
-    ///////////////////TODO: Randomly generate stock and display//////////////////////////////////
+    //Randomly choose stock to auction -> Make sure the stock has not been sold yet
+    do
+    {
+        target = rand() % _index;
+        counter ++;
+    }
+    while((*_stocks)[target].status == "sold" && counter < _index*5); //After a threshold of checks or found a good stock, quit
 
+    cout << "done" << endl;
+
+    if(counter >= _index*5) //If over threshhold, output and return
+    {
+        cout << " >- Unable to find stock to auction" << endl;
+        return;
+    }
+    else //otherwise output info on stock
+    {
+        cout << " >- Stock found" << endl;
+        cout << " >- Name|| " << (*_stocks)[target].name << endl;
+        cout << " >- Return/m|| " << (*_stocks)[target].dividend << endl << endl;
+    }
+
+    //Generate the baseline decay of interest that the ai has for the stock based on price, random chance, and the baseline % const given
+    oddsIntervals = round((((100 - BASEODDS)/10) / (((round((*_stocks)[target].cost/100)*100))/100)))*2; //////////////////////TODO: Fix this/////////////////////////
+
+    cout << "int odds intervals " << oddsIntervals << endl;
+
+    //Actual auction system
     cout << " >- Ready? Press any key to continue" << endl;
     getch();
 
     cout << "<<start>>" << endl;
-    cout << "[" << LIMIT/1000 << "]" << endl;//Print initial time
+    cout << " >- Value ||> " << value << endl;
+    timer = clock();
 
-    ///////////////////TODO: Track bidding amount//////////////////////////////////
-
-    while(clock() - timer < LIMIT) //Run through the timer phase untill timer runs out
+    while(clock() - timer < AUCTIONLIMIT) //Run through the timer phase untill timer runs out
     {
         if((clock() - timer) % 1000 == 0 && interTime != clock()) //if time has not been shown yet and rests on a second interval, print out
         {
             interTime = clock(); //This is to make sure that between miliseconds counted the number is not repeated
-            cout << "[" << round((LIMIT - (clock() - timer))/1000) << "]" << endl;
+            cout << "[" << round((AUCTIONLIMIT - (clock() - timer))/1000) << "]" << endl;
         }
 
         if(GetKeyState(VK_UP) & 0x8000) //Check for input , if yes reset timer
         {
-            cout << "<<reset>> + " << endl;
-            cout << "[" << LIMIT/1000 << "]" << endl;//Print initial time
-            timer = clock(); //Reset timer
-            Sleep(200);
+            ///////////////////TODO: Actual bidding process//////////////////////////////////
+            if(*_balance > value + 100)
+            {
+                cout << "<<Player Raises>> + $100" << endl;
+                cout << "[" << AUCTIONLIMIT/1000 << "]" << endl;//Print initial time
+                timer = clock(); //Reset timer
+                Sleep(200);
+            }
         }
     }
 
     cout << "<<sold>>" << endl;
 
-    ///////////////////TODO: Do Sold System//////////////////////////////////
+    //If player one, allocate stock to player. Remove from stock market
+    if(playerHasIt)
+    {
+        (*_stocks)[target].status = "sold";
+        *_balance -= value; //Subtract from budget to purchase
+        (*_myStocks).push_back((*_stocks)[target]); //Add element to vector
+        *_myIndex ++; //Add to index
 
+        wipeFile(2); //Wipe file
+        writeFile(_myStocks, _myIndex, 2, _balance, _date); //Update my stock file
+    }
+
+    return; //Return to main()
 }
