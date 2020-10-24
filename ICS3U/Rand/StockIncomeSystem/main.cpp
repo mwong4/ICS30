@@ -7,8 +7,6 @@
 To Do
 Link image file
 Auction system
-    not triggering AI
-
     bidding intervals
     making auction only appear once in a while
 */
@@ -730,8 +728,6 @@ void searchRange(vector<Stock>* _stocks, int _stocksSize, vector<int>* _results,
 //For the auction system
 void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, int* _myIndex, float* _balance, int* _date)
 {
-    cout << * _myIndex << endl;
-
     time_t timer = clock(); //Retains a time
     int interTime = 0; //To prevent repeating a print of time while between miliseconds
     int target = 0; //This is a randomly generated number for the target stock
@@ -740,7 +736,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
     int odds = 100; //This is the percent chance for the ai to bid higher
     int oddsIntervals = 0; //Set to null initiially, determines approx what % of lossed interest will happen with ai each time
     bool playerHasIt = false; //Indicates who currently has the highest bid
-    int intervenePeriod = rand() % (AUCTIONLIMIT/1000);
+    int intervenePeriod = 2 + rand() % ((AUCTIONLIMIT/1000)-3);
     Stock tempStock;
 
     //Randomly choose stock to auction -> Make sure the stock has not been sold yet
@@ -750,8 +746,6 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
         counter ++;
     }
     while((*_stocks)[target].status == "sold" && counter < _index*5); //After a threshold of checks or found a good stock, quit
-
-    cout << "done" << endl;
 
     if(counter >= _index*5) //If over threshhold, output and return
     {
@@ -769,8 +763,6 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
     //Generate the baseline decay of interest that the ai has for the stock based on price, random chance, and the baseline % const given
     oddsIntervals = round((100 - BASEODDS)/((*_stocks)[target].cost/100));
 
-    cout << "int odds intervals " << oddsIntervals << endl;
-
     //Actual auction system
     cout << " >- Ready? Press any key to continue" << endl;
     getch();
@@ -787,9 +779,9 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
             cout << "[" << round((AUCTIONLIMIT - (clock() - timer))/1000) << "]" << endl;
 
             //When the pre-determined time is right, AI will make it's decision
-            if(intervenePeriod == clock() - timer)
+            if(intervenePeriod == round((AUCTIONLIMIT - (clock() - timer))/1000))
             {
-                if(rand() % 100 > odds && playerHasIt) //AI generates randomly if they want to bid higher. If yes, enter if
+                if(rand() % 100 < odds && playerHasIt) //AI generates randomly if they want to bid higher. If yes, enter if
                 {
                     cout << "<<Other Raises>> + $100" << endl;
                     value += 100; //Increase value
@@ -809,7 +801,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
                     }
 
                     //Generate new intervention time
-                    intervenePeriod = rand() % (AUCTIONLIMIT/1000);
+                    intervenePeriod = 2 + rand() % ((AUCTIONLIMIT/1000)-3);
                 }
             }
         }
@@ -838,6 +830,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
                 }
 
                 Sleep(200);
+                intervenePeriod = 2 + rand() % ((AUCTIONLIMIT/1000)-3); //regenerate intervention period
             }
             else
             {
@@ -867,9 +860,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
         cout << " to Other>>" << endl;
     }
 
-    cout << " >- Press any key to return to menu" << endl;
-    getch();
-
+    system("PAUSE");//Pause temp
     system("CLS"); //Wipe screen
 
     return; //Return to main()
