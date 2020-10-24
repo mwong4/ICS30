@@ -8,7 +8,7 @@ To Do
 Link image file
 Auction system
     not triggering AI
-    crashes after allocation -> whenever writing stock to file type 1
+
     bidding intervals
     making auction only appear once in a while
 */
@@ -99,7 +99,7 @@ int main()
     //Get user owned stocks
     resetVector(&myData.ownedStock, &myData.index, 2, &myData.balance, &myData.timeKeeper);
 
-    while(inputValue < 6)
+    while(inputValue < 7)
     {
         cout << " >- Welcome, You have: ~" << round(myData.balance) << " hundred thousand dollars" << endl;
         cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars" << endl;
@@ -389,6 +389,7 @@ int main()
         {
             auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper);
         }
+
     wipeFile(1); //Wipe file
     writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper); //Update my stock file
     }
@@ -728,8 +729,9 @@ void searchRange(vector<Stock>* _stocks, int _stocksSize, vector<int>* _results,
 
 //For the auction system
 void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, int* _myIndex, float* _balance, int* _date)
-
 {
+    cout << * _myIndex << endl;
+
     time_t timer = clock(); //Retains a time
     int interTime = 0; //To prevent repeating a print of time while between miliseconds
     int target = 0; //This is a randomly generated number for the target stock
@@ -739,6 +741,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
     int oddsIntervals = 0; //Set to null initiially, determines approx what % of lossed interest will happen with ai each time
     bool playerHasIt = false; //Indicates who currently has the highest bid
     int intervenePeriod = rand() % (AUCTIONLIMIT/1000);
+    Stock tempStock;
 
     //Randomly choose stock to auction -> Make sure the stock has not been sold yet
     do
@@ -848,12 +851,13 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
     //If player one, allocate stock to player. Remove from stock market
     if(playerHasIt)
     {
-        cout << endl << " to Player>>" << endl;
+        cout << " to Player>>" << endl;
 
         (*_stocks)[target].status = "sold";
         *_balance -= value; //Subtract from budget to purchase
-        (*_myStocks).push_back((*_stocks)[target]); //Add element to vector
-        *_myIndex ++; //Add to index
+        tempStock = (*_stocks)[target];
+        (*_myStocks).push_back(tempStock); //Add element to vector
+        *_myIndex += 1; //Add to index
 
         wipeFile(2); //Wipe file
         writeFile(_stocks, &_index, 2, _balance, _date); //Update my stock file
