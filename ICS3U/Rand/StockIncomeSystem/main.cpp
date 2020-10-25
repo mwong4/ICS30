@@ -1,14 +1,15 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: October 23, 2020
+>- Updated: October 25, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
 Link image file
 Auction system
-    bidding intervals
-    making auction only appear once in a while
+    Test
+Saving data in .exe file
+Combo system
 */
 
 #include <iostream>
@@ -91,6 +92,8 @@ int main()
     vector<Stock> stockSelection; //This vector represents the available stocks
     int selectionSize = 0; //This determines the size of the selection
 
+    bool checkedAuction = false; //To limit the ability to check the auction to once per month
+
     //Get the stocks selection
     resetVector(&stockSelection, &selectionSize, 1, &myData.balance, &myData.timeKeeper);
 
@@ -145,6 +148,7 @@ int main()
         else if(inputValue == 2)
         {
             cout << " >- Ending month.... Updating balance" << endl;
+            checkedAuction = false; //Rest checked auction value
             system("CLS");
             updateMonth(&myData);
             system("PAUSE");
@@ -385,7 +389,23 @@ int main()
         }
         else
         {
-            auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper);
+            if(!checkedAuction) //If player has not checked the auction yet
+            {
+                if(rand() % 6 == 0) //Give auction 1/4 chance of appearing
+                {
+                    auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper); //call auction mode
+                }
+                else
+                {
+                    cout << endl << " >- Sorry, Auction not in session. 1/5 chance of appearing. Check again later" << endl;
+                }
+            }
+            else
+            {
+                cout << " >- Sorry, already checked Auction this month. Try again next month" << endl;
+            }
+            system("PAUSE");
+            system("CLS");
         }
 
     wipeFile(1); //Wipe file
@@ -739,6 +759,9 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
     int intervenePeriod = 2 + rand() % ((AUCTIONLIMIT/1000)-3);
     Stock tempStock;
 
+    int bidInterval = 100;
+    int intervalTotal = 1;
+
     //Randomly choose stock to auction -> Make sure the stock has not been sold yet
     do
     {
@@ -765,7 +788,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
 
     //Actual auction system
     cout << " >- Ready? Press any key to continue" << endl;
-    getch();
+    system("PAUSE");
 
     cout << "<<start>>" << endl;
     cout << " >- Value ||> " << value << endl;
@@ -783,8 +806,10 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
             {
                 if(rand() % 100 < odds && playerHasIt) //AI generates randomly if they want to bid higher. If yes, enter if
                 {
-                    cout << "<<Other Raises>> + $100" << endl;
-                    value += 100; //Increase value
+                    cout << "<<Other Raises>> + $" << bidInterval << endl;
+                    value += bidInterval; //Increase value
+                    intervalTotal ++; //Count how many intervals have been added
+                    cout << intervalTotal << endl;
                     cout << " >- Value ||> " << value << endl;
                     cout << "[" << AUCTIONLIMIT/1000 << "]" << endl;//Print initial time
                     timer = clock(); //Reset timer
@@ -800,6 +825,13 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
                         odds -= oddsIntervals - round(rand() % (oddsIntervals/3));
                     }
 
+                    if(intervalTotal >= 4) //for every 4 times someone bids add 50 dollars to the bidding interval
+                    {
+                        bidInterval = bidInterval * 2;
+                        oddsIntervals = round(oddsIntervals * 2);
+                        intervalTotal = 0;
+                    }
+
                     //Generate new intervention time
                     intervenePeriod = 2 + rand() % ((AUCTIONLIMIT/1000)-3);
                 }
@@ -810,10 +842,12 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
         {
             ///////////////////TODO: Make Intervals Varry//////////////////////////////////
 
-            if(*_balance > value + 100)
+            if(*_balance > value + bidInterval)
             {
-                cout << "<<Player Raises>> + $100" << endl;
-                value += 100; //Increase value
+                cout << "<<Player Raises>> + $" << bidInterval << endl;
+                value += bidInterval; //Increase value
+                intervalTotal ++; //Count how many intervals have been added
+                cout << intervalTotal << endl;
                 cout << " >- Value ||> " << value << endl;
                 cout << "[" << AUCTIONLIMIT/1000 << "]" << endl;//Print initial time
                 timer = clock(); //Reset timer
@@ -827,6 +861,13 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
                 else
                 {
                     odds -= oddsIntervals - round(rand() % (oddsIntervals/3));
+                }
+
+                if(intervalTotal >= 4) //for every 4 times someone bids add 50 dollars to the bidding interval
+                {
+                    bidInterval = bidInterval * 2;
+                    oddsIntervals = round(oddsIntervals * 2);
+                    intervalTotal = 0;
                 }
 
                 Sleep(200);

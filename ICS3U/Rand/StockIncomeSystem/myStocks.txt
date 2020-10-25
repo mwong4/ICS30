@@ -1,8 +1,2 @@
-9200
+10000
 0
-Facebook
-580
-65
-sold
-0
-Social Media Platform

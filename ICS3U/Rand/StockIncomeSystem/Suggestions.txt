@@ -1,5 +1,4 @@
 /////Suggestions/////
 -png++
--live auction style? ->convert to new
 -.dat?
 -combo system
