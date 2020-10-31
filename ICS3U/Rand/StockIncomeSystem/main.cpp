@@ -1,11 +1,10 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: October 25, 2020
+>- Updated: October 26, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
-Link image file
 Auction system
     Test
 Saving data in .exe file
@@ -13,16 +12,16 @@ Combo system
 */
 
 #include <iostream>
-#include <vector>     //For vectors
+#include <vector>        //For vectors
 #include <stdlib.h>
-#include <fstream>    //For txt file
-#include <limits>     //For error trapping
-#include <tgmath.h>   //For rounding
-#include <stdio.h>    //For NULL (srand)
-#include <stdlib.h>   //For srand, rand
-#include <time.h>     //For time
-#include <conio.h>    //For getch()
-#include <windows.h>  //For key detection
+#include <fstream>       //For txt file
+#include <limits>        //For error trapping
+#include <tgmath.h>      //For rounding
+#include <stdio.h>       //For NULL (srand)
+#include <stdlib.h>      //For srand, rand
+#include <time.h>        //For time
+#include <conio.h>       //For getch()
+#include <windows.h>     //For key detection
 
 using namespace std;
 
@@ -102,6 +101,8 @@ int main()
 
     while(inputValue < 7)
     {
+        auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper); //call auction mode
+
         cout << " >- Welcome, You have: ~" << round(myData.balance) << " hundred thousand dollars" << endl;
         cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars" << endl;
         cout << " >- Current Month Count: ||" << myData.timeKeeper << "||" << endl;
@@ -336,11 +337,11 @@ int main()
             else if(inputValue == 3) //If user chooses to search by cost range
             {
                 cout << endl << " >- Please enter the max value" << endl;
-                getAnswer(1000, 0, &rangeMax);
+                getAnswer(10000, 0, &rangeMax);
                 cout << " >- Please enter the min value" << endl;
-                getAnswer(1000, 0, &rangeMin);
+                getAnswer(10000, 0, &rangeMin);
 
-                searchRange(&stockSelection, selectionSize, &foundResults, &resultSize, rangeMax, rangeMin); //Call function to search for results
+                searchRange(&stockSelection, selectionSize, &foundResults, &resultSize, rangeMax + 1, rangeMin - 1); //Call function to search for results
 
                 if(resultSize != 0)
                 {
@@ -393,7 +394,7 @@ int main()
             {
                 if(rand() % 6 == 0) //Give auction 1/4 chance of appearing
                 {
-                    auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper); //call auction mode
+                    //auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper); //call auction mode
                 }
                 else
                 {
@@ -729,7 +730,7 @@ void searchRange(vector<Stock>* _stocks, int _stocksSize, vector<int>* _results,
     cout << " >- Searching..." << endl; //Print to console for indication
     for(int i = 0; i < _stocksSize; i++) //Search for matching name
     {
-        if(_min < (*_stocks)[i].cost < _max) //If match is found, save in result
+        if(_min < (*_stocks)[i].cost && (*_stocks)[i].cost < _max) //If match is found, save in result
         {
             counter ++;
             (*_results).push_back(i);
@@ -816,11 +817,11 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
                     playerHasIt = false;
 
                     //Affect the odds of the AI giving a response
-                    if(rand()%2 == 0)
+                    if(rand()%2 == 0 && oddsIntervals >= 3)
                     {
                         odds -= oddsIntervals + round(rand() % (oddsIntervals/3));
                     }
-                    else
+                    else if(oddsIntervals >= 3)
                     {
                         odds -= oddsIntervals - round(rand() % (oddsIntervals/3));
                     }
@@ -847,18 +848,17 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
                 cout << "<<Player Raises>> + $" << bidInterval << endl;
                 value += bidInterval; //Increase value
                 intervalTotal ++; //Count how many intervals have been added
-                cout << intervalTotal << endl;
                 cout << " >- Value ||> " << value << endl;
                 cout << "[" << AUCTIONLIMIT/1000 << "]" << endl;//Print initial time
                 timer = clock(); //Reset timer
                 playerHasIt = true;
 
                 //Affect the odds of the AI giving a response
-                if(rand()%2 == 0)
+                if(rand()%2 == 0 && oddsIntervals >= 3)
                 {
                     odds -= oddsIntervals + round(rand() % (oddsIntervals/3));
                 }
-                else
+                else if(oddsIntervals >= 3)
                 {
                     odds -= oddsIntervals - round(rand() % (oddsIntervals/3));
                 }
