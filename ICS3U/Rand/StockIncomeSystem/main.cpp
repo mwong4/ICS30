@@ -1,12 +1,10 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: October 26, 2020
+>- Updated: October 31, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
-Auction system
-    Test
 Saving data in .exe file
 Combo system
 */
