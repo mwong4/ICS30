@@ -6,13 +6,8 @@
 
 To Do
 -Search is finicky
--Stay in my stocks mode
 -Search by letter purchase wrong - Goes by index not by searched one
 -when selling back, doesnt switch back to unsold
-
--auction going mult
--Second pause - Auction
--Auction check can be triggered a lot?
 */
 
 #include <iostream>
@@ -159,86 +154,94 @@ int main()
         else if(inputValue == 3)
         {
             cout << endl << " >- Loading my stocks" << endl;
-            cout << " >- Please select a stock:" << endl << endl;
-            showStocks(&myData.index, myData.ownedStock, 2);
-            cout << " >- " << myData.index + 1 << ". To exit" << endl;
-            getAnswer(myData.index + 1, 1, &inputValue);
 
-            if(inputValue != myData.index + 1)
-            {
-                cout << endl << "////////////////////////////////////////////////////////////////" << endl << endl;
-                savedNumber = inputValue; //save number temp
+            do{
+                cout << " >- Please select a stock:" << endl << endl;
+                showStocks(&myData.index, myData.ownedStock, 2);
+                cout << " >- " << myData.index + 1 << ". To exit" << endl;
+                getAnswer(myData.index + 1, 1, &inputValue);
 
-                //get player input
-                cout << " >- 1 To Sell Stock. 2 To Upgrade Stock. 3 To Exit" << endl;
-                cout << ">- Upgrade cost: $" << round(myData.ownedStock[savedNumber-1].cost*0.2) << endl;
-                getAnswer(3, 1, &inputValue);
-
-                if(inputValue == 1)
+                if(inputValue != myData.index + 1)
                 {
-                    if(!myData.ownedStock[savedNumber-1].triedSelling)
+                    cout << endl << "////////////////////////////////////////////////////////////////" << endl << endl;
+                    savedNumber = inputValue; //save number temp
+
+                    //get player input
+                    cout << " >- 1 To Sell Stock. 2 To Upgrade Stock. 3 To Exit" << endl;
+                    cout << ">- Upgrade cost: $" << round(myData.ownedStock[savedNumber-1].cost*0.2) << endl;
+                    getAnswer(3, 1, &inputValue);
+
+                    if(inputValue == 1)
                     {
-                        cout << " >- Please enter a markup: "; //get player's markup
-                        getAnswer(2000, -myData.ownedStock[savedNumber-1].cost, &markup);
+                        if(!myData.ownedStock[savedNumber-1].triedSelling)
+                        {
+                            cout << " >- Please enter a markup: "; //get player's markup
+                            getAnswer(2000, -myData.ownedStock[savedNumber-1].cost, &markup);
 
-                        //Display availability
-                        cout << " >- Action Available: ";
-                        if(myData.ownedStock[savedNumber-1].triedSelling) cout << "No" << endl;
-                        else cout << "Yes" << endl;
-                        //Display Chanced
-                        cout << " >- Chance of success: " << 100 - round((markup*150)/myData.ownedStock[savedNumber-1].cost) - 20 + myData.ownedStock[savedNumber-1].timeOwned*1.5 << "%" << endl;
-                        //Breakdown
-                        cout << "             >- 100% - 20%(Base) - " << round((markup*150)/myData.ownedStock[savedNumber-1].cost) << "%(For Markup) + " << myData.ownedStock[savedNumber-1].timeOwned*1.5 << "%(Time Owned)" << endl;
-                        //Revenue
-                        cout << " >- Approximate Revenue: " << round(myData.ownedStock[savedNumber-1].cost + myData.ownedStock[savedNumber-1].cost*0.001*myData.ownedStock[savedNumber-1].timeOwned + markup) << endl << endl;
+                            //Display availability
+                            cout << " >- Action Available: ";
+                            if(myData.ownedStock[savedNumber-1].triedSelling) cout << "No" << endl;
+                            else cout << "Yes" << endl;
+                            //Display Chanced
+                            cout << " >- Chance of success: " << 100 - round((markup*150)/myData.ownedStock[savedNumber-1].cost) - 20 + myData.ownedStock[savedNumber-1].timeOwned*1.5 << "%" << endl;
+                            //Breakdown
+                            cout << "             >- 100% - 20%(Base) - " << round((markup*150)/myData.ownedStock[savedNumber-1].cost) << "%(For Markup) + " << myData.ownedStock[savedNumber-1].timeOwned*1.5 << "%(Time Owned)" << endl;
+                            //Revenue
+                            cout << " >- Approximate Revenue: " << round(myData.ownedStock[savedNumber-1].cost + myData.ownedStock[savedNumber-1].cost*0.001*myData.ownedStock[savedNumber-1].timeOwned + markup) << endl << endl;
 
-                        cout << " >- Are you sure? Press 1 for Yes. 2 for No" << endl;
-                        getAnswer(2, 1, &inputValue);
-                        if(inputValue == 1)
-                        {   //Spin the lottery wheel!
-                            if(rand()%100 > 100 - round((markup*150)/myData.ownedStock[savedNumber-1].cost) - 20 + myData.ownedStock[savedNumber-1].timeOwned*2)
-                            {
-                                cout << " >- Selling Failed" << endl;
-                                myData.ownedStock[savedNumber-1].triedSelling = true;
-                            }
-                            else
-                            {
-                                cout << " >- Sold Success" << endl;
-                                myData.balance += round(myData.ownedStock[savedNumber-1].cost + myData.ownedStock[savedNumber-1].cost*0.001*myData.ownedStock[savedNumber-1].timeOwned + markup); //Seel your item and get money
-                                myData.ownedStock.erase(myData.ownedStock.begin() + savedNumber-1); //Erase the chosen element
-                                myData.index --; //Decrease index
-
-                                counter = 0;
-                                while(myData.ownedStock[savedNumber-1].name != stockSelection[counter].name) //Search for sold stock in stock selection
+                            cout << " >- Are you sure? Press 1 for Yes. 2 for No" << endl;
+                            getAnswer(2, 1, &inputValue);
+                            if(inputValue == 1)
+                            {   //Spin the lottery wheel!
+                                if(rand()%100 > 100 - round((markup*150)/myData.ownedStock[savedNumber-1].cost) - 20 + myData.ownedStock[savedNumber-1].timeOwned*2)
                                 {
-                                    counter ++;
+                                    cout << " >- Selling Failed" << endl;
+                                    myData.ownedStock[savedNumber-1].triedSelling = true;
                                 }
-                                if(myData.ownedStock[savedNumber-1].name == stockSelection[counter].name) //Safety check
+                                else
                                 {
-                                    cout << "changed" << endl;
-                                    stockSelection[counter].status = "unsold"; //Set to unsold
+                                    cout << " >- Sold Success" << endl;
+                                    myData.balance += round(myData.ownedStock[savedNumber-1].cost + myData.ownedStock[savedNumber-1].cost*0.001*myData.ownedStock[savedNumber-1].timeOwned + markup); //Seel your item and get money
+                                    myData.ownedStock.erase(myData.ownedStock.begin() + savedNumber-1); //Erase the chosen element
+                                    myData.index --; //Decrease index
+
+                                    counter = 0;
+                                    while(myData.ownedStock[savedNumber-1].name != stockSelection[counter].name) //Search for sold stock in stock selection
+                                    {
+                                        counter ++;
+                                    }
+                                    if(myData.ownedStock[savedNumber-1].name == stockSelection[counter].name) //Safety check
+                                    {
+                                        cout << "changed" << endl;
+                                        stockSelection[counter].status = "unsold"; //Set to unsold
+                                    }
                                 }
                             }
                         }
+                        else cout << " >- Action not available" << endl;
                     }
-                    else cout << " >- Action not available" << endl;
-                }
-                else if(inputValue == 2)
-                {
-                    if(myData.balance >= round(myData.ownedStock[savedNumber-1].cost*0.2)) //If they have enough money
-                    {   //Update stock information with upgraded data
-                        myData.ownedStock[savedNumber-1].cost += round(myData.ownedStock[savedNumber-1].cost*0.1);
-                        myData.ownedStock[savedNumber-1].dividend += round(myData.ownedStock[savedNumber-1].dividend*0.15);
-                        myData.balance -= round(myData.ownedStock[savedNumber-1].cost*0.2);
-                        wipeFile(1); //Wipe file
-                        writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper); //Update my stock file
-                    }
-                    else //Print erro rotherwise
+                    else if(inputValue == 2)
                     {
-                        cout << " >- You do not have enough money" << endl;
+                        if(myData.balance >= round(myData.ownedStock[savedNumber-1].cost*0.2)) //If they have enough money
+                        {   //Update stock information with upgraded data
+                            myData.ownedStock[savedNumber-1].cost += round(myData.ownedStock[savedNumber-1].cost*0.1);
+                            myData.ownedStock[savedNumber-1].dividend += round(myData.ownedStock[savedNumber-1].dividend*0.15);
+                            myData.balance -= round(myData.ownedStock[savedNumber-1].cost*0.2);
+                            wipeFile(1); //Wipe file
+                            writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper); //Update my stock file
+                        }
+                        else //Print erro rotherwise
+                        {
+                            cout << " >- You do not have enough money" << endl;
+                        }
                     }
+                    inputValue = myData.index;
                 }
-            }
+            system("PAUSE");
+            system("CLS");
+
+            }while(inputValue != myData.index + 1); //Repeat until player chooses to exit
+
             inputValue = 3;
             system("PAUSE");
             system("CLS");
@@ -407,6 +410,7 @@ int main()
             {
                 cout << " >- Sorry, already checked Auction this month. Try again next month" << endl;
             }
+            checkedAuction = true; //Block auction from being checked until next month
             system("PAUSE");
             system("CLS");
         }
@@ -902,9 +906,6 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
     {
         cout << " to Other>>" << endl;
     }
-
-    system("PAUSE");//Pause temp
-    system("CLS"); //Wipe screen
 
     return; //Return to main()
 }
