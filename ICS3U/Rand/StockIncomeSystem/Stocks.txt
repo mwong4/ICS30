@@ -1,23 +1,23 @@
 Apple
 90
 90
-sold
+unsold
 0
 Most popular platforms include the mobile iphone and ipad series. Main desktop series is an integrated tower-monitor OSX series -> current version is El Capitain.
 Microsoft
-101
+500
 300
 unsold
 0
 Most popular platforms include Windows 7 and 10. Currently owners of multiple game franchises including Xbox and Minecraft.
 Google
-90
+300
 1400
 unsold
 0
 The most efficient and widely used search engin on earth. Offers multiple other software, web and hardware services.
 Facebook
-90
+1000
 650
 unsold
 0

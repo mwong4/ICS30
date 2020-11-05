@@ -6,7 +6,6 @@
 
 To Do
 -Search is finicky
--Search by letter purchase wrong - Goes by index not by searched one
 -when selling back, doesnt switch back to unsold
 */
 
@@ -315,15 +314,15 @@ int main()
                     if(inputValue < resultSize + 1)
                     {
                         savedNumber = inputValue - 1; //Save selected stock
-                        if(stockSelection[result].status == "unsold" && myData.balance > stockSelection[result].cost) //If stock is unsold offer purchase offer
+                        if(stockSelection[foundResults[savedNumber]].status == "unsold" && myData.balance > stockSelection[foundResults[savedNumber]].cost) //If stock is unsold offer purchase offer
                         {
                             cout << endl << " >- Would you like to purchase? Press 1 for Yes, 2 for No" << endl;
                             getAnswer(2, 1, &inputValue);
                             if(inputValue == 1) //If they say yes, purchase stock
                             {
-                                stockSelection[savedNumber].status = "sold";
-                                myData.balance -= stockSelection[savedNumber].cost; //Subtract from budget to purchase
-                                myData.ownedStock.push_back(stockSelection[savedNumber]); //Add element to vector
+                                stockSelection[foundResults[savedNumber]].status = "sold";
+                                myData.balance -= stockSelection[foundResults[savedNumber]].cost; //Subtract from budget to purchase
+                                myData.ownedStock.push_back(stockSelection[foundResults[savedNumber]]); //Add element to vector
                                 myData.index ++; //Add to index
 
                                 wipeFile(2); //Wipe file
@@ -366,15 +365,15 @@ int main()
                     if(inputValue < resultSize + 1)
                     {
                         savedNumber = inputValue - 1; //Save selected stock
-                        if(stockSelection[result].status == "unsold" && myData.balance > stockSelection[result].cost) //If stock is unsold offer purchase offer
+                        if(stockSelection[foundResults[savedNumber]].status == "unsold" && myData.balance > stockSelection[foundResults[savedNumber]].cost) //If stock is unsold offer purchase offer
                         {
                             cout << endl << " >- Would you like to purchase? Press 1 for Yes, 2 for No" << endl;
                             getAnswer(2, 1, &inputValue);
                             if(inputValue == 1) //If they say yes, purchase stock
                             {
-                                stockSelection[savedNumber].status = "sold";
-                                myData.balance -= stockSelection[savedNumber].cost; //Subtract from budget to purchase
-                                myData.ownedStock.push_back(stockSelection[savedNumber]); //Add element to vector
+                                stockSelection[foundResults[savedNumber]].status = "sold";
+                                myData.balance -= stockSelection[foundResults[savedNumber]].cost; //Subtract from budget to purchase
+                                myData.ownedStock.push_back(stockSelection[foundResults[savedNumber]]); //Add element to vector
                                 myData.index ++; //Add to index
 
                                 wipeFile(2); //Wipe file
