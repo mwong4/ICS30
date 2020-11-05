@@ -243,8 +243,6 @@ int main()
             }while(inputValue != myData.index + 1); //Repeat until player chooses to exit
 
             inputValue = 3;
-            system("PAUSE");
-            system("CLS");
         }
         else if(inputValue == 4)
         {
@@ -390,8 +388,9 @@ int main()
 
                 inputValue = 1;//Reset to some value between 1 & 5
             }
-        system("PAUSE");
-        system("CLS");
+
+            system("PAUSE"); //Clear console on input
+            system("CLS");
         }
         else
         {
