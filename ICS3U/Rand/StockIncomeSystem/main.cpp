@@ -1,12 +1,18 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: October 31, 2020
+>- Updated: Nov 5, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
-Saving data in .exe file
-Combo system
+-Search is finicky
+-Stay in my stocks mode
+-Search by letter purchase wrong - Goes by index not by searched one
+-when selling back, doesnt switch back to unsold
+
+-auction going mult
+-Second pause - Auction
+-Auction check can be triggered a lot?
 */
 
 #include <iostream>
@@ -62,7 +68,7 @@ void auctionMode(vector<Stock>*, int, vector<Stock>*, int*, float*, int*); //For
 
 //For auction mode
 const int AUCTIONLIMIT = 7000; //This is how long the auction timer goes before time is up
-const int BASEODDS = 30; //This is the baseline % odds at the price of stock in 100s
+const int BASEODDS = 20; //This is the baseline % odds at the price of stock in 100s
 const int RANDRANGE = 3; //This is the range od deviation that the odds have for the ai's interest
 
 int main()
@@ -99,8 +105,6 @@ int main()
 
     while(inputValue < 7)
     {
-        auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper); //call auction mode
-
         cout << " >- Welcome, You have: ~" << round(myData.balance) << " hundred thousand dollars" << endl;
         cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars" << endl;
         cout << " >- Current Month Count: ||" << myData.timeKeeper << "||" << endl;
@@ -392,7 +396,7 @@ int main()
             {
                 if(rand() % 6 == 0) //Give auction 1/4 chance of appearing
                 {
-                    //auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper); //call auction mode
+                    auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper); //call auction mode
                 }
                 else
                 {
@@ -767,7 +771,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
         target = rand() % _index;
         counter ++;
     }
-    while((*_stocks)[target].status == "sold" && counter < _index*5); //After a threshold of checks or found a good stock, quit
+    while(((*_stocks)[target].status == "sold" || bidInterval + 1 > (*_stocks)[target].cost) && counter < _index*5); //After a threshold of checks or found a good stock, quit
 
     if(counter >= _index*5) //If over threshhold, output and return
     {
