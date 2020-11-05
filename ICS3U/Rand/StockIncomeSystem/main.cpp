@@ -5,7 +5,8 @@
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
--Search is finicky
+-Search is finicky -> by range
+
 -when selling back, doesnt switch back to unsold
 */
 
@@ -416,6 +417,8 @@ int main()
 
     wipeFile(1); //Wipe file
     writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper); //Update my stock file
+    wipeFile(2); //Wipe file
+    writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper); //Update stockss file
     }
     return 0;
 }

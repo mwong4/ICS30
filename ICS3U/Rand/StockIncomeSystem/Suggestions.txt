@@ -2,20 +2,10 @@
 -png++
 -XML?
 -combo system
+-Search is finicky - by range
 
 -Random events?
 
 Some sort of risk
 -Or motivator
 	-die unless you buy something?
-
--Search is finicky
--auction going mult
--Bid on $100
--Second pause - Auction
--Auction check can be triggered a lot?
--Balance Auction, too op
--Mercy - crash? - too small of an interval
--Stay in my stocks mode
--Search by letter purchase wrong - Goes by index not by searched one
--when selling back, doesnt switch back to unsold
