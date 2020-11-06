@@ -5,7 +5,3 @@
 -Search is finicky - by range
 
 -Random events?
-
-Some sort of risk
--Or motivator
-	-die unless you buy something?

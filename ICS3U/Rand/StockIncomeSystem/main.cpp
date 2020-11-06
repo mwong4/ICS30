@@ -6,10 +6,6 @@
 
 To Do
 -Search is finicky -> by range
-
--Finances cost
-    -Increase Cap
-    -Increase days
 */
 
 #include <iostream>
@@ -69,6 +65,9 @@ const int AUCTIONLIMIT = 7000; //This is how long the auction timer goes before 
 const int BASEODDS = 20; //This is the baseline % odds at the price of stock in 100s
 const int RANDRANGE = 3; //This is the range od deviation that the odds have for the ai's interest
 
+const int CAPUPGRADE = 1500; //The cost to upgrade cap by 1
+const int LIFESPANUPGRADE = 400; //The cost to upgrade lifespan by 6 months
+
 int main()
 {
     srand (time(NULL)); //Randomize seed according to time
@@ -124,13 +123,15 @@ int main()
         system("CLS");
     }
 
-    while(inputValue < 7)
+    while(inputValue < 9)
     {
         cout << " >- Welcome, You have: ~" << round(myData.balance) << " hundred thousand dollars" << endl;
         cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars || " << myData.index << "/" << myData.cap << endl;
         cout << " >- Current Month Count: ||" << myData.timeKeeper << "||" << endl;
-        cout << " >- Press 1 to see stocks" << endl << " >- Press 2 to end month" << endl << " >- Press 3 to show my stocks" << endl << " >- Press 4 to add a stock" << endl << " >- Press 5 to search stock selection" << endl << " >- Press 6 to check auction" << endl << " >- Press 7 to quit" << endl;
-        getAnswer(7, 1, &inputValue);
+        cout << " >- Press 1 to see stocks" << endl << " >- Press 2 to end month" << endl << " >- Press 3 to show my stocks" << endl << " >- Press 4 to add a stock" << endl;
+        cout << " >- Press 5 to search stock selection" << endl << " >- Press 6 to check auction" << endl;
+        cout << " >- Press 7 to upgrade cap (1 spot/$" << CAPUPGRADE << ")" << endl << " >- Press 8 to upgrade lifespan (6 months/$" << LIFESPANUPGRADE << ")" << endl << " >- Press 9 to quit" << endl;
+        getAnswer(9, 1, &inputValue);
 
         if(inputValue == 1)
         {
@@ -459,6 +460,46 @@ int main()
             }
 
             checkedAuction = true; //Block auction from being checked until next month
+            system("PAUSE");
+            system("CLS");
+        }
+        else if(inputValue == 7)
+        {
+            cout << endl;
+            if(myData.balance > CAPUPGRADE)
+            {
+                cout << " >- Are you sure? 1 for yes" << endl;
+                getAnswer(2, 1, &inputValue);
+                if(inputValue == 1)
+                {
+                    myData.balance -= CAPUPGRADE;
+                    myData.cap ++;
+                }
+            }
+            else
+            {
+                cout << " >- Not enough Money" << endl;
+            }
+            system("PAUSE");
+            system("CLS");
+        }
+        else if(inputValue == 8)
+        {
+            cout << endl;
+            if(myData.balance > LIFESPANUPGRADE)
+            {
+                cout << " >- Are you sure? 1 for yes" << endl;
+                getAnswer(2, 1, &inputValue);
+                if(inputValue == 1)
+                {
+                    myData.balance -= LIFESPANUPGRADE;
+                    myData.timeKeeper += 6;
+                }
+            }
+            else
+            {
+                cout << " >- Not enough Money" << endl;
+            }
             system("PAUSE");
             system("CLS");
         }
