@@ -1,13 +1,15 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: Nov 5, 2020
+>- Updated: Nov 6, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
 -Search is finicky -> by range
 
--when selling back, doesnt switch back to unsold
+-Finances cost
+    -Increase Cap
+    -Increase days
 */
 
 #include <iostream>
@@ -44,6 +46,7 @@ struct UserData
     float balance; //This represents the amout of money you have
     int timeKeeper; //keeps track of the time
     vector<Stock> ownedStock; //This vector saves all the stock you have
+    int cap; //This is the cap for the amount of stocks
 };
 
 
@@ -51,9 +54,9 @@ void showStocks(int*, vector<Stock>, int); //This function is in charge of displ
 float countIncome(int*, vector<Stock>); //This function is in charge of finding and returning your monthly income
 void resetData(UserData*); //This resets user data as the initializer
 void updateMonth(UserData*); //This ends your turn/month
-void resetVector(vector<Stock>*, int*, int, float*, int*); //This function is used to find each line in the stock file and save it into the vector
+void resetVector(vector<Stock>*, int*, int, float*, int*, int*); //This function is used to find each line in the stock file and save it into the vector
 void getAnswer(int, int, int*); //Function used to get the players response as an integer (with error trapping)
-void writeFile(vector<Stock>*, int*, int, float*, int*); //This function is in charge of saving the vector into the txt file
+void writeFile(vector<Stock>*, int*, int, float*, int*, int); //This function is in charge of saving the vector into the txt file
 void wipeFile(int); //Wipe file
 void addStock(vector<Stock>*, int*, float*, int*); //Used to add a new stock
 void searchName(vector<Stock>*, int, int*, string); //For finding a stock by name
@@ -93,18 +96,41 @@ int main()
     bool checkedAuction = false; //To limit the ability to check the auction to once per month
 
     //Get the stocks selection
-    resetVector(&stockSelection, &selectionSize, 1, &myData.balance, &myData.timeKeeper);
+    resetVector(&stockSelection, &selectionSize, 1, &myData.balance, &myData.timeKeeper, &myData.cap);
 
     //Get user owned stocks
-    resetVector(&myData.ownedStock, &myData.index, 2, &myData.balance, &myData.timeKeeper);
+    resetVector(&myData.ownedStock, &myData.index, 2, &myData.balance, &myData.timeKeeper, &myData.cap);
+
+    //Start Menu, indicated by 0 money and 0 days
+    if(myData.balance == 0 && myData.timeKeeper == 0 && myData.cap == 0)
+    {
+        cout << " >- Welcome, please choose your difficulty" << endl;
+        cout << " [1] casual" << endl << " [2] normal" << endl << " [3] challenge" << endl << " [4] sandbox" << endl;
+        getAnswer(4, 1, &inputValue);
+
+        if(inputValue == 4) //If sandbox mode chosen
+        {
+            myData.cap = 1000; //Set cap to infinite
+            myData.balance = 10000; //Set start money to a lot
+            myData.timeKeeper = 10000; //Set days to a lot
+        }
+        else
+        {
+            myData.cap = (4 - inputValue)*3; //Set cap to proper amount
+            myData.balance = (4 - inputValue)*50; //Set start money to proper amount
+            myData.timeKeeper = 60*inputValue; //Set days to proper amount
+        }
+        system("PAUSE"); //wait for player input before wiping console
+        system("CLS");
+    }
 
     while(inputValue < 7)
     {
         cout << " >- Welcome, You have: ~" << round(myData.balance) << " hundred thousand dollars" << endl;
-        cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars" << endl;
+        cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars || " << myData.index << "/" << myData.cap << endl;
         cout << " >- Current Month Count: ||" << myData.timeKeeper << "||" << endl;
-        cout << " >- Press 1 to see stocks" << endl << " >- Press 2 to end month" << endl << " >- Press 3 to show my stocks" << endl << " >- Press 4 to add a stock" << endl << " >- Press 5 to search stock selection" << endl << " >- Press 6 to check auction" << endl;
-        getAnswer(6, 1, &inputValue);
+        cout << " >- Press 1 to see stocks" << endl << " >- Press 2 to end month" << endl << " >- Press 3 to show my stocks" << endl << " >- Press 4 to add a stock" << endl << " >- Press 5 to search stock selection" << endl << " >- Press 6 to check auction" << endl << " >- Press 7 to quit" << endl;
+        getAnswer(7, 1, &inputValue);
 
         if(inputValue == 1)
         {
@@ -116,7 +142,7 @@ int main()
 
             if(inputValue != selectionSize + 1)
             {
-                if(myData.balance > stockSelection[inputValue-1].cost)
+                if(myData.balance > stockSelection[inputValue-1].cost && myData.index < myData.cap )
                 {
                     if(stockSelection[inputValue-1].status == "unsold")
                     {
@@ -126,7 +152,7 @@ int main()
                         myData.index ++; //Add to index
 
                         wipeFile(2); //Wipe file
-                        writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper); //Update my stock file
+                        writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper, 0); //Update my stock file
                     }
                     else
                     {
@@ -135,7 +161,7 @@ int main()
                 }
                 else
                 {
-                    cout << " >- You do not have enough money" << endl;
+                    cout << " >- You do not have enough money or cap space" << endl;
                 }
             }
 
@@ -149,6 +175,17 @@ int main()
             checkedAuction = false; //Rest checked auction value
             system("CLS");
             updateMonth(&myData);
+
+            //Check for game over conditions
+            if(myData.timeKeeper <= -1)
+            {
+                for(int i = 0; i < 10; i++) //Print game over message 10 times
+                {
+                    cout << "GAME OVER" << endl;
+                }
+                inputValue = 10; //Set value to quit game
+            }
+
             system("PAUSE");
         }
         else if(inputValue == 3)
@@ -228,7 +265,7 @@ int main()
                             myData.ownedStock[savedNumber-1].dividend += round(myData.ownedStock[savedNumber-1].dividend*0.15);
                             myData.balance -= round(myData.ownedStock[savedNumber-1].cost*0.2);
                             wipeFile(1); //Wipe file
-                            writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper); //Update my stock file
+                            writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper, myData.cap); //Update my stock file
                         }
                         else //Print erro rotherwise
                         {
@@ -272,7 +309,7 @@ int main()
                     cout << " >- Months Owned|| " << stockSelection[result].timeOwned << endl;
                     cout << " >- Extra Info|| " << stockSelection[result].extraInfo << endl << endl;
 
-                    if(stockSelection[result].status == "unsold" && myData.balance > stockSelection[result].cost) //If stock is unsold offer purchase offer
+                    if(stockSelection[result].status == "unsold" && myData.balance > stockSelection[result].cost && myData.index < myData.cap) //If stock is unsold offer purchase offer
                     {
                         cout << endl << " >- Would you like to purchase? Press 1 for Yes, 2 for No" << endl;
                         getAnswer(2, 1, &inputValue);
@@ -284,8 +321,12 @@ int main()
                             myData.index ++; //Add to index
 
                             wipeFile(2); //Wipe file
-                            writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper); //Update my stock file
+                            writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper, 0); //Update my stock file
                         }
+                    }
+                    else
+                    {
+                        cout << " >- [ERROR] Purchase cannot proceed" << endl;
                     }
                 }
             }
@@ -313,7 +354,7 @@ int main()
                     if(inputValue < resultSize + 1)
                     {
                         savedNumber = inputValue - 1; //Save selected stock
-                        if(stockSelection[foundResults[savedNumber]].status == "unsold" && myData.balance > stockSelection[foundResults[savedNumber]].cost) //If stock is unsold offer purchase offer
+                        if(stockSelection[foundResults[savedNumber]].status == "unsold" && myData.balance > stockSelection[foundResults[savedNumber]].cost && myData.index < myData.cap) //If stock is unsold offer purchase offer
                         {
                             cout << endl << " >- Would you like to purchase? Press 1 for Yes, 2 for No" << endl;
                             getAnswer(2, 1, &inputValue);
@@ -325,12 +366,12 @@ int main()
                                 myData.index ++; //Add to index
 
                                 wipeFile(2); //Wipe file
-                                writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper); //Update my stock file
+                                writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper, 0); //Update my stock file
                             }
                         }
                         else
                         {
-                            cout << " >- Unable to purchase..." << endl;
+                            cout << " >- [ERROR] Purchase cannot proceed" << endl;
                         }
                     }
                 }
@@ -364,7 +405,7 @@ int main()
                     if(inputValue < resultSize + 1)
                     {
                         savedNumber = inputValue - 1; //Save selected stock
-                        if(stockSelection[foundResults[savedNumber]].status == "unsold" && myData.balance > stockSelection[foundResults[savedNumber]].cost) //If stock is unsold offer purchase offer
+                        if(stockSelection[foundResults[savedNumber]].status == "unsold" && myData.balance > stockSelection[foundResults[savedNumber]].cost && myData.index  < myData.cap) //If stock is unsold offer purchase offer
                         {
                             cout << endl << " >- Would you like to purchase? Press 1 for Yes, 2 for No" << endl;
                             getAnswer(2, 1, &inputValue);
@@ -376,12 +417,12 @@ int main()
                                 myData.index ++; //Add to index
 
                                 wipeFile(2); //Wipe file
-                                writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper); //Update my stock file
+                                writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper, 0); //Update my stock file
                             }
                         }
                         else
                         {
-                            cout << " >- Unable to purchase..." << endl;
+                            cout << " >- [ERROR] Purchase cannot proceed" << endl;
                         }
                     }
                 }
@@ -392,32 +433,40 @@ int main()
             system("PAUSE"); //Clear console on input
             system("CLS");
         }
-        else
+        else if(inputValue == 6)
         {
-            if(!checkedAuction) //If player has not checked the auction yet
+            if(myData.index < myData.cap)
             {
-                if(rand() % 6 == 0) //Give auction 1/4 chance of appearing
+                if(!checkedAuction) //If player has not checked the auction yet
                 {
-                    auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper); //call auction mode
+                    if(rand() % 6 == 0) //Give auction 1/4 chance of appearing
+                    {
+                        auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper); //call auction mode
+                    }
+                    else
+                    {
+                        cout << endl << " >- Sorry, Auction not in session. 1/5 chance of appearing. Check again later" << endl;
+                    }
                 }
                 else
                 {
-                    cout << endl << " >- Sorry, Auction not in session. 1/5 chance of appearing. Check again later" << endl;
+                    cout << " >- Sorry, already checked Auction this month. Try again next month" << endl;
                 }
             }
             else
             {
-                cout << " >- Sorry, already checked Auction this month. Try again next month" << endl;
+                cout << " >- Cap is full" << endl;
             }
+
             checkedAuction = true; //Block auction from being checked until next month
             system("PAUSE");
             system("CLS");
         }
 
     wipeFile(1); //Wipe file
-    writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper); //Update my stock file
+    writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper, myData.cap); //Update my stock file
     wipeFile(2); //Wipe file
-    writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper); //Update stockss file
+    writeFile(&stockSelection, &selectionSize, 2, &myData.balance, &myData.timeKeeper, 0); //Update stockss file
     }
     return 0;
 }
@@ -462,7 +511,7 @@ void resetData(UserData* _data)
 //This ends your turn/month
 void updateMonth(UserData* _data)
 {
-    (*_data).timeKeeper ++;
+    (*_data).timeKeeper --;
     (*_data).balance += countIncome(&(*_data).index, (*_data).ownedStock);
 
     for(int i = 0; i < (*_data).index; i++) //For each stock owned, increase time owned by a month
@@ -496,19 +545,19 @@ void addStock(vector<Stock>* _stocks, int* _size, float* _balance, int* _date)
     *_size += 1; //Update index
 
     wipeFile(2); //Wipe file
-    writeFile(_stocks, _size, 2, _balance, _date); //Update the stock file
+    writeFile(_stocks, _size, 2, _balance, _date, 0); //Update the stock file
     return;
 }
 
 //This function is used to find each line in the stock file and save it into the vector
-void resetVector(vector<Stock>* _stocks, int* _size, int _file, float* _balance, int* _date)
+void resetVector(vector<Stock>* _stocks, int* _size, int _file, float* _balance, int* _date, int* _cap)
 {
     string line; //String line used to seperate the text file into lines
     ifstream stockFile_("Stocks.txt"); //This is the map file
     ifstream myStocksFile_("myStocks.txt"); //This is the map file
     Stock tempStock; //This is a temporary stock
 
-    int lineRow = -2; //This integer keeps count of the row number for the saving in array
+    int lineRow = -3; //This integer keeps count of the row number for the saving in array
 
     if(stockFile_.is_open() && _file == 1) //If instricted to save the file
     {
@@ -551,13 +600,17 @@ void resetVector(vector<Stock>* _stocks, int* _size, int _file, float* _balance,
         {
             if(lineRow < 0)
             {
-                if(lineRow == -2) //Run at very start
+                if(lineRow == -3) //Run at very start
                 {
-                    *_balance = atoi(line.c_str());
+                    *_balance = atoi(line.c_str()); //update balance
                 }
-                if(lineRow == -1) //Run at very start
+                if(lineRow == -2)
                 {
-                    *_date = atoi(line.c_str());
+                    *_date = atoi(line.c_str()); //update date
+                }
+                if(lineRow == -1)
+                {
+                    *_cap = atoi(line.c_str()); //update cap
                 }
             }
             else if(lineRow % 6 == 0)
@@ -623,7 +676,7 @@ void getAnswer (int _maxLimit, int _minLimit, int* _value)
 }
 
 //This function is in charge of saving the vector into the txt file
-void writeFile(vector<Stock>* _stocks, int* _size, int _file, float* _balance, int* _date)
+void writeFile(vector<Stock>* _stocks, int* _size, int _file, float* _balance, int* _date, int _cap)
 {
     ofstream myfile;
     ofstream stockFile;
@@ -632,6 +685,7 @@ void writeFile(vector<Stock>* _stocks, int* _size, int _file, float* _balance, i
         myfile.open("myStocks.txt"); //Open files
         myfile << *_balance << endl; //Add balance on first line
         myfile << *_date << endl; //Add date to second line
+        myfile << _cap << endl; //Add cap to third line
     }
     else if(_file == 2)
     {
@@ -901,7 +955,7 @@ void auctionMode(vector<Stock>* _stocks, int _index, vector<Stock>* _myStocks, i
         *_myIndex += 1; //Add to index
 
         wipeFile(2); //Wipe file
-        writeFile(_stocks, &_index, 2, _balance, _date); //Update my stock file
+        writeFile(_stocks, &_index, 2, _balance, _date, 0); //Update my stock file
     }
     else
     {
