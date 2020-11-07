@@ -443,6 +443,7 @@ int main()
                 inputValue = 1;//Reset to some value between 1 & 5
             }
 
+            foundResults.clear(); //make sure to reset vector for next use
             system("PAUSE"); //Clear console on input
             system("CLS");
         }
