@@ -8,6 +8,4 @@
 
 -Search by letter and name returning weird sometimes
 	-Array retains info?
--Increase Auction rate
--Auction indicator
 -Are you sure on quit

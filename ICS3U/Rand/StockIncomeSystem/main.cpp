@@ -6,8 +6,6 @@
 
 To Do
 -Search is finicky -> by range
-
-test
 */
 
 #include <iostream>
@@ -66,6 +64,7 @@ void auctionMode(vector<Stock>*, int, vector<Stock>*, int*, float*, int*); //For
 const int AUCTIONLIMIT = 7000; //This is how long the auction timer goes before time is up
 const int BASEODDS = 20; //This is the baseline % odds at the price of stock in 100s
 const int RANDRANGE = 3; //This is the range od deviation that the odds have for the ai's interest
+const int AUCTIONRATE = 5; //This defines how often the auction kicks in
 
 const int CAPUPGRADE = 1500; //The cost to upgrade cap by 1
 const int LIFESPANUPGRADE = 400; //The cost to upgrade lifespan by 6 months
@@ -82,6 +81,7 @@ int main()
     int markup = 0; //How much the player is willing to mark up their product
     int counter = 0; //For search function/system
     int randNum = 0; //Rand num assigned by the computer
+    int auctionRand = rand() % AUCTIONRATE; //This random number is devoted to the auction system. Start rand
 
     string keyWord = " ";
     char keyLetter = ' ';
@@ -131,8 +131,16 @@ int main()
         cout << " >- Your monthly income is: ~" << countIncome(&myData.index, myData.ownedStock) << " hundred thousand dollars || " << myData.index << "/" << myData.cap << endl;
         cout << " >- Current Month Count: ||" << myData.timeKeeper << "||" << endl;
         cout << " >- Press 1 to see stocks" << endl << " >- Press 2 to end month" << endl << " >- Press 3 to show my stocks" << endl << " >- Press 4 to add a stock" << endl;
-        cout << " >- Press 5 to search stock selection" << endl << " >- Press 6 to check auction" << endl;
-        cout << " >- Press 7 to upgrade cap (1 spot/$" << CAPUPGRADE << ")" << endl << " >- Press 8 to upgrade lifespan (6 months/$" << LIFESPANUPGRADE << ")" << endl << " >- Press 9 to quit" << endl;
+        cout << " >- Press 5 to search stock selection" << endl << " >- Press 6 to check auction";
+        if(auctionRand == 0) //If auction is available, show
+        {
+            cout << " (available)";
+        }
+        else
+        {
+            cout << " (CLOSED)";
+        }
+        cout << endl << " >- Press 7 to upgrade cap (1 spot/$" << CAPUPGRADE << ")" << endl << " >- Press 8 to upgrade lifespan (6 months/$" << LIFESPANUPGRADE << ")" << endl << " >- Press 9 to quit" << endl;
         getAnswer(9, 1, &inputValue);
 
         if(inputValue == 1)
@@ -188,6 +196,8 @@ int main()
                 }
                 inputValue = 10; //Set value to quit game
             }
+
+            auctionRand = rand() % AUCTIONRATE; //Determine in advance if auction will happen
 
             system("PAUSE");
         }
@@ -442,13 +452,13 @@ int main()
             {
                 if(!checkedAuction) //If player has not checked the auction yet
                 {
-                    if(rand() % 6 == 0) //Give auction 1/4 chance of appearing
+                    if(auctionRand == 0) //Give auction 1/4 chance of appearing
                     {
                         auctionMode(&stockSelection, selectionSize, &myData.ownedStock, &myData.index, &myData.balance, &myData.timeKeeper); //call auction mode
                     }
                     else
                     {
-                        cout << endl << " >- Sorry, Auction not in session. 1/5 chance of appearing. Check again later" << endl;
+                        cout << endl << " >- Sorry, Auction not in session. 1/" << AUCTIONRATE  - 1 << " chance of appearing. Check again later" << endl;
                     }
                 }
                 else
