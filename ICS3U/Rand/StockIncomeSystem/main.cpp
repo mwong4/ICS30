@@ -515,6 +515,17 @@ int main()
             system("PAUSE");
             system("CLS");
         }
+        else
+        {
+            //Confirm with user before they quit
+            cout << " >- Are you sure you want to quit? Press 1 to confirm" << endl;
+            getAnswer(2, 1, &inputValue);
+            if(inputValue != 1) //if they answer no, make sure not to trigger quit
+            {
+                inputValue = 1;
+            }
+
+        }
 
     wipeFile(1); //Wipe file
     writeFile(&myData.ownedStock, &myData.index, 1, &myData.balance, &myData.timeKeeper, myData.cap); //Update my stock file
