@@ -1,7 +1,7 @@
 /*
 >- Author: Max Wong
 >- Date: February 11, 2019
->- Updated: Nov 6, 2020
+>- Updated: Nov 7, 2020
 >- Purpose: To write a program to practice vectors and pointers
 
 To Do
@@ -117,7 +117,7 @@ int main()
         {
             myData.cap = (4 - inputValue)*3; //Set cap to proper amount
             myData.balance = (4 - inputValue)*50; //Set start money to proper amount
-            myData.timeKeeper = 60*inputValue; //Set days to proper amount
+            myData.timeKeeper = 60*(4 - inputValue); //Set days to proper amount
         }
         system("PAUSE"); //wait for player input before wiping console
         system("CLS");
