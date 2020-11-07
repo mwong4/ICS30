@@ -115,9 +115,9 @@ int main()
         }
         else
         {
-            myData.cap = (4 - inputValue)*3; //Set cap to proper amount
+            myData.cap = inputValue + 2; //Set cap to proper amount
             myData.balance = (4 - inputValue)*50; //Set start money to proper amount
-            myData.timeKeeper = 60*(4 - inputValue); //Set days to proper amount
+            myData.timeKeeper = 40 + 40*(4 - inputValue); //Set days to proper amount
         }
         system("PAUSE"); //wait for player input before wiping console
         system("CLS");
@@ -194,7 +194,7 @@ int main()
             cout << endl << " >- Loading my stocks" << endl;
 
             do{
-                cout << " >- Please select a stock:" << endl << endl;
+                cout << " >- Please select a stock:" << endl << " >- Balance: " << myData.balance << " hundred thousand dollars" << endl << endl;
                 showStocks(&myData.index, myData.ownedStock, 2);
                 cout << " >- " << myData.index + 1 << ". To exit" << endl;
                 getAnswer(myData.index + 1, 1, &inputValue);
@@ -292,7 +292,7 @@ int main()
         {
             cout << endl << " >- What would you like to search with" << endl; //Display options and get input
             cout << " >- [1] To search by name" << endl << " >- [2] To search by first letter" << endl << " >- [3] To search by cost range" << endl << " >- [4] To quit" << endl;
-            getAnswer(3, 1, &inputValue);
+            getAnswer(4, 1, &inputValue);
 
             if(inputValue == 1) //If user chooses to search by name
             {
